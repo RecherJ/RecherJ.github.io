@@ -1,0 +1,345 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>RecherJ&#39;s Blog</title>
+    <link>https://recher.github.io/</link>
+    <description>Recent content on RecherJ&#39;s Blog</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>en-CH</language>
+    <lastBuildDate>Sun, 06 May 2018 14:38:37 +0000</lastBuildDate>
+    
+	<atom:link href="https://recher.github.io/index.xml" rel="self" type="application/rss+xml" />
+    
+    
+    <item>
+      <title>重拾博客</title>
+      <link>https://recher.github.io/blog/%E9%87%8D%E6%8B%BE%E5%8D%9A%E5%AE%A2/</link>
+      <pubDate>Sun, 06 May 2018 14:38:37 +0000</pubDate>
+      
+      <guid>https://recher.github.io/blog/%E9%87%8D%E6%8B%BE%E5%8D%9A%E5%AE%A2/</guid>
+      <description>最近一直督促自己要把荒废的博客捡起来，之前搭建这个也是为了督促自己学习、写作、不断巩固学到的知识。
+ 懒惰真是自己最大的敌人
+ 今天看了下，16年时还记录的蛮多，整个17年就荒废了，说好的知识点、读书笔记呢？？真是惭愧惭愧&amp;hellip;
+这个博客主题也从最开始 very simple 到后面的 cactus-dark 再多现在的 apollo ，最终定下这款主题，也是因为简洁大方，就看不厌，毕竟一个良好美观的界面也会让自己坚持下去 [一个颜值党的自我安慰🤣]
+后面的目标是讲在作者的基础修改，因为这也不是我最终想要的效果，后面一点点完成，也算是给自己立个flag吧。
+今年也有很多可写的，最后都因为懒惰没有付诸行动。
+不能懒不能懒不能懒，重要的事说三遍</description>
+    </item>
+    
+    <item>
+      <title>初识CATextLayer</title>
+      <link>https://recher.github.io/blog/%E5%88%9D%E8%AF%86catextlayer/</link>
+      <pubDate>Fri, 03 Feb 2017 11:17:25 +0000</pubDate>
+      
+      <guid>https://recher.github.io/blog/%E5%88%9D%E8%AF%86catextlayer/</guid>
+      <description>用户界面是无法从一个单独的图片里面构建的。一个设计良好的图标能够很好地表现一个按钮或控件的意图，不过你迟早都要需要一个不错的老式风格的文本标签。
+如果你想在一个图层里面显示文字，完全可以借助图层代理直接将字符串使用 Core Graphics 写入图层的内 容(这就是UILabel的精髓)。如果越过寄宿于图层的视图,直接在图层上操作,那其实相当繁琐。你要为每一个显示文字的图层创建一个能像图层代理一样工作的类,还要逻辑上判断哪个图层需要显示哪个字符串,更别提还要记录不同的字体,颜色等一系列乱七八糟的东西。
+万幸的是这些都是不必要的, Core Animation 提供了一个 CALayer 的子类 CATextLayer ,它以图层的形 式包含了 UILabel 几乎所有的绘制特性,并且额外提供了一些新的特性。
+同样, CATextLayer 也要比 UILabel 渲染得快得多。很少有人知道在iOS 6及之前的版本, UILabel 其实是通过 WebKit 来实现绘制的，这样就造成了当有很多文字的时候就会有极大的性能压力。而 CATextLayer 使用了 Core text ，并且渲染得非常快。
+让我们来尝试用 CATextLayer 来显示一些文字。代码如下：
+@interface ViewController () @property (nonatomic, weak) IBOutlet UIView *labelView; @end @implementation ViewController - (void)viewDidLoad { [super viewDidLoad]; //create a text layer CATextLayer *textLayer = [CATextLayer layer]; textLayer.frame = self.labelView.bounds; [self.labelView.layer addSublayer:textLayer]; //set text attributes textLayer.foregroundColor = [UIColor blackColor].</description>
+    </item>
+    
+    <item>
+      <title>Shadowsocks配合Proxifier实现Mac全局科学上网</title>
+      <link>https://recher.github.io/blog/shadowsocks%E9%85%8D%E5%90%88proxifier%E5%AE%9E%E7%8E%B0mac%E5%85%A8%E5%B1%80%E7%A7%91%E5%AD%A6%E4%B8%8A%E7%BD%91/</link>
+      <pubDate>Wed, 25 Jan 2017 13:05:43 +0000</pubDate>
+      
+      <guid>https://recher.github.io/blog/shadowsocks%E9%85%8D%E5%90%88proxifier%E5%AE%9E%E7%8E%B0mac%E5%85%A8%E5%B1%80%E7%A7%91%E5%AD%A6%E4%B8%8A%E7%BD%91/</guid>
+      <description>前些天写了一篇给git设置全局代理的笔记，使用后发现不是很完美，利用connect接管了git的SSH使得像SourceTree这样的第三方GUI的git管理软件没有办法使用。并且curl、wget等在终端中跑的命令也是不能解决，局限性很大。
+ 所以，Proxifier的出现像一个救世主，完美解决了像我这种不能翻墙就会死的人的痛点。  关于Proxifier的使用，我就不在累赘，网上关于proxifier的配置文章实在太多。这里需要感谢一下 @似水无痕 对我的帮助，推荐一下他的简书地址似水无痕的小窝。
+这里需特别说明一点，Proxifier有一个关于DNS的配置
+ 强烈建议勾选使用Resolve hostnames through proxy，即使用代理服务器DNS解析。
+ 系统default是上一个选项，即使用ISP分配给你的DNS。众所周知，国内网络有墙，如使用这种被污染的DNS是无法请求你需要的网址，所以建议使用你ss里的代理服务器DNS。
+关于Proxifier配置使用的详细讲解，推荐 @似水无痕 同学的一篇博文
+解决 mac （windows）终端上代理的难题</description>
+    </item>
+    
+    <item>
+      <title>配合Shadowsocks为git配置SSH全局代理突破GFW</title>
+      <link>https://recher.github.io/blog/%E9%85%8D%E5%90%88shadowsocks%E4%B8%BAgit%E9%85%8D%E7%BD%AEssh%E5%85%A8%E5%B1%80%E4%BB%A3%E7%90%86%E7%AA%81%E7%A0%B4gfw/</link>
+      <pubDate>Tue, 17 Jan 2017 10:27:52 +0000</pubDate>
+      
+      <guid>https://recher.github.io/blog/%E9%85%8D%E5%90%88shadowsocks%E4%B8%BAgit%E9%85%8D%E7%BD%AEssh%E5%85%A8%E5%B1%80%E4%BB%A3%E7%90%86%E7%AA%81%E7%A0%B4gfw/</guid>
+      <description>更新说明  2017-01-17 初稿 2017-01-18 用 ssh:// 协议全局替换 https:// 协议  由于国内的特殊的网络环境，在某些特殊地方GFW更加凶残，github和国内的CSDN博客等网站居然都是封堵的，这让我们这些只想安静的写两行代码与世界的程序员交流(clone第三方框架)的美好愿望都无法实现。
+由于对github的限制，让在terminal中的一些命令异常难执行。国内的程序员在科学上网也是*八仙过海，各显神通*。几种主流的何学上网手段：
+ VPN shadowsock lantern  先说VPN，本想买个VPN一劳永逸，免得在翻墙上浪费太多时间，结果经过测试，发现VPN在这种特殊地方管控更加严格，连他们的自己都回复说由于国家对你们网络管制太严格，VPN无法稳定的使用。所以VPN这条路是行不通。国外的VPN也许可以，但由于价位太高，出于成本考虑我没有进行测试，但也估计很难达到稳定的效果。
+ss的稳定家喻户晓，我也长期再用。但局限性大家都知道，这种智能代理浏览器中的http和https请求，对于在一些终端中要跑的命令还是无法解决。
+lantern相同，如果你只是想上上YouTube或Google等浏览一下网页，我想免费的lantern已经足够用了。
+写代码免不了要与git打交道，中断不通相当于自断一臂。 &amp;gt; 为了解决这个问题网上各种搜索查阅，花了2天时间，目前已经可以实现SSH方式自由的访问github
+准备工作  shadowsocks一枚 connect 系统已安装git  开始配置 ss建议直接购买，网上很多，不要自己搭建因为付费的速度非常快，个人香港节点全天看YouTube1080p视频无压力。
+首先，ss直接全局模式
+connect直接利用sourcetree软件clone到本地
+cd connect # 编译 make # 然后将编译得到的文件connect拷贝到bin目录 cp connect /usr/local/bin  修改ssh的配置文件(没有就新建一个)
+vi ~/.ssh/config  # 全局 ProxyCommand connect -S 127.0.0.1:1080 %h %p # 只为特定域名设定 Host github.com ProxyCommand connect -S 127.0.0.1:1080 %h %p  建议直接使用全局模式，直接#注释针对个别域名的代理</description>
+    </item>
+    
+    <item>
+      <title>Projects</title>
+      <link>https://recher.github.io/projects/</link>
+      <pubDate>Sun, 02 Oct 2016 22:55:05 -0400</pubDate>
+      
+      <guid>https://recher.github.io/projects/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>App打包时遇大量警告解决办法</title>
+      <link>https://recher.github.io/blog/app%E6%89%93%E5%8C%85%E6%97%B6%E9%81%87%E5%A4%A7%E9%87%8F%E8%AD%A6%E5%91%8A%E8%A7%A3%E5%86%B3%E5%8A%9E%E6%B3%95/</link>
+      <pubDate>Thu, 05 May 2016 09:44:33 +0000</pubDate>
+      
+      <guid>https://recher.github.io/blog/app%E6%89%93%E5%8C%85%E6%97%B6%E9%81%87%E5%A4%A7%E9%87%8F%E8%AD%A6%E5%91%8A%E8%A7%A3%E5%86%B3%E5%8A%9E%E6%B3%95/</guid>
+      <description>昨天在对App进行最后一次小修小布后，准备进行第一个版本的打包上架，在真机运行和调试时都没有问题，但是当Archive时一下呼呼出现了89个警告，我想当时我的表情应该是这样的 这么多警告，能上架吗？？？ ！！
+几乎全是类似于这样的警告 xxxx.pch No such file or directory
+warning: /var/folders/_j/hqhnz9xd2qv_39dd1vdmw1nc0000gn/C/org.llvm.clang.tarekskr/ModuleCache/2YCOBXU93NY4O/UIKit-1MCEWB5GAZIR1.pcm: No such file or directory  其实之前也遇到过，但是当时没管，想的反正又不是报错，程序能跑不就完了，但是一想到苹果那严苛的审核机制，万一遇上个心情不好的，拒绝后我再提上去，一个月过去了。。 想到这，我还是不要挑战苹果的底线，老老实实改警告
+于是各种Google呀，各种查，stackoverflow上和Apple Developer Forums遇到过这个问题的人倒也挺多，大概看了一下，很多人说这是Xcode7 beta版的问题，没有什么好的解决办法，也有人说这是编译时链接问题，想办法绕过就可以了，于是我参照了别人的解决方案修改了一下几个编译链接的设置
+- Precompile Prefix (GCC_PRECOMPILE_PREFIX_HEADER) = NO - Debug Information Format (DEBUG_INFORMATION_FORMAT) = DWARF with dSYM - Enabled Modules (C and Objective-C) (CLANG_ENABLE_MODULES) = NO  Lots of warnings when building with Xcode 7 with 3rd party libraries
+Warnings creating dSYM in Xcode beta 6
+Warnings with STV 5.</description>
+    </item>
+    
+    <item>
+      <title>dyld: Library not loaded: /System/Library/Frameworks/ModelIO.framework/XXXX问题解决</title>
+      <link>https://recher.github.io/blog/dyld-library-not-loaded-system-library-frameworks-modelio-framework-xxxx%E9%97%AE%E9%A2%98%E8%A7%A3%E5%86%B3/</link>
+      <pubDate>Thu, 05 May 2016 09:28:46 +0000</pubDate>
+      
+      <guid>https://recher.github.io/blog/dyld-library-not-loaded-system-library-frameworks-modelio-framework-xxxx%E9%97%AE%E9%A2%98%E8%A7%A3%E5%86%B3/</guid>
+      <description>29号用朋友4s（iOS 8.4.1）真机调试时，编译时没问题，运行时程序直接奔溃，控制台打印出现了这样一个问题 dyld: Library not loaded: /System/Library/Frameworks/ModelIO.framework/ModelIO Referenced from: /var/mobile/Applications/。。。。。 Reason: image not found  后来Google了一下，网上也有人遇到过，是因为导入的框架引起的，将ModelIO.framework这个框架的status改为可选的即可(Optional)
+参考链接 xcode解决问题dyld: Library not loaded(AdSupport.framework)</description>
+    </item>
+    
+    <item>
+      <title>根据不同控制器自动切换横竖屏</title>
+      <link>https://recher.github.io/blog/%E6%A0%B9%E6%8D%AE%E4%B8%8D%E5%90%8C%E6%8E%A7%E5%88%B6%E5%99%A8%E8%87%AA%E5%8A%A8%E5%88%87%E6%8D%A2%E6%A8%AA%E7%AB%96%E5%B1%8F/</link>
+      <pubDate>Thu, 21 Apr 2016 22:51:27 +0000</pubDate>
+      
+      <guid>https://recher.github.io/blog/%E6%A0%B9%E6%8D%AE%E4%B8%8D%E5%90%8C%E6%8E%A7%E5%88%B6%E5%99%A8%E8%87%AA%E5%8A%A8%E5%88%87%E6%8D%A2%E6%A8%AA%E7%AB%96%E5%B1%8F/</guid>
+      <description>准备制作自己的第一款App,但是遇到一个技术上问题： &amp;gt; 如何在当前控制器modal出下一个控制器时自动将屏幕切换成横屏模式。
+技术点：
+  App是否支持横竖屏由plist中的配置文件决定，这个设置在PROJECT-&amp;gt;Deployment Info中设置  一个ViewController是否支持横竖屏由这个函数控制supportedInterfaceOrientations
+ 如果当前嵌套了TabBarController和NavigationController之后情况和直接使用UIViewController是不一样的，这里*岁寒*说的很好 &amp;gt;&amp;gt; 跟 shouldAutorotate() 不同，判断是否应该改变 APP 屏幕方向并不会检测当前显示的 View Controller 的属性，而是去检测根 View Controller 的属性，所以我们要从 TabBarController 一路获取到当前 View Controller。
+ 当modal出来的控制嵌套了导航控制器时，需要对导航控制器重写supportedInterfaceOrientations方法，来控制其子控制器。
+ 当第一个控制器modal出第二个控制器，设置其屏幕模式
+  - (IBAction)playClick { VideoViewController *vc = [[VideoViewController alloc] init]; YGNavigationController *nav = [[YGNavigationController alloc] initWithRootViewController:vc]; nav.orientation = VideoOrientationLandscapeLeft; [self.navigationController presentViewController:nav animated:YES completion:nil]; }   为导航控制器定义一个枚举，表示其横竖屏  #import &amp;lt;UIKit/UIKit.h&amp;gt; typedef enum : NSUInteger { VideoOrientationLandscapeLeft = 1, VideoOrientationPortrait = 2 } VideoOrientation; @interface YGNavigationController : UINavigationController @property (assign, nonatomic) VideoOrientation orientation; @end  这样第一个控制才能拿到这个属性，进行修改。</description>
+    </item>
+    
+    <item>
+      <title>Mac下利用github和Hexo搭建个人博客（二）</title>
+      <link>https://recher.github.io/blog/mac%E4%B8%8B%E5%88%A9%E7%94%A8github%E5%92%8Chexo%E6%90%AD%E5%BB%BA%E4%B8%AA%E4%BA%BA%E5%8D%9A%E5%AE%A2%E4%BA%8C/</link>
+      <pubDate>Mon, 18 Apr 2016 16:32:46 +0000</pubDate>
+      
+      <guid>https://recher.github.io/blog/mac%E4%B8%8B%E5%88%A9%E7%94%A8github%E5%92%8Chexo%E6%90%AD%E5%BB%BA%E4%B8%AA%E4%BA%BA%E5%8D%9A%E5%AE%A2%E4%BA%8C/</guid>
+      <description>补上4月9号要写的后续搭建博客 利用Google搜索关键字“Hexo+github+个人博客”可以足足搜出4页之多，大家已经非常详尽的写了如果利用github和Hexo搭建个人的博客。我就不在阐述，Hexo上也有非常详尽的教程。这里只是总结一下基本的要点，和注意事项，记录一下帮助我以后如果重装系统或更换电脑重新搭建使用。
+首先，默认已经安装了Node。
+安装Hexo：  现在安装Hexo到本机上 bash npm install hexo -g  执行上面的命令时最好开着VPN，因为不科学上上网可能导致部分插件安装不完整 然后在需要创建博客的目录下面，输入一下命令 ```bash hexo init blog cd blog npm install hexo server   - 这时，在浏览器输入`http://0.0.0.0:4000/` 就可以看到本地静态的博客样式了，里面默认会有一篇`hello world` ### 设置github - 默认已经拥有github账号。 - 在github上新建一个仓库以`yourname.github.io`命名。 - 在本地配置用户名和邮箱 ```bash git config --global user.name yourname git config --global user.email youremail   查看当前所有的配置 bash git config -l  cd进blog目录下将github上的仓库clone下来  发布博客 cd进blog目录下，里面有个_config.yml配置文件
+vim _config.yml  里面有个deploy字段
+deploy: type: git repository: https://github.</description>
+    </item>
+    
+    <item>
+      <title>OC下runtime获取类私有成员属性</title>
+      <link>https://recher.github.io/blog/oc%E4%B8%8Bruntime%E8%8E%B7%E5%8F%96%E7%B1%BB%E7%A7%81%E6%9C%89%E6%88%90%E5%91%98%E5%B1%9E%E6%80%A7/</link>
+      <pubDate>Mon, 18 Apr 2016 11:36:36 +0000</pubDate>
+      
+      <guid>https://recher.github.io/blog/oc%E4%B8%8Bruntime%E8%8E%B7%E5%8F%96%E7%B1%BB%E7%A7%81%E6%9C%89%E6%88%90%E5%91%98%E5%B1%9E%E6%80%A7/</guid>
+      <description>苹果的runtime运行机制还是非常强大的，掌握runtime对开发帮助是如虎添翼。因为有些类的私有成员属性是不暴漏在外供开发者使用的，但是有时，如果我们知道了这些属性对开发来说事半功倍，省去很多麻烦。
+下面介绍一个runtime中的C语言函数，可以找出这些藏在类中的私有成员属性。使用方法也很简单，首先导入头文件#import &amp;quot;objc/runtime.h&amp;quot;,这样就可以敲出下面这个方法
+class_copyIvarList(Class cls, unsigned int *outCount)  两个参数：第一个传入你想获取的类，第二个传入一个整型的总数count的地址，它会返回这个总数给你。 这个函数返回的是一个Ivar类型的指针对象，该指针指向每一个属性的地址，其实就是一个数组，遍历这个数组，就可以取出所有的私有成员变量了。 注意点：该列表返回的属性中，只有本来的私有成员属性，不包含继承父类的。
+Ivar *ivars = class_copyIvarList([UIGestureRecognizer class], &amp;amp;count); for (int i = 0; i &amp;lt; count; i++) { Ivar ivar = ivars[i]; //获取属性名 NSString *ivarName = @(ivar_getName(ivar)); NSLog(@&amp;quot;%@&amp;quot;, ivarName); }  获取到私有的成员属性后，就可以利用KVC来取出对应的值，非常方便。
+例如，可以利用这个方法在系统手势的基础上，增加一个自定义的返回手势
+系统的返回手势，只有在靠近左边滑动时才会有返回效果，如果我们希望在中间向右滑动也有返回效果的话，我们可以自己添加一个手势，将其添加到导航控制的View上，调用系统自带的target选择子，来实现该功能
+首先，禁用系统自带的滑动返回手势
+self.interactivePopGestureRecognizer.enabled = NO;  新建一个手势，将其添加到导航控制器View上
+UIPanGestureRecognizer *pan = [[UIPanGestureRecognizer alloc] initWithTarget:target action:@selector(handleNavigationTransition:)]; [self.view addGestureRecognizer:pan];  这里target对象就是利用KVC模式取出的target
+NSArray *targets= [self.interactivePopGestureRecognizer valueForKeyPath:@&amp;quot;_targets&amp;quot;]; id objc = [targets firstObject]; id target = [objc valueForKeyPath:@&amp;quot;_target&amp;quot;];  这样即使滑动中间也会有返回手势了，并且与系统自带的靠边返回不冲突。但是，如果当前的导航控制的栈顶控制器是自身的话，我们其实是需要将这个手势禁用的。因为，当前栈中已经没有需要出栈的控制器了。 UIGestureRecognizerDelegate代理方法中有一个监听手势是否可用的方法，返回YES时手势可用。 给刚才自己添加的pan手势设置代理</description>
+    </item>
+    
+    <item>
+      <title>linker command failed with exit code 1 (use -vto see invocation)原因和解决</title>
+      <link>https://recher.github.io/blog/linker-command-failed-with-exit-code-1-use-vto-see-invocation-%E5%8E%9F%E5%9B%A0%E5%92%8C%E8%A7%A3%E5%86%B3/</link>
+      <pubDate>Sun, 17 Apr 2016 18:22:27 +0000</pubDate>
+      
+      <guid>https://recher.github.io/blog/linker-command-failed-with-exit-code-1-use-vto-see-invocation-%E5%8E%9F%E5%9B%A0%E5%92%8C%E8%A7%A3%E5%86%B3/</guid>
+      <description>今天在写代码是遇到一个问题，编译时通不过，报“linker command failed with exit code 1 (use -vto see invocation)”错误，其实之前也遇到过，但是不理明白怎么去解决，就绕开了。。今天Google了一下说是可能是因为相同的.m文件造成的。 参考链接
+但是我这没有同名的两个类，怎么会存在这样的问题呢。但是貌似理解了，应该是两个文件中定义了相同内容的东西，导致编译时生成了相同的.o文件导致。 检查发现时因为在appDelegate.m文件中加入了一个通知，同时在发送通知的类中也加入了相同的通知声明
+NSString * const YGNewFeatureStartBtnClickNotification = @&amp;quot;YGNewFeatureStartBtnClickNotification&amp;quot;;  于是将这段代码加入到了pch文件中声明成全局的，删掉了appDelegate中和发通知类中的相同申明，但是编译还是不通过。
+提示还是appDelagate.o文件和YGNewFeatureController.o文件有冲突，可能是直接将这个定义加入pch中不行，从新建立了一个继承自NSObject的类，专门用来申明全局使用到的常量 .h中加入
+/** * 切换根控制器通知 */ UIKIT_EXTERN NSString * const YGNewFeatureStartBtnClickNotification;  .m中具体实现
+NSString * const YGNewFeatureStartBtnClickNotification = @&amp;quot;YGNewFeatureStartBtnClickNotification&amp;quot;;  搞定~</description>
+    </item>
+    
+    <item>
+      <title>《不是每个故事都有解决》-读书笔记</title>
+      <link>https://recher.github.io/blog/%E4%B8%8D%E6%98%AF%E6%AF%8F%E4%B8%AA%E6%95%85%E4%BA%8B%E9%83%BD%E6%9C%89%E7%BB%93%E5%B1%80-%E8%AF%BB%E4%B9%A6%E7%AC%94%E8%AE%B0/</link>
+      <pubDate>Sat, 16 Apr 2016 21:07:23 +0000</pubDate>
+      
+      <guid>https://recher.github.io/blog/%E4%B8%8D%E6%98%AF%E6%AF%8F%E4%B8%AA%E6%95%85%E4%BA%8B%E9%83%BD%E6%9C%89%E7%BB%93%E5%B1%80-%E8%AF%BB%E4%B9%A6%E7%AC%94%E8%AE%B0/</guid>
+      <description>这是一本情感故事类的书，一本闲书。 亚马逊购买链接
+作者王豕，是我在知乎上认识的一个大V，此人有留学经历，御姐一枚，聪颖漂亮，才华横溢，又会撩汉。比较欣赏。在学习新浪微博项目时顺便关注了她，然后得知其花了一年时间写了一本书，个人首部作品，在微博上卖的拼命，不惜爆照来换取粉丝买书，也是感叹太拼了，哈哈哈哈哈。就决定买来读一读。
+前前后后零散的花了2天时间读完，一本情感类书籍，每一节是一个故事。通俗的白话，没有深奥的哲理意义，作者借用书中主人公的身份讲述她的留学经历和生活经历，以及对感情等个人价值观。
+有别于我听过、读过或看过的其他女作家，王豕个人这部作品，没有矫情的文字，缠绵的爱情桥段或错综复杂的情感纠葛，冷静、平和的以一个旁观者的身份讲述了身边一起留学的朋友和自己的情感经历。看着不酸不腻，处处彰显着一个现代成熟的独立女性个人魅力。
+ 故事的主人公于一，一个从小叛逆与众不同的女孩子，读完大学后决定留学法国，在国外合租结识了一起求学的柯米和董荷蔓，作者以于一的身份讲述了她们几个的爱情观和现实经历，同时表达了作者对感情，人生的一些看法。
+ 里面有几处作者的人生观独白，还是非常不错。由于来了朋友，仓促将书籍借于他，没来的及记录下来。简单的写写，没有什么太大的感触，毕竟已经不是情窦初开的少年了，也没那么多感慨，买的目的就是用来写代码累了拿来休息休息，另外看作者卖书也是蛮拼。
+如果闲着，可以买来一读，还是可以看看，以一个女性的角度去了解一下女性对爱情价值观。</description>
+    </item>
+    
+    <item>
+      <title>《Effective Objective-2.0》读书笔记一</title>
+      <link>https://recher.github.io/blog/effective-objective-2-0%E8%AF%BB%E4%B9%A6%E7%AC%94%E8%AE%B0%E4%B8%80/</link>
+      <pubDate>Tue, 12 Apr 2016 23:18:10 +0000</pubDate>
+      
+      <guid>https://recher.github.io/blog/effective-objective-2-0%E8%AF%BB%E4%B9%A6%E7%AC%94%E8%AE%B0%E4%B8%80/</guid>
+      <description> 这本书也是我之前在一篇别人推荐的移动开发必读的书单中看到的，这本被重点推荐。然后上亚马逊看了一下大家的评价，还不错，就决定买了，不过就是挺贵的，69软妹。。 但我觉得挺值得，非常值得一看。
+与其他的iOS开发书籍翻译官方文档不同，这个书的作者是一个位有着非常丰富开发经验的老外，从事iOS和Mac开发多年。积累下的52条纯干货，真的很干。。看完一遍，其实很多还是没有什么太深的体会，网上也是建议大家有2到3年开发经验的读者阅读，书中的知识点覆盖非常全面，基本把所有OC开发中可能遇到的坑都总结出来了。
+下面简单写一些我看完后的认识：
+熟悉Objective-c  知道了OC是一门消息语言，在运行期才会检查对象的类型。 除非确有必要，不要在头文件中导入其他类的头文件，降低耦合性，采用向前声明来引入其他类，即@class 类名的方式。 作者推荐使用字面量语法来创建字符串、数组、数值、字典。如果值一旦为nil，就会奔溃，方便调试。 头文件中声明的全局常量有EXTERN来声明，并用该类的类名做前缀。  对象、消息、运行期  类族模式可以把实现细节隐藏在一套简单的公共接口后面 给某对象“发送消息”也就相当于在该对象上“调用方法”。 对象会把无法解读的消息转发给其他对象来处理，如果经过一层层转发后还是没有对象能处理，那么就抛出异常提示，程序奔溃。 方法调配也称“黑魔法”，这个技术是在运行期将两个方法互换调用，一般可以给那些不知道具体实现的方法增加日志记录功能，一般在调试时使用，但是也要慎用，不然代码将非常难读懂。 每个OC对象实例都是指向某块内存数据的指针。 isMemberOfClass:可以判断出对象是否为某个特定类的实例，isKindOfClass:可以判断出独享是否为某类或派生类的实例。 某个对象可能会把收到的所有选择子转发给另外一个对象，这样的对象叫代理proxy，此对象均以NSProxy为根类；  接口与API设计  给类名或方法名添加前缀，避免与系统的或其他的冲突。 如果父类的初始化方法不试用于子类，那么应该复写这个父类的方法，并在其中抛出异常。 debugDescription方法是开发者在调试器中以控制台命令打印对象时才调用。 对外公布的成员属性，应设置成只读readonly，不让外界随意修改变量，保证一些封装的功能能正常运行。 在公共接口中声明的属性，可以在分类中重新声明为可读可写。 命名一定要规范，简洁、易理解，可以为一些私有方法增加前缀与共有方法加以区分。 在可变对象上调用copy方法会返回另外一个不可变类的实例。 若想让自己所写的对象具备拷贝功能，则需实现NSCopying协议。  协议与分类  委托模式（代理模式）为对象提供一套接口，使其可由此将相关事件告知其他对象 当某个对象需要从另外一个对象获取数据时，可以使用委托模式，在这种情况下，该模式也称“数据源协议”。 善于利用分类，将实现代码划分成易于管理的各小块。 将分类方法加入类中这一操作是在运行期系统加载分类时完成的。运行期系统会把分类中所实现的每个方法都加入类的方法列表中。如果类中本来就有此方法，分类又实现了一次，就会覆盖原来的方法，多次覆盖的结果以最后一次为准。 给第三方类中添加分类时，应该给名称和方法都加上自己的前缀。 把封装数据所用的全部属性都定义在主接口中，不要在分类中增加属性，但是可以增加方法。 协议可在某种程度上提供匿名类型，具体的对象类型可以淡化成遵从某协议的id类型，协议里规定了对象所应实现的方法。  内存管理  引用计数机制通过可以递增或递减计数器来管理内存，对象创建好后，其保留计数器为1，若引用一次，会+1，当计数器降为0时，对象即被销毁。 ARC管理对象生命期的办法基本上就是：在合适的地方插入“保留”及“释放”操作。在ARC环境下，变量的内存管理语义可以通过修饰符指明，而原来则需要手工执行“保留”和“释放”操作。 ARC只负责管理Objective-C对象的内存，CoreFoundation对象不管理 在dealloc方法中取消订阅的“键值观察（KVO）”或NSNotificationCenter通知。 block块中一定要用弱引用，不然会产生保留环，对象不能被销毁。 合理利用自动释放池，可以降低程序的内存峰值。 系统在回收对象时不会将其真的回收，而是把它转化成僵尸对象。通过环境变量NSZombieEnabled可开启此功能。 不要使用retainCount，任何时间点上的“绝对保留计数”都无法反正生命期的全貌，所以这个保留计数其实是不准确的。  块与大中枢派发  在块中的所有变量都可以被其捕获，默认情况下，被块捕获的变量是不可以在块里修改的，声明变量时在前面加上__block修饰符，这样就可以在块中修改了。 建议为所有的块都定义别名，这样可以令块更加易读，更重要的是，如果一处块的参数变量修改了，那么不定义的话，其他用到该块的地方都要修改，而创建了typedef的则不用，扩展性更好 块可以使业务逻辑更加紧凑，联系性更好。 将同步与异步派发结合起来，可以实现与普通加锁机制一样的同步行为，这样不会阻塞执行异步派发线程。 通过dispatch_once函数执行只需要执行一次的线程代码。  </description>
+    </item>
+    
+    <item>
+      <title>手势识别器几个重要知识点</title>
+      <link>https://recher.github.io/blog/%E6%89%8B%E5%8A%BF%E8%AF%86%E5%88%AB%E5%99%A8%E5%87%A0%E4%B8%AA%E9%87%8D%E8%A6%81%E7%9F%A5%E8%AF%86%E7%82%B9/</link>
+      <pubDate>Mon, 11 Apr 2016 22:21:53 +0000</pubDate>
+      
+      <guid>https://recher.github.io/blog/%E6%89%8B%E5%8A%BF%E8%AF%86%E5%88%AB%E5%99%A8%E5%87%A0%E4%B8%AA%E9%87%8D%E8%A6%81%E7%9F%A5%E8%AF%86%E7%82%B9/</guid>
+      <description>今天复习了一下手势识别器，UIGestureRecognizer类 该类中包含以下几个子类
+ UITapGestureRecognizer(敲击) UIPinchGestureRecognizer(捏合，用于缩放) UIPanGestureRecognizer(拖拽) UISwipeGestureRecognizer(轻扫) UIRotationGestureRecognizer(旋转) UILongPressGestureRecognizer(长按)  UISwipeGestureRecognizer 其中轻扫手势有一个扫动方向，direction属性，支持4个方向的扫动，是一个枚举。不设置默认是向右扫动。如果想支持多个方向的扫动，需要给该控件添加多个手势即可。
+UIPanGestureRecognizer  - translationInView:方法返回一个在该控件上移动的点。所以可以改变该控件的transform值来实现拖拽的效果，实现代码如下：  // 获取移动点 CGPoint transP = [pan translationInView:self.imageView]; self.imageView.transform = CGAffineTransformTranslate(self.imageView.transform, transP.x, transP.y); // 复位 [pan setTranslation:CGPointZero inView:self.imageView];   改变了控件的transform的属性后一定要将移动点置零，不然会有一个叠加效果，会在当前的transform基础上继续叠加，类似于一个加速度的概念。  [pan setTranslation:CGPointZero inView:self.imageView];  UIRotationGestureRecognizer  旋转手势有一个旋转角度的属性rotation属性，改变这个值可完成旋转的效果 但同样，当改变控件的transform属性后也是要清空这个rotation，性质类似于拖拽手势的translation。  此外，需要支持多个手势复合识别，需要实现UIGestureRecognizerDelegate代理协议中的一个- (BOOL)gestureRecognizer: shouldRecognizeSimultaneouslyWithGestureRecognizer:方法，返回Yes，代表支持多个手势识别。</description>
+    </item>
+    
+    <item>
+      <title>访问通信录-适配iOS7</title>
+      <link>https://recher.github.io/blog/%E8%AE%BF%E9%97%AE%E9%80%9A%E4%BF%A1%E5%BD%95-%E9%80%82%E9%85%8Dios7/</link>
+      <pubDate>Sat, 09 Apr 2016 21:48:42 +0000</pubDate>
+      
+      <guid>https://recher.github.io/blog/%E8%AE%BF%E9%97%AE%E9%80%9A%E4%BF%A1%E5%BD%95-%E9%80%82%E9%85%8Dios7/</guid>
+      <description>昨天学习iOS中访问用户通信录的一个框架AddressBookUI.framework,这是个自带UI界面的系统框架,第一次访问要获得用户的授权. 因为是已经封装好的所以,用起来也比较方便
+ 导入框架#import &amp;lt;AddressBookUI/AddressBookUI.h&amp;gt; 创建控制器
+ABPeoplePickerNavigationController *Vc = [[ABPeoplePickerNavigationController alloc] init];  设置控制器为代理,监听通信录控制器弹出后用户的点击操作
+Vc.peoplePickerDelegate = self;  弹出
+[self presentViewController:Vc animated:YES completion:nil];  ABPeoplePickerNavigationControllerDelegate代理协议中,有两个方法可以监听用户点击操作的方法 ```objc
+ (void)peoplePickerNavigationController:(ABPeoplePickerNavigationController *)peoplePicker didSelectPerson:(ABRecordRef)person;
+ (void)peoplePickerNavigationController:(ABPeoplePickerNavigationController *)peoplePicker didSelectPerson:(ABRecordRef)person property:(ABPropertyID)property identifier:(ABMultiValueIdentifier)identifier ``` 这两个方法的区别在于: 第一个方法是监听到用户点击了某个联系人时就会调用,并自动关闭页面;第二个在于点击了某个具体联系人后会自动跳转到对应联系人的详情页面,在点击具体属性时便会调用,这个方法会把这个property值传递过来,拿到这个值就可以具体获取一些具体信息了. 点击右上角的 Cancel按钮后会将 modal出来的界面关闭,同时调用cancel方法
+  - (void)peoplePickerNavigationControllerDidCancel:(ABPeoplePickerNavigationController *)peoplePicker  以上效果均是在iOS9.2模拟器上测试的结果
+为了测试真机,我将部署版本改成了 iOS7.1之后运行在我的4S老爷机上之后,发现这两个方法不调用,而且 modal 出来的控制器也关闭不了 =。=
+google了一下,发现原来- (void)peoplePickerNavigationController:peoplePicker didSelectPerson:和- (void)peoplePickerNavigationController:peoplePicker didSelectPerson: property: identifier:这两个方法,是从iOS8之后才有用的,而 iOS7及以前都是要用- (BOOL)peoplePickerNavigationController:shouldContinueAfterSelectingPerson:和- (BOOL)peoplePickerNavigationController:shouldContinueAfterSelectingPerson:property:identifier:这两个方法,和iOS8之后的两个方法类似,只是iOS8之后过期了.
+所以如果要适配更低的版本时,这两个过期的方法还是非常必要的.同时在 iOS7中- (void)peoplePickerNavigationControllerDidCancel:方法也是要自己手动弹出控制器.iOS8之后会自动弹出,所以为了适配,保证iOS7-iOS9均有效,手动dismiss掉.</description>
+    </item>
+    
+    <item>
+      <title>There was an internal API error的解决方法</title>
+      <link>https://recher.github.io/blog/there-was-an-internal-api-error%E7%9A%84%E8%A7%A3%E5%86%B3%E6%96%B9%E6%B3%95/</link>
+      <pubDate>Sat, 09 Apr 2016 21:45:48 +0000</pubDate>
+      
+      <guid>https://recher.github.io/blog/there-was-an-internal-api-error%E7%9A%84%E8%A7%A3%E5%86%B3%E6%96%B9%E6%B3%95/</guid>
+      <description>今天在真机调试二维码功能时遇到一个这样的问题&amp;rdquo;There was an internal API error&amp;rdquo;:
+Google 后发现原来是product name在作怪,我之前这个程序使用了中文命名,只要将这个改成英文就 OK 了.
+具体操作路径bulid settings -&amp;gt; packaging -&amp;gt; product name</description>
+    </item>
+    
+    <item>
+      <title>故事不一定有标题</title>
+      <link>https://recher.github.io/blog/%E6%95%85%E4%BA%8B%E4%B8%8D%E4%B8%80%E5%AE%9A%E6%9C%89%E6%A0%87%E9%A2%98/</link>
+      <pubDate>Sat, 09 Apr 2016 21:42:06 +0000</pubDate>
+      
+      <guid>https://recher.github.io/blog/%E6%95%85%E4%BA%8B%E4%B8%8D%E4%B8%80%E5%AE%9A%E6%9C%89%E6%A0%87%E9%A2%98/</guid>
+      <description>我想，有些也堪称不了故事。
+这段故事，没有结尾，没有升华，更没有跌宕的情节。
+14年8月到今天，19个月。我不知是怎么从煎熬中一路走来，数不清的夜晚，寂寞与痛苦交织，撕扯着思绪，苦苦难以入眠。想必，人大抵都是孤独的，一个人来到这个世界，一个人离去。 昨日，许久未联系的朋友突然发来了消息，带来了她的音讯，问我想不想知道，万千思绪涌起，不甘与倔强，最总还是咬牙说出了“算了”。
+ 人心，是最复杂的迷宫
+ 越来越喜欢，思绪在心里嚼烂，哭也要笑着。 我不知道放下是一种怎么样的心态，我也不明白，为什么明明心里要想，去还是固执违心的说出了相反的话。成年人嘴里的成熟是不是就是这样，逼着一个人慢慢长大。虽然，我不知道她转述了什么，但此刻，我觉得也不必要了，我要的也许就是 各自安好，相忘于江湖……
+一时间想起，那句不知道出处的话
+ 青春的残酷在于，你尚未意识到某人某事对你的一生有多深远的影响、或者觉得自己还有无数推倒重来的机会，于是就轻率的错过了他们。成年人的残酷在于，你已知某人某事是此生最爱，失去后永不再来，依然咬牙闭眼，狠心错过。
+ 错过，就错过吧。</description>
+    </item>
+    
+    <item>
+      <title>《百思不得姐》项目总结-63个知识点</title>
+      <link>https://recher.github.io/blog/%E7%99%BE%E6%80%9D%E4%B8%8D%E5%BE%97%E5%A7%90%E9%A1%B9%E7%9B%AE%E6%80%BB%E7%BB%93-63%E4%B8%AA%E7%9F%A5%E8%AF%86%E7%82%B9/</link>
+      <pubDate>Sat, 09 Apr 2016 21:03:47 +0000</pubDate>
+      
+      <guid>https://recher.github.io/blog/%E7%99%BE%E6%80%9D%E4%B8%8D%E5%BE%97%E5%A7%90%E9%A1%B9%E7%9B%AE%E6%80%BB%E7%BB%93-63%E4%B8%AA%E7%9F%A5%E8%AF%86%E7%82%B9/</guid>
+      <description>从2月12日开始到3月9日，一个月学习这个项目收获了很多知识点，给自己总结出来，方便以后查看。 - 控制器的view加载完毕，首先在- (void)viewDidLoad方法中添加 下拉刷新 的控件；
+1.1将添加下拉刷新控件封装一个函数`- (void)setupRefresh`，该方法中添加`MJRefresh`框架的header控件 1.2写一个头部控件调用的刷新方法`- (void)loadNewTopics`，里面写发送网络请求代码   在成功返回的block中调用endRefreshing将Header控件隐藏起来，当然失败一样也要影藏起来；
+ 一进来TableView就应该自动刷新，所以在- (void)setupRefresh方法中添加完header控件，就调用它的beginRefreshing方法，让其自动刷新；
+ 利用header的automaticallyChangeAlpha(YES)属性自动改变header的透明度，让其影藏，解决下图效果问题
+   利用MJRefreshAutoNormalFooter类添加footer控件，一开始设置footer控件hidden属性为YES隐藏；
+5.1MJRefreshAutoNormalFooter类的footer是上拉到指定位置自动刷新 5.2MJRefreshBackFooter类刷新完会有一个回弹的效果
+ 上拉刷新加载更多数据，所以将下拉刷新发送网络请求的代码同样复制一份到- (void)loadMoreTopics方法中，但是加载更多需要下一个的页码参数
+  网络延迟中一些细节处理
+ 网络不好时，上拉加载更多失败了，但是page++了，下次加载就会直接跳过失败那页数据，所以在失败的block中将page—-；
+ 加入显示处在第5页数据中，先在下拉刷新加载最新数据，但是也有可能失败，一旦下拉刷新page被清空为0了，但现在处在第5页，如果现在上拉刷新加载更多，将会重复加载第0页数据。所以改进办法就是当下拉刷新成功了，才将页码清空为0，将self.page = 0; 放到成功的block中；
+ 用户有可能下拉刷新又上拉刷新 例如：现在用户当前处在第5页，先下拉刷新，又上拉刷新，一会下拉刷新的数据回来后，page被清空为0了，之后上拉数据回来，成功后会将第六页数据放到第5页数据后，但是第5页数据被清空了，就讲最前面的0页数据和第6页数据合在一起了。如果上拉数据失败，page—，这样当前page被减为负数，也是有问题。 *两种解决办法：
+（1）控制器增加一个字典成员属性params，只处理最后一次的网络请求，如果当前返回的请求和params中的请求不是同一个请求，直接return
+if(self.params != params) return;  （2）禁止用户同时上拉和下拉刷新，如果发现有一个在刷新，则禁止掉例外一个刷新
+  其他一些知识点
+ footer控件永远粘着cell的底部，如果一上来，TableView没有数据，那么会直接显示footer控件。所以创建完footer控件时，默认让其隐藏，同时在numberOfRowInSession中设置如果返回的count==0时隐藏 objc self.tableView.mj_footer.hidden = (self.topics.count == 0);  设置TableView内边距的一些代码放在“精华”控制器中不合适，应该放到TableView自己的控制器中，子控制器的代码应该放到子控制器
+ 在other文件中新建一个保存常量的类（继承NSObject）,用来保存一些全局都用到的常量信息
+12.1 删除所有内容，导入.h和.m都导入#import &amp;lt;UIKit/UIkit.h&amp;gt; 12.2 .m中放一些const常量，.h中放一些放常量的引用同时加上UIKIT_EXTERN
+ 修改TableView内部的Cell的尺寸，让其左右有间距，需要重写他的setFrame方法，只需要设置一次的东西就写在awakeFromNib(xib)，或initWithFrame(代码)方法中</description>
+    </item>
+    
+    <item>
+      <title>UITextView实现占位文字的两种方法</title>
+      <link>https://recher.github.io/blog/uitextview%E5%AE%9E%E7%8E%B0%E5%8D%A0%E4%BD%8D%E6%96%87%E5%AD%97%E7%9A%84%E4%B8%A4%E7%A7%8D%E6%96%B9%E6%B3%95/</link>
+      <pubDate>Sat, 09 Apr 2016 20:41:37 +0000</pubDate>
+      
+      <guid>https://recher.github.io/blog/uitextview%E5%AE%9E%E7%8E%B0%E5%8D%A0%E4%BD%8D%E6%96%87%E5%AD%97%E7%9A%84%E4%B8%A4%E7%A7%8D%E6%96%B9%E6%B3%95/</guid>
+      <description>在Cocoa Touch框架中有两种系统自带的文本输入控件：UITextFiled和UITextView
+ UITextFiled特点  只显示一行文本输入 高度（30）默认不能修改 没有拖拽滚动(父控件是UIscrollView除外)  UITextView特点  支持多行输入显示 支持滚动（继承自UIscrollView） 没有占位文字（placeholder） 本质就是一个可调整的多行输入文本框 有时候我们希望给一个多行文本框增加一个占位文字的功能，来提示用户输入的内容。但是这两种都不能满足我们的要求，这样我们可以自定义一个这样的控件，实现我们的需要。   实现思路： 自定义一个类，继承自UITextView，在现有功能的基础上增加一个占位文字的功能
+两种实现方法： 1. 实现UITextView内部的- (void)drawRect:(CGRect)rect方法，将占位文字文字画到UITextView控件上 1.1 在.h的头文件中给外界提供一个占位文字的属性
+/** * 占位文字 */ @property (weak, nonatomic) NSString *placeholder;  1.2 将占位文字画到矩形框中  /** * 绘制占位文字 */ - (void)drawRect:(CGRect)rect { NSMutableDictionary *attrs = [NSMutableDictionary dictionary]; attrs[NSFontAttributeName] = self.font; attrs[NSForegroundColorAttributeName] = [UIColor lightGrayColor]; // 在textView的矩形框中绘制文字 [self.placeholder drawInRect:CGRectMake(0, 64, self.frame.size.width, self.frame.size.height) withAttributes:attrs]; }  注：label的font要在初始化时确定，不然程序会奔溃 1.3 采用通知的方式监听键盘文字的改变。文字一旦改变，会发出一个UITextViewTextDidChangeNotification的通知，所以给TextView初始化后就添加一个监听器</description>
+    </item>
+    
+    <item>
+      <title>浅谈UITableView内Cell的选中细节过程</title>
+      <link>https://recher.github.io/blog/%E6%B5%85%E8%B0%88uitableview%E5%86%85cell%E7%9A%84%E9%80%89%E4%B8%AD%E7%BB%86%E8%8A%82%E8%BF%87%E7%A8%8B/</link>
+      <pubDate>Sat, 09 Apr 2016 20:34:31 +0000</pubDate>
+      
+      <guid>https://recher.github.io/blog/%E6%B5%85%E8%B0%88uitableview%E5%86%85cell%E7%9A%84%E9%80%89%E4%B8%AD%E7%BB%86%E8%8A%82%E8%BF%87%E7%A8%8B/</guid>
+      <description>UITableView的代理协议中给代理者提供了4个代理方法，用来监听从选中一个cell到选中另一个cell的切换过程，当然代理必须实现这些方法，才能监听整个cell的点击切换过程。
+//将要选中 - (NSIndexPath *)tableView:(UITableView *)tableView willSelectRowAtIndexPath:(NSIndexPath *)indexPath // 选中 - (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath // 将要取消选中 - (NSIndexPath *)tableView:(UITableView *)tableView willDeselectRowAtIndexPath:(NSIndexPath *)indexPath // 取消选中 - (void)tableView:(UITableView *)tableView didDeselectRowAtIndexPath:(NSIndexPath *)indexPath   当第一次点击某个cell时 1.1 首先调用代理的- willSelectRowAtIndexPath:(NSIndexPath *)indexPath方法，并将选中的indexPath对象返回给代理，其中包含选中的这组section组号和row行号 1.2 紧接着，马上会调- didSelectRowAtIndexPath:(NSIndexPath *)indexPath方法，告诉代理选中了该cell 再点击另一个Cell时 2.1 首先调- willSelectRowAtIndexPath:(NSIndexPath *)indexPath方法，告诉代理有一个新Cell将要被选中，并将这个新cell的indexPath返回给代理 2.2 然后调willDeselectRowAtIndexPath:(NSIndexPath *)indexPath方法，告诉代理即将取消选中上一个cell 2.3 接着调didDeselectRowAtIndexPath:(NSIndexPath *)indexPath取消选中上一个cell 2.4 最后调didSelectRowAtIndexPath:(NSIndexPath *)indexPath选中新cell 明白了这些cell选中的细节过程，我们就可以让控制器成为TableView的代理，监听其内部的点击事件，完成一些转场动画、弹框提示、modal新控制器或者修改cell内数据时，传递数据给下一个控制器等等一些详细操作了。 例如，可以不用push新控制器修改数据的方式，直接将修改后的数据在原来的view中刷新，将刷新表格的代码写在willDeselectRowAtIndexPath:(NSIndexPath *)indexPath中，这样修改后点击新cell，新数据自动刷新，不用上下拉滚动cell来刷新； 再例如，当点击某个cell，界面显示一些友好的文字提示，之后慢慢消失。整个view的显示、透明度变化、消失、view的最终删除等一系列动画过程的相关代码，就可以放在didSelectRowAtIndexPath:(NSIndexPath *)indexPath方法中完成 等等 ……  总之，在明白了这个cell点击函数调用的先后顺序后，我们就可以做很多事情了。</description>
+    </item>
+    
+    <item>
+      <title>控制器中两个TableView的一些细节处理</title>
+      <link>https://recher.github.io/blog/%E6%8E%A7%E5%88%B6%E5%99%A8%E4%B8%AD%E4%B8%A4%E4%B8%AAtableview%E7%9A%84%E4%B8%80%E4%BA%9B%E7%BB%86%E8%8A%82%E5%A4%84%E7%90%86/</link>
+      <pubDate>Sat, 09 Apr 2016 18:02:53 +0000</pubDate>
+      
+      <guid>https://recher.github.io/blog/%E6%8E%A7%E5%88%B6%E5%99%A8%E4%B8%AD%E4%B8%A4%E4%B8%AAtableview%E7%9A%84%E4%B8%80%E4%BA%9B%E7%BB%86%E8%8A%82%E5%A4%84%E7%90%86/</guid>
+      <description>先展示一张效果图
+当一个控制器内有两个TableView时，它们共用一个代理和一些数据源方法，这时候就相当复杂。 右侧的TableView根据左侧的选中显示对应数据，两个TableView关联会产生很多复杂的共用问题，现在将这些问题和细节整理出来，方便自己查阅，以后避免，同时也给一同学习需要的朋友们。
+1.重复发送网络请求的处理办法  当点击了左侧的TableView将发送网络请求给服务器，右侧的TableView将返回的数据装载到右侧的Cell中，但是有时用户点了左侧的A cell又点击了B cell，再点击A Cell时会重复发送网络请求给服务器，这样即浪费了用户流量，而且网络不好时用户体验也非常差。  解决办法： 给左侧cell的模型增加一个成员属性，用来保存该类别对应的用户数据。 一下我们以YGRecommendCategory类为例，在YGRecommendCategory类的.h文件中增加该可变数组
+/** 保存该类别对应的用户数据 */ @property (nonatomic, strong) NSMutableArray *users;  在.m文件中重写users的getter方法，采用懒加载，不用关心该属性什么时候创建，只创建一次，提升系能
+- (NSMutableArray *)users { if (!_users) { // 如果users没用值，则创建，否则直接返回_users值 _users = [NSMutableArray array]; } return _users; }  在TableView控制器的代理方法- (void)tableView: didSelectRowAtIndexPath:中，将每次返回的用户数据存储到这个users大数组中，方便下次直接读取。因为每次点击Cell都会调用这个方法，所以在这个方法中将返回的数据保存起来
+- (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath { // 取出左边选中行对应的用户模型数据 YGRecommendCategory *c = self.categories[indexPath.row]; if (c.users.count) { // 如果users中有对应的值，直接加载数据，不再发送网络请求 // 刷新右侧的TableView，显示最新的拿到的数据 [self.rightTableView reloadData]; } else { // 发送请求给服务器, 加载右侧的数据 NSMutableDictionary *params = [NSMutableDictionary dictionary]; params[@&amp;quot;a&amp;quot;] = @&amp;quot;list&amp;quot;; params[@&amp;quot;c&amp;quot;] = @&amp;quot;subscribe&amp;quot;; params[@&amp;quot;category_id&amp;quot;] = @(c.</description>
+    </item>
+    
+    <item>
+      <title>Transport security has blocked a cleartext HTTP ...”的解决办法</title>
+      <link>https://recher.github.io/blog/transport-security-has-blocked-a-cleartext-http-http-resource-load-since-it-is-insecure-temporary-exceptions-can-be-configured-via-your-app-s-info-plist-file%E7%9A%84%E8%A7%A3%E5%86%B3%E5%8A%9E%E6%B3%95/</link>
+      <pubDate>Sat, 09 Apr 2016 17:45:46 +0000</pubDate>
+      
+      <guid>https://recher.github.io/blog/transport-security-has-blocked-a-cleartext-http-http-resource-load-since-it-is-insecure-temporary-exceptions-can-be-configured-via-your-app-s-info-plist-file%E7%9A%84%E8%A7%A3%E5%86%B3%E5%8A%9E%E6%B3%95/</guid>
+      <description>Xcode中利用AFNetworking框架发送get请求时，如果是第一次，可能会报“Transport security has blocked a cleartext HTTP (http://) resource load since it is insecure. Temporary exceptions can be configured via your app&amp;rsquo;s Info.plist file”这样的警告。
+这时候我们需要修改info.plist文件来消除这个警告，右键info.plist show in finder 用文本编辑器打开，会显示所有的xml信息，然后在dict大字典中添加以下一些内容：
+&amp;lt;key&amp;gt;NSAppTransportSecurity&amp;lt;/key&amp;gt; &amp;lt;dict&amp;gt; &amp;lt;key&amp;gt;NSAllowsArbitraryLoads&amp;lt;/key&amp;gt; &amp;lt;true/&amp;gt; &amp;lt;/dict&amp;gt;  保存后 找到info.plist中第一项App Transport Security Settings中的Allow Arbitrary Loads设置为YES即可。</description>
+    </item>
+    
+    <item>
+      <title>成功搭建Hexo后的第一篇博客</title>
+      <link>https://recher.github.io/blog/%E6%88%90%E5%8A%9F%E6%90%AD%E5%BB%BAhexo%E5%90%8E%E7%9A%84%E7%AC%AC%E4%B8%80%E7%AF%87%E5%8D%9A%E5%AE%A2/</link>
+      <pubDate>Sat, 09 Apr 2016 12:00:00 +0000</pubDate>
+      
+      <guid>https://recher.github.io/blog/%E6%88%90%E5%8A%9F%E6%90%AD%E5%BB%BAhexo%E5%90%8E%E7%9A%84%E7%AC%AC%E4%B8%80%E7%AF%87%E5%8D%9A%E5%AE%A2/</guid>
+      <description>标题党，哈哈哈哈。按时间顺序来说，这个已经不是第一篇了。之前一直在简书写，但一直想搭建自己的专属博客网站，昨天在完成（基本）了swift版的新浪微博项目后，花了一天时间自己终于捣鼓出来了。这个主题界面是我挑选了众多前端童鞋写的主题后最终确定下来的。
+ 就是简单
+ 当然中间也是各种蛋疼，后面抽时间会简单讲到。
+我为什么写博客  没有那么多高大上的理想，其实就是一颗未死的文艺的心。不愿妥协的倔强。
+  随手记录灵感、想法、总结。总之，我想把它们都记录下来，无论好坏。 梳理知识，形成体系。 把遇到的问题，学到的知识都整理出来，因为我坚信*好记性不如烂笔头*这句话，养成良好的记录习惯，对自己也是一种很好的锻炼。 分享才是最好的学习。将自己学会的技能，无私的分享出来，与志同道合的人一起交流经验、想法，碰撞思维，我认为这是一种最好的学习方式。个人非常推崇github这种开源精神。 整理总结也是一种能力的提升。*“授人以鱼不如授人以渔”*，越来越能体会一位老师很早对我说的那那段话，“将你学到知识，无私的教给别人，对你自己来说是一种最好的学习”，当时不理解，现在真是感谢那些在不同行业中无私奉献，乐于分享经验、技术，交流思想的布道者。你在能将其总结出来的同时，一定也是在这个问题上有所研究，同时，自己应该也是有所理解了。 以严谨、认真的高标准要求自己。既然要写出来，那一定是认真总结梳理后的结果，别人对你博文的评价就是一种最好的检验标准，所以无形中也会给与压力，让自己努力将内容做的更好，更完美。  基于此，也是我想坚持写博客的原因。认真，坚持，不断提升自己。
+写作的本身，就是自己与自己最好的交流。
+我为什么从简书搬迁至此  打造一个安静的环境，不被外界打扰。 简书是一个很好的写作社区，个人非常喜欢。但其实你在这个社区中，也很有可能大多数时间都在交流。再完美的故事，都是别人的故事，我想书写自己的故事。 不被虚荣心驱使。 简友的点赞数，应该就是对每一位作者最好的鼓励吧，所以在这种环境下，也会更有力的推动你不断去创造更有价值，更优质的内容。但是，有时候时间一长，你可能已经慢慢背离了写作的初衷。可能已是虚荣心在驱使着自己不断前进，当然我并不反对这种方式，因为其实这也是一种很好的激励方式，不断驱使着自己向更好的方向努力。相较而言，我更喜欢这种从心的写作，更接近写作的本质，也许我就是点，我想写的。 不愿暴漏在镁光灯下。也许我并不想被关注，至少现在是。我想这更像是一个日记本，记录着你生活的点滴；一些重大事件；自己的学习经过；想法见解和对这个世界、对自己的认知。  这也许更接近真实的自己。
+定下这个标题，本来是想梳理一下自己利用github和Hexo搭建个人博客的过程，但写完才发现通篇和Hexo无关==.无奈自己文思如尿奔，一写就刹不住了。。下次有时间再把这个补上吧。</description>
+    </item>
+    
+  </channel>
+</rss>
