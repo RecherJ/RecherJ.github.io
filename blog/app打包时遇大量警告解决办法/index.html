@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="en-CH">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="author" content="map[]" />
+    <meta name="description" content="一个个人博客">
+    <link rel="shortcut icon" type="image/x-icon" href="https://RecherJ.github.io/img/favicon.ico">
+    <title>App打包时遇大量警告解决办法</title>
+    <meta name="generator" content="Hugo 0.41" />
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
+    <link rel="stylesheet" type="text/css" href="https://RecherJ.github.io/css/main.css" />
+    <link rel="stylesheet" type="text/css" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.6.3/css/font-awesome.min.css" />
+    <link rel="stylesheet" type="text/css" href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:200,400,200bold,400old" />
+    
+    <!--[if lt IE 9]>
+			<script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
+			<script src="https://oss.maxcdn.com/libs/respond.js/1.4.2/respond.min.js"></script>
+		<![endif]-->
+
+    
+  </head>
+
+  <body>
+    <div id="wrap">
+
+      
+      <nav class="navbar navbar-default">
+  <div class="container">
+    <div class="navbar-header">
+      <a class="navbar-brand" href="https://RecherJ.github.io/"><i class="fa fa-home"></i></a>
+    </div>
+    <div id="navbar">
+      <ul class="nav navbar-nav navbar-right">
+      
+        
+        <li><a href="/blog/">BLOG</a></li>
+        
+        <li><a href="/projects/">PROJECTS</a></li>
+        
+      
+      </ul>
+    </div>
+  </div>
+</nav>
+
+      
+      <div class="container">
+        <div class="blog-post">
+          <h3>
+            <strong><a href="https://RecherJ.github.io/blog/app%E6%89%93%E5%8C%85%E6%97%B6%E9%81%87%E5%A4%A7%E9%87%8F%E8%AD%A6%E5%91%8A%E8%A7%A3%E5%86%B3%E5%8A%9E%E6%B3%95/">App打包时遇大量警告解决办法</a></strong>
+          </h3>
+        </div>
+        <div class="blog-title">
+          <h4>
+          May 5, 2016
+            &nbsp;&nbsp;
+            
+          </h4>
+        </div>
+        <div class="panel panel-default">
+          <div class="panel-body">
+            <div class="blogpost">
+              <p>昨天在对App进行最后一次小修小布后，准备进行第一个版本的打包上架，在真机运行和调试时都没有问题，但是当<code>Archive</code>时一下呼呼出现了89个警告，我想当时我的表情应该是这样的
+<!-- more -->
+<img src="/img/download.png" alt="" /></p>
+
+<p>这么多警告，能上架吗？？？ ！！<br>
+几乎全是类似于这样的警告 <code>xxxx.pch No such file or directory</code></p>
+
+<pre><code>warning: /var/folders/_j/hqhnz9xd2qv_39dd1vdmw1nc0000gn/C/org.llvm.clang.tarekskr/ModuleCache/2YCOBXU93NY4O/UIKit-1MCEWB5GAZIR1.pcm: No such file or directory
+</code></pre>
+
+<p>其实之前也遇到过，但是当时没管，想的反正又不是报错，程序能跑不就完了，但是一想到苹果那严苛的审核机制，万一遇上个心情不好的，拒绝后我再提上去，一个月过去了。。 想到这，我还是不要挑战苹果的底线，老老实实改警告</p>
+
+<p><img src="/img/url.gif" alt="" /></p>
+
+<p>于是各种Google呀，各种查，stackoverflow上和Apple Developer Forums遇到过这个问题的人倒也挺多，大概看了一下，很多人说这是Xcode7 beta版的问题，没有什么好的解决办法，也有人说这是编译时链接问题，想办法绕过就可以了，于是我参照了别人的解决方案修改了一下几个编译链接的设置</p>
+
+<pre><code>- Precompile Prefix (GCC_PRECOMPILE_PREFIX_HEADER) = NO
+- Debug Information Format (DEBUG_INFORMATION_FORMAT) = DWARF with dSYM
+- Enabled Modules (C and Objective-C) (CLANG_ENABLE_MODULES) = NO
+</code></pre>
+
+<p><a href="https://forums.developer.apple.com/thread/17921">Lots of warnings when building with Xcode 7 with 3rd party libraries</a><br>
+<a href="https://forums.developer.apple.com/message/47932#47932">Warnings creating dSYM in Xcode beta 6</a><br>
+<a href="http://sensiblecocoa.com/community/topic/2344-warnings-with-stv-500-and-xcode-7-beta-5/#entry12829">Warnings with STV 5.0.0 and Xcode 7 beta 5</a></p>
+
+<p>然而并没什么乱用。。</p>
+
+<p>后来我怀疑可能是当时引入了一个pch导致，因为当时我的pch文件在工程中是全路径引入，即<code>/Users/liuyonggang/Documents/Guitar/GuitarTeach/GuitarTeach/Classes/Others/PrefixHeader.pch</code></p>
+
+<p>会不会是这个在打包后，就找不到文件里面的链接地址了呢？ 反正不管那么多，先改了再说，我记得之前学习时看老师的代码中pch文件路径是截止到工程路径位置，不写全路径。于是我将路径改为<code>GuitarTeach/Classes/Others/PrefixHeader.pch</code>，并将<code>Precompile Prefix Header</code>设置为NO，CMD+B 哎呦通过了！
+然后再打包时就一下只剩4个警告了，看到从89个警告变为4个，心里那是一个酸爽！</p>
+
+              <hr>
+              <div class="related-posts">
+                <h5>Related Posts</h5>
+                
+              </div>
+            </div>
+          </div>
+          <hr>
+        <div class="disqus">
+  <div id="disqus_thread"></div>
+  <script type="text/javascript">
+
+    (function() {
+      
+      
+      if (window.location.hostname == "localhost")
+        return;
+
+      var disqus_shortname = '';
+      var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+      dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+      (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+    })();
+  </script>
+  <noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+  <a href="http://disqus.com/" class="dsq-brlink">comments powered by <span class="logo-disqus">Disqus</span></a>
+</div>
+        </div>
+      </div>
+      
+    </div>
+
+    
+    <footer>
+  <div id="footer">
+    <div class="container">
+      <p class="text-muted">&copy; All rights reserved. Powered by <a href="https://gohugo.io/">Hugo</a> and
+      <a href="http://www.github.com/nurlansu/hugo-sustain/">sustain</a> with ♥</p>
+    </div>
+  </div>
+</footer>
+<div class="footer"></div>
+
+
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
+
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" crossorigin="anonymous"></script>
+<script src="https://RecherJ.github.io/js/docs.min.js"></script>
+<script src="https://RecherJ.github.io/js/main.js"></script>
+
+<script src="https://RecherJ.github.io/js/ie10-viewport-bug-workaround.js"></script>
+
+
+    
+  </body>
+</html>

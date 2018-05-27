@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="en-CH">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="author" content="map[]" />
+    <meta name="description" content="一个个人博客">
+    <link rel="shortcut icon" type="image/x-icon" href="https://RecherJ.github.io/img/favicon.ico">
+    <title>访问通信录-适配iOS7</title>
+    <meta name="generator" content="Hugo 0.41" />
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
+    <link rel="stylesheet" type="text/css" href="https://RecherJ.github.io/css/main.css" />
+    <link rel="stylesheet" type="text/css" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.6.3/css/font-awesome.min.css" />
+    <link rel="stylesheet" type="text/css" href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:200,400,200bold,400old" />
+    
+    <!--[if lt IE 9]>
+			<script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
+			<script src="https://oss.maxcdn.com/libs/respond.js/1.4.2/respond.min.js"></script>
+		<![endif]-->
+
+    
+  </head>
+
+  <body>
+    <div id="wrap">
+
+      
+      <nav class="navbar navbar-default">
+  <div class="container">
+    <div class="navbar-header">
+      <a class="navbar-brand" href="https://RecherJ.github.io/"><i class="fa fa-home"></i></a>
+    </div>
+    <div id="navbar">
+      <ul class="nav navbar-nav navbar-right">
+      
+        
+        <li><a href="/blog/">BLOG</a></li>
+        
+        <li><a href="/projects/">PROJECTS</a></li>
+        
+      
+      </ul>
+    </div>
+  </div>
+</nav>
+
+      
+      <div class="container">
+        <div class="blog-post">
+          <h3>
+            <strong><a href="https://RecherJ.github.io/blog/%E8%AE%BF%E9%97%AE%E9%80%9A%E4%BF%A1%E5%BD%95-%E9%80%82%E9%85%8Dios7/">访问通信录-适配iOS7</a></strong>
+          </h3>
+        </div>
+        <div class="blog-title">
+          <h4>
+          April 9, 2016
+            &nbsp;&nbsp;
+            
+          </h4>
+        </div>
+        <div class="panel panel-default">
+          <div class="panel-body">
+            <div class="blogpost">
+              <p>昨天学习iOS中访问用户通信录的一个框架<code>AddressBookUI.framework</code>,这是个自带UI界面的系统框架,第一次访问要获得用户的授权.
+因为是已经封装好的所以,用起来也比较方便</p>
+
+<!-- more -->
+
+<ol>
+<li>导入框架<code>#import &lt;AddressBookUI/AddressBookUI.h&gt;</code></li>
+
+<li><p>创建控制器</p>
+
+<pre><code class="language-objc">ABPeoplePickerNavigationController *Vc = [[ABPeoplePickerNavigationController alloc] init];
+</code></pre></li>
+
+<li><p>设置控制器为代理,监听通信录控制器弹出后用户的点击操作</p>
+
+<pre><code class="language-objc">Vc.peoplePickerDelegate = self;
+</code></pre></li>
+
+<li><p>弹出</p>
+
+<pre><code class="language-objc">[self presentViewController:Vc animated:YES completion:nil];
+</code></pre>
+
+<p><code>ABPeoplePickerNavigationControllerDelegate</code>代理协议中,有两个方法可以监听用户点击操作的方法
+```objc</p></li>
+
+<li><p>(void)peoplePickerNavigationController:(ABPeoplePickerNavigationController *)peoplePicker didSelectPerson:(ABRecordRef)person;</p></li>
+
+<li><p>(void)peoplePickerNavigationController:(ABPeoplePickerNavigationController *)peoplePicker didSelectPerson:(ABRecordRef)person property:(ABPropertyID)property identifier:(ABMultiValueIdentifier)identifier
+```
+这两个方法的区别在于:
+第一个方法是监听到用户点击了某个联系人时就会调用,并自动关闭页面;第二个在于点击了某个具体联系人后会自动跳转到对应联系人的详情页面,在点击具体属性时便会调用,这个方法会把这个property值传递过来,拿到这个值就可以具体获取一些具体信息了.
+点击右上角的 Cancel按钮后会将 modal出来的界面关闭,同时调用cancel方法</p></li>
+</ol>
+
+<pre><code class="language-objc">- (void)peoplePickerNavigationControllerDidCancel:(ABPeoplePickerNavigationController *)peoplePicker
+</code></pre>
+
+<p>以上效果均是在iOS9.2模拟器上测试的结果</p>
+
+<p>为了测试真机,我将部署版本改成了 iOS7.1之后运行在我的4S老爷机上之后,发现这两个方法不调用,而且 modal 出来的控制器也关闭不了 =。=</p>
+
+<p>google了一下,发现原来<code>- (void)peoplePickerNavigationController:peoplePicker didSelectPerson:</code>和<code>- (void)peoplePickerNavigationController:peoplePicker didSelectPerson: property: identifier:</code>这两个方法,是从iOS8之后才有用的,而 iOS7及以前都是要用<code>- (BOOL)peoplePickerNavigationController:shouldContinueAfterSelectingPerson:</code>和<code>- (BOOL)peoplePickerNavigationController:shouldContinueAfterSelectingPerson:property:identifier:</code>这两个方法,和iOS8之后的两个方法类似,只是iOS8之后过期了.</p>
+
+<p>所以如果要适配更低的版本时,这两个过期的方法还是非常必要的.同时在 iOS7中<code>- (void)peoplePickerNavigationControllerDidCancel:</code>方法也是要自己手动弹出控制器.iOS8之后会自动弹出,所以为了适配,保证iOS7-iOS9均有效,手动dismiss掉.</p>
+
+              <hr>
+              <div class="related-posts">
+                <h5>Related Posts</h5>
+                
+              </div>
+            </div>
+          </div>
+          <hr>
+        <div class="disqus">
+  <div id="disqus_thread"></div>
+  <script type="text/javascript">
+
+    (function() {
+      
+      
+      if (window.location.hostname == "localhost")
+        return;
+
+      var disqus_shortname = '';
+      var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+      dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+      (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+    })();
+  </script>
+  <noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+  <a href="http://disqus.com/" class="dsq-brlink">comments powered by <span class="logo-disqus">Disqus</span></a>
+</div>
+        </div>
+      </div>
+      
+    </div>
+
+    
+    <footer>
+  <div id="footer">
+    <div class="container">
+      <p class="text-muted">&copy; All rights reserved. Powered by <a href="https://gohugo.io/">Hugo</a> and
+      <a href="http://www.github.com/nurlansu/hugo-sustain/">sustain</a> with ♥</p>
+    </div>
+  </div>
+</footer>
+<div class="footer"></div>
+
+
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
+
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" crossorigin="anonymous"></script>
+<script src="https://RecherJ.github.io/js/docs.min.js"></script>
+<script src="https://RecherJ.github.io/js/main.js"></script>
+
+<script src="https://RecherJ.github.io/js/ie10-viewport-bug-workaround.js"></script>
+
+
+    
+  </body>
+</html>

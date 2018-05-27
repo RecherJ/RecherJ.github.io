@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+<html lang="en-CH">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="author" content="map[]" />
+    <meta name="description" content="一个个人博客">
+    <link rel="shortcut icon" type="image/x-icon" href="https://RecherJ.github.io/img/favicon.ico">
+    <title>Mac下利用github和Hexo搭建个人博客（二）</title>
+    <meta name="generator" content="Hugo 0.41" />
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
+    <link rel="stylesheet" type="text/css" href="https://RecherJ.github.io/css/main.css" />
+    <link rel="stylesheet" type="text/css" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.6.3/css/font-awesome.min.css" />
+    <link rel="stylesheet" type="text/css" href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:200,400,200bold,400old" />
+    
+    <!--[if lt IE 9]>
+			<script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
+			<script src="https://oss.maxcdn.com/libs/respond.js/1.4.2/respond.min.js"></script>
+		<![endif]-->
+
+    
+  </head>
+
+  <body>
+    <div id="wrap">
+
+      
+      <nav class="navbar navbar-default">
+  <div class="container">
+    <div class="navbar-header">
+      <a class="navbar-brand" href="https://RecherJ.github.io/"><i class="fa fa-home"></i></a>
+    </div>
+    <div id="navbar">
+      <ul class="nav navbar-nav navbar-right">
+      
+        
+        <li><a href="/blog/">BLOG</a></li>
+        
+        <li><a href="/projects/">PROJECTS</a></li>
+        
+      
+      </ul>
+    </div>
+  </div>
+</nav>
+
+      
+      <div class="container">
+        <div class="blog-post">
+          <h3>
+            <strong><a href="https://RecherJ.github.io/blog/mac%E4%B8%8B%E5%88%A9%E7%94%A8github%E5%92%8Chexo%E6%90%AD%E5%BB%BA%E4%B8%AA%E4%BA%BA%E5%8D%9A%E5%AE%A2%E4%BA%8C/">Mac下利用github和Hexo搭建个人博客（二）</a></strong>
+          </h3>
+        </div>
+        <div class="blog-title">
+          <h4>
+          April 18, 2016
+            &nbsp;&nbsp;
+            
+          </h4>
+        </div>
+        <div class="panel panel-default">
+          <div class="panel-body">
+            <div class="blogpost">
+              
+
+<p><em>补上4月9号要写的后续搭建博客</em>
+<!-- more -->
+利用Google搜索关键字<strong>“Hexo+github+个人博客”</strong>可以足足搜出4页之多，大家已经非常详尽的写了如果利用github和Hexo搭建个人的博客。我就不在阐述，Hexo上也有非常详尽的教程。这里只是总结一下基本的要点，和注意事项，记录一下帮助我以后如果重装系统或更换电脑重新搭建使用。</p>
+
+<p>首先，默认已经安装了Node。</p>
+
+<h3 id="安装hexo">安装Hexo：</h3>
+
+<ul>
+<li>现在安装Hexo到本机上
+<code>bash
+npm install hexo -g
+</code>
+执行上面的命令时最好开着VPN，因为不科学上上网可能导致部分插件安装不完整</li>
+<li>然后在需要创建博客的目录下面，输入一下命令
+```bash
+hexo init blog
+cd blog
+npm install
+hexo server</li>
+</ul>
+
+<pre><code>
+- 这时，在浏览器输入`http://0.0.0.0:4000/` 就可以看到本地静态的博客样式了，里面默认会有一篇`hello world`
+
+### 设置github
+- 默认已经拥有github账号。
+- 在github上新建一个仓库以`yourname.github.io`命名。
+- 在本地配置用户名和邮箱
+```bash
+git config --global user.name yourname
+git config --global user.email youremail
+</code></pre>
+
+<ul>
+<li>查看当前所有的配置
+<code>bash
+git config -l
+</code>
+cd进blog目录下将github上的仓库<code>clone</code>下来</li>
+</ul>
+
+<h3 id="发布博客">发布博客</h3>
+
+<p>cd进blog目录下，里面有个<code>_config.yml</code>配置文件</p>
+
+<pre><code class="language-bash">vim _config.yml
+</code></pre>
+
+<p>里面有个<code>deploy</code>字段</p>
+
+<pre><code class="language-bash">deploy:
+type: git
+repository: https://github.com/yourname/yourname.github.io.git
+branch: master
+</code></pre>
+
+<p>注意：冒号后面都要空一格</p>
+
+<p>新建博客</p>
+
+<pre><code class="language-bash">hexo new &quot;博客名称&quot;
+</code></pre>
+
+<p>清除缓存</p>
+
+<pre><code class="language-bash">hexo clean
+</code></pre>
+
+<p>部署</p>
+
+<pre><code class="language-bash">hexo generate -d
+</code></pre>
+
+<p>###写在最后</p>
+
+<p>建议利用<code>https</code>提交发布博客内容，之前使用的是SSH来发布，但是由于我朝网络的问题，经常会出现连接不上的问题</p>
+
+<pre><code>connect to host github.com port 22: Operation timed out
+</code></pre>
+
+<p><code>StackOverflow</code>上有人说可以把SSH的端口号改为443走https，但我觉得最好的办法还是使用https部署</p>
+
+<p><a href="http://stackoverflow.com/questions/15589682/ssh-connect-to-host-github-com-port-22-connection-timed-out">ssh: connect to host github.com port 22: Connection timed out</a>
+<a href="https://help.github.com/articles/using-ssh-over-the-https-port/">Using SSH over the HTTPS port</a></p>
+
+<p>修改的方式在<code>_config.yml</code>配置文件中有一个deploy设置。同时，也要修改github上仓库的提交方式。</p>
+
+<p>参考链接：
+<a href="http://www.jianshu.com/p/821fe67e712b">简书-Hexo搭建静态个人博客</a></p>
+
+              <hr>
+              <div class="related-posts">
+                <h5>Related Posts</h5>
+                
+              </div>
+            </div>
+          </div>
+          <hr>
+        <div class="disqus">
+  <div id="disqus_thread"></div>
+  <script type="text/javascript">
+
+    (function() {
+      
+      
+      if (window.location.hostname == "localhost")
+        return;
+
+      var disqus_shortname = '';
+      var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+      dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+      (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+    })();
+  </script>
+  <noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+  <a href="http://disqus.com/" class="dsq-brlink">comments powered by <span class="logo-disqus">Disqus</span></a>
+</div>
+        </div>
+      </div>
+      
+    </div>
+
+    
+    <footer>
+  <div id="footer">
+    <div class="container">
+      <p class="text-muted">&copy; All rights reserved. Powered by <a href="https://gohugo.io/">Hugo</a> and
+      <a href="http://www.github.com/nurlansu/hugo-sustain/">sustain</a> with ♥</p>
+    </div>
+  </div>
+</footer>
+<div class="footer"></div>
+
+
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
+
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" crossorigin="anonymous"></script>
+<script src="https://RecherJ.github.io/js/docs.min.js"></script>
+<script src="https://RecherJ.github.io/js/main.js"></script>
+
+<script src="https://RecherJ.github.io/js/ie10-viewport-bug-workaround.js"></script>
+
+
+    
+  </body>
+</html>

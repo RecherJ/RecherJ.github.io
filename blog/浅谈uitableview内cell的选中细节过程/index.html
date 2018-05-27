@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="en-CH">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="author" content="map[]" />
+    <meta name="description" content="一个个人博客">
+    <link rel="shortcut icon" type="image/x-icon" href="https://RecherJ.github.io/img/favicon.ico">
+    <title>浅谈UITableView内Cell的选中细节过程</title>
+    <meta name="generator" content="Hugo 0.41" />
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
+    <link rel="stylesheet" type="text/css" href="https://RecherJ.github.io/css/main.css" />
+    <link rel="stylesheet" type="text/css" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.6.3/css/font-awesome.min.css" />
+    <link rel="stylesheet" type="text/css" href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:200,400,200bold,400old" />
+    
+    <!--[if lt IE 9]>
+			<script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
+			<script src="https://oss.maxcdn.com/libs/respond.js/1.4.2/respond.min.js"></script>
+		<![endif]-->
+
+    
+  </head>
+
+  <body>
+    <div id="wrap">
+
+      
+      <nav class="navbar navbar-default">
+  <div class="container">
+    <div class="navbar-header">
+      <a class="navbar-brand" href="https://RecherJ.github.io/"><i class="fa fa-home"></i></a>
+    </div>
+    <div id="navbar">
+      <ul class="nav navbar-nav navbar-right">
+      
+        
+        <li><a href="/blog/">BLOG</a></li>
+        
+        <li><a href="/projects/">PROJECTS</a></li>
+        
+      
+      </ul>
+    </div>
+  </div>
+</nav>
+
+      
+      <div class="container">
+        <div class="blog-post">
+          <h3>
+            <strong><a href="https://RecherJ.github.io/blog/%E6%B5%85%E8%B0%88uitableview%E5%86%85cell%E7%9A%84%E9%80%89%E4%B8%AD%E7%BB%86%E8%8A%82%E8%BF%87%E7%A8%8B/">浅谈UITableView内Cell的选中细节过程</a></strong>
+          </h3>
+        </div>
+        <div class="blog-title">
+          <h4>
+          April 9, 2016
+            &nbsp;&nbsp;
+            
+          </h4>
+        </div>
+        <div class="panel panel-default">
+          <div class="panel-body">
+            <div class="blogpost">
+              <p>UITableView的代理协议中给代理者提供了4个代理方法，用来监听从选中一个cell到选中另一个cell的切换过程，当然代理必须实现这些方法，才能监听整个cell的点击切换过程。</p>
+
+<!-- more -->
+
+<pre><code class="language-objc">//将要选中
+- (NSIndexPath *)tableView:(UITableView *)tableView willSelectRowAtIndexPath:(NSIndexPath *)indexPath
+// 选中 
+- (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath
+// 将要取消选中
+- (NSIndexPath *)tableView:(UITableView *)tableView willDeselectRowAtIndexPath:(NSIndexPath *)indexPath
+// 取消选中
+- (void)tableView:(UITableView *)tableView didDeselectRowAtIndexPath:(NSIndexPath *)indexPath
+</code></pre>
+
+<ol>
+<li>当第一次点击某个cell时
+1.1 首先调用代理的<code>- willSelectRowAtIndexPath:(NSIndexPath *)indexPath</code>方法，并将选中的<code>indexPath</code>对象返回给代理，其中包含选中的这组section组号和row行号
+1.2 紧接着，马上会调<code>- didSelectRowAtIndexPath:(NSIndexPath *)indexPath</code>方法，告诉代理选中了该cell</li>
+<li>再点击另一个Cell时
+2.1 首先调<code>- willSelectRowAtIndexPath:(NSIndexPath *)indexPath</code>方法，告诉代理有一个新Cell将要被选中，并将这个新cell的indexPath返回给代理
+2.2 然后调<code>willDeselectRowAtIndexPath:(NSIndexPath *)indexPath</code>方法，告诉代理即将取消选中上一个cell
+2.3 接着调<code>didDeselectRowAtIndexPath:(NSIndexPath *)indexPath</code>取消选中上一个cell
+2.4 最后调<code>didSelectRowAtIndexPath:(NSIndexPath *)indexPath</code>选中新cell
+明白了这些cell选中的细节过程，我们就可以让控制器成为TableView的代理，监听其内部的点击事件，完成一些转场动画、弹框提示、modal新控制器或者修改cell内数据时，传递数据给下一个控制器等等一些详细操作了。
+例如，可以不用push新控制器修改数据的方式，直接将修改后的数据在原来的view中刷新，将刷新表格的代码写在<code>willDeselectRowAtIndexPath:(NSIndexPath *)indexPath</code>中，这样修改后点击新cell，新数据自动刷新，不用上下拉滚动cell来刷新；
+再例如，当点击某个cell，界面显示一些友好的文字提示，之后慢慢消失。整个view的显示、透明度变化、消失、view的最终删除等一系列动画过程的相关代码，就可以放在<code>didSelectRowAtIndexPath:(NSIndexPath *)indexPath</code>方法中完成
+等等
+……</li>
+</ol>
+
+<p>总之，在明白了这个cell点击函数调用的先后顺序后，我们就可以做很多事情了。</p>
+
+              <hr>
+              <div class="related-posts">
+                <h5>Related Posts</h5>
+                
+              </div>
+            </div>
+          </div>
+          <hr>
+        <div class="disqus">
+  <div id="disqus_thread"></div>
+  <script type="text/javascript">
+
+    (function() {
+      
+      
+      if (window.location.hostname == "localhost")
+        return;
+
+      var disqus_shortname = '';
+      var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+      dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+      (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+    })();
+  </script>
+  <noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+  <a href="http://disqus.com/" class="dsq-brlink">comments powered by <span class="logo-disqus">Disqus</span></a>
+</div>
+        </div>
+      </div>
+      
+    </div>
+
+    
+    <footer>
+  <div id="footer">
+    <div class="container">
+      <p class="text-muted">&copy; All rights reserved. Powered by <a href="https://gohugo.io/">Hugo</a> and
+      <a href="http://www.github.com/nurlansu/hugo-sustain/">sustain</a> with ♥</p>
+    </div>
+  </div>
+</footer>
+<div class="footer"></div>
+
+
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
+
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" crossorigin="anonymous"></script>
+<script src="https://RecherJ.github.io/js/docs.min.js"></script>
+<script src="https://RecherJ.github.io/js/main.js"></script>
+
+<script src="https://RecherJ.github.io/js/ie10-viewport-bug-workaround.js"></script>
+
+
+    
+  </body>
+</html>

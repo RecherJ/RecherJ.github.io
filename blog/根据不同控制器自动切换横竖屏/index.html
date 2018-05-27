@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html lang="en-CH">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="author" content="map[]" />
+    <meta name="description" content="一个个人博客">
+    <link rel="shortcut icon" type="image/x-icon" href="https://RecherJ.github.io/img/favicon.ico">
+    <title>根据不同控制器自动切换横竖屏</title>
+    <meta name="generator" content="Hugo 0.41" />
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
+    <link rel="stylesheet" type="text/css" href="https://RecherJ.github.io/css/main.css" />
+    <link rel="stylesheet" type="text/css" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.6.3/css/font-awesome.min.css" />
+    <link rel="stylesheet" type="text/css" href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:200,400,200bold,400old" />
+    
+    <!--[if lt IE 9]>
+			<script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
+			<script src="https://oss.maxcdn.com/libs/respond.js/1.4.2/respond.min.js"></script>
+		<![endif]-->
+
+    
+  </head>
+
+  <body>
+    <div id="wrap">
+
+      
+      <nav class="navbar navbar-default">
+  <div class="container">
+    <div class="navbar-header">
+      <a class="navbar-brand" href="https://RecherJ.github.io/"><i class="fa fa-home"></i></a>
+    </div>
+    <div id="navbar">
+      <ul class="nav navbar-nav navbar-right">
+      
+        
+        <li><a href="/blog/">BLOG</a></li>
+        
+        <li><a href="/projects/">PROJECTS</a></li>
+        
+      
+      </ul>
+    </div>
+  </div>
+</nav>
+
+      
+      <div class="container">
+        <div class="blog-post">
+          <h3>
+            <strong><a href="https://RecherJ.github.io/blog/%E6%A0%B9%E6%8D%AE%E4%B8%8D%E5%90%8C%E6%8E%A7%E5%88%B6%E5%99%A8%E8%87%AA%E5%8A%A8%E5%88%87%E6%8D%A2%E6%A8%AA%E7%AB%96%E5%B1%8F/">根据不同控制器自动切换横竖屏</a></strong>
+          </h3>
+        </div>
+        <div class="blog-title">
+          <h4>
+          April 21, 2016
+            &nbsp;&nbsp;
+            
+          </h4>
+        </div>
+        <div class="panel panel-default">
+          <div class="panel-body">
+            <div class="blogpost">
+              
+
+<p>准备制作自己的第一款App,但是遇到一个技术上问题：
+&gt; <strong>如何在当前控制器modal出下一个控制器时自动将屏幕切换成横屏模式</strong>。</p>
+
+<!-- more -->
+
+<h3 id="技术点-br">技术点：<br></h3>
+
+<ul>
+<li><p>App是否支持横竖屏由plist中的配置文件决定，这个设置在PROJECT-&gt;Deployment Info中设置
+<img src="/img/横竖屏.png" alt="横竖屏" /></p></li>
+
+<li><p>一个ViewController是否支持横竖屏由这个函数控制<code>supportedInterfaceOrientations</code><br></p></li>
+
+<li><p>如果当前嵌套了<code>TabBarController</code>和<code>NavigationController</code>之后情况和直接使用<code>UIViewController</code>是不一样的，这里*岁寒*说的很好
+&gt;&gt; 跟 shouldAutorotate() 不同，判断是否应该改变 APP 屏幕方向并不会检测当前显示的 View Controller 的属性，而是去检测根 View Controller 的属性，所以我们要从 TabBarController 一路获取到当前 View Controller。</p></li>
+
+<li><p>当modal出来的控制嵌套了导航控制器时，需要对导航控制器重写<code>supportedInterfaceOrientations</code>方法，来控制其子控制器。</p></li>
+
+<li><p>当第一个控制器modal出第二个控制器，设置其屏幕模式</p></li>
+</ul>
+
+<pre><code class="language-objc">- (IBAction)playClick {
+    VideoViewController *vc = [[VideoViewController alloc] init];
+    YGNavigationController *nav = [[YGNavigationController alloc] initWithRootViewController:vc];
+    nav.orientation = VideoOrientationLandscapeLeft;
+    [self.navigationController presentViewController:nav animated:YES completion:nil];
+}
+</code></pre>
+
+<ul>
+<li>为导航控制器定义一个枚举，表示其横竖屏</li>
+</ul>
+
+<pre><code class="language-objc">#import &lt;UIKit/UIKit.h&gt;
+typedef enum : NSUInteger {
+    VideoOrientationLandscapeLeft = 1,
+    VideoOrientationPortrait = 2
+} VideoOrientation;
+
+@interface YGNavigationController : UINavigationController
+
+@property (assign, nonatomic) VideoOrientation orientation;
+
+@end
+</code></pre>
+
+<p>这样第一个控制才能拿到这个属性，进行修改。</p>
+
+<ul>
+<li>导航控制其中重写<code>supportedInterfaceOrientations</code>方法</li>
+</ul>
+
+<pre><code class="language-objc">- (UIInterfaceOrientationMask)supportedInterfaceOrientations
+{
+    if (self.orientation == VideoOrientationLandscapeLeft) {
+        return UIInterfaceOrientationMaskLandscapeLeft;
+    } else {
+        return UIInterfaceOrientationMaskPortrait;
+    }
+}
+</code></pre>
+
+<p>判断当前控制器是否是横屏模式</p>
+
+<ul>
+<li>在<code>tabBarController</code>中将所有子控制锁定为竖屏模式，只有在需要横屏的控制器中才设置为横屏模式</li>
+</ul>
+
+<pre><code class="language-objc">/**
+ *  锁死所有自控制器为竖屏
+ */
+- (UIInterfaceOrientationMask)supportedInterfaceOrientations
+{
+    return UIInterfaceOrientationMaskPortrait;
+}
+</code></pre>
+
+<p>这样不管用户是否锁定为锁屏，都可以自由的切换为想要的横屏模式了。非常简单~
+<img src="/img/横竖屏效果图.gif" alt="效果图" /></p>
+
+<p>这里非常感谢，*岁寒*的技术博客。</p>
+
+<h3 id="参考链接">参考链接</h3>
+
+<p><a href="https://lvwenhan.com/ios/458.html">如何用代码控制以不同屏幕方向打开新页面【iOS】</a></p>
+
+              <hr>
+              <div class="related-posts">
+                <h5>Related Posts</h5>
+                
+              </div>
+            </div>
+          </div>
+          <hr>
+        <div class="disqus">
+  <div id="disqus_thread"></div>
+  <script type="text/javascript">
+
+    (function() {
+      
+      
+      if (window.location.hostname == "localhost")
+        return;
+
+      var disqus_shortname = '';
+      var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+      dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+      (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+    })();
+  </script>
+  <noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+  <a href="http://disqus.com/" class="dsq-brlink">comments powered by <span class="logo-disqus">Disqus</span></a>
+</div>
+        </div>
+      </div>
+      
+    </div>
+
+    
+    <footer>
+  <div id="footer">
+    <div class="container">
+      <p class="text-muted">&copy; All rights reserved. Powered by <a href="https://gohugo.io/">Hugo</a> and
+      <a href="http://www.github.com/nurlansu/hugo-sustain/">sustain</a> with ♥</p>
+    </div>
+  </div>
+</footer>
+<div class="footer"></div>
+
+
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
+
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" crossorigin="anonymous"></script>
+<script src="https://RecherJ.github.io/js/docs.min.js"></script>
+<script src="https://RecherJ.github.io/js/main.js"></script>
+
+<script src="https://RecherJ.github.io/js/ie10-viewport-bug-workaround.js"></script>
+
+
+    
+  </body>
+</html>
