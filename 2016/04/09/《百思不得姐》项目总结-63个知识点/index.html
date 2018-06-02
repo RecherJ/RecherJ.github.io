@@ -1,0 +1,186 @@
+<!DOCTYPE html><html><head><meta charset="utf-8"><meta name="X-UA-Compatible" content="IE=edge"><title> 《百思不得姐》项目总结-63个知识点 · RecherJ's blog</title><meta name="description" content="《百思不得姐》项目总结-63个知识点 - RecherJ"><meta name="viewport" content="width=device-width, initial-scale=1"><link rel="icon" href="/favicon.ico"><link rel="stylesheet" href="/css/apollo.css"><link rel="search" type="application/opensearchdescription+xml" href="https://recherj.github.io/atom.xml" title="RecherJ's blog"></head><body><div class="wrap"><header><a href="/" class="logo-link"><img src="/favicon.png" alt="logo"></a><ul class="nav nav-list"><li class="nav-list-item"><a href="/" target="_self" class="nav-list-link">BLOG</a></li><li class="nav-list-item"><a href="/archives/" target="_self" class="nav-list-link">ARCHIVE</a></li><li class="nav-list-item"><a href="https://weibo.com/u/2698628733" target="_blank" class="nav-list-link">WEIBO</a></li><li class="nav-list-item"><a href="https://github.com/RecherJ" target="_blank" class="nav-list-link">GITHUB</a></li><li class="nav-list-item"><a href="/atom.xml" target="_self" class="nav-list-link">RSS</a></li></ul></header><main class="container"><div class="post"><article class="post-block"><h1 class="post-title">《百思不得姐》项目总结-63个知识点</h1><div class="post-info">Apr 9, 2016</div><div class="post-content"><p>从2月12日开始到3月9日，一个月学习这个项目收获了很多知识点，给自己总结出来，方便以后查看。<br><a id="more"></a></p>
+<ul>
+<li><p>控制器的view加载完毕，首先在<code>- (void)viewDidLoad</code>方法中添加 下拉刷新 的控件；</p>
+<p>  1.1将添加下拉刷新控件封装一个函数<code>- (void)setupRefresh</code>，该方法中添加<code>MJRefresh</code>框架的header控件<br>  1.2写一个头部控件调用的刷新方法<code>- (void)loadNewTopics</code>，里面写发送网络请求代码</p>
+</li>
+<li><p>在成功返回的block中调用<code>endRefreshing</code>将Header控件隐藏起来，当然失败一样也要影藏起来；</p>
+</li>
+<li><p>一进来TableView就应该自动刷新，所以在<code>- (void)setupRefresh</code>方法中添加完header控件，就调用它的<code>beginRefreshing</code>方法，让其自动刷新；</p>
+</li>
+<li><p>利用header的<code>automaticallyChangeAlpha(YES)</code>属性自动改变header的透明度，让其影藏，解决下图效果问题</p>
+</li>
+</ul>
+<p><img src="/img/1557972-19285bc20226c60e.png" alt="一张图"></p>
+<ul>
+<li><p>利用<code>MJRefreshAutoNormalFooter</code>类添加footer控件，一开始设置footer控件<code>hidden</code>属性为YES隐藏；</p>
+<p>  5.1<code>MJRefreshAutoNormalFooter</code>类的footer是上拉到指定位置自动刷新<br>  5.2<code>MJRefreshBackFooter</code>类刷新完会有一个回弹的效果</p>
+</li>
+<li>上拉刷新加载更多数据，所以将下拉刷新发送网络请求的代码同样复制一份到<code>- (void)loadMoreTopics</code>方法中，但是加载更多需要下一个的页码参数</li>
+</ul>
+<p><strong>网络延迟中一些细节处理</strong></p>
+<ul>
+<li><p>网络不好时，上拉加载更多失败了，但是page++了，下次加载就会直接跳过失败那页数据，所以在失败的block中将page—-；</p>
+</li>
+<li><p>加入显示处在第5页数据中，先在下拉刷新加载最新数据，但是也有可能失败，一旦下拉刷新page被清空为0了，但现在处在第5页，如果现在上拉刷新加载更多，将会重复加载第0页数据。所以改进办法就是当下拉刷新成功了，才将页码清空为0，将<code>self.page = 0</code>; 放到成功的block中；</p>
+</li>
+<li><p>用户有可能下拉刷新又上拉刷新<br>例如：现在用户当前处在第5页，先下拉刷新，又上拉刷新，一会下拉刷新的数据回来后，page被清空为0了，之后上拉数据回来，成功后会将第六页数据放到第5页数据后，但是第5页数据被清空了，就讲最前面的0页数据和第6页数据合在一起了。如果上拉数据失败，page—，这样当前page被减为负数，也是有问题。<br>*两种解决办法：</p>
+<p>  （1）控制器增加一个字典成员属性params，只处理最后一次的网络请求，如果当前返回的请求和params中的请求不是同一个请求，直接return</p>
+<figure class="highlight objc"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">if</span>(<span class="keyword">self</span>.params != params) <span class="keyword">return</span>;</span><br></pre></td></tr></table></figure>
+<p>  （2）禁止用户同时上拉和下拉刷新，如果发现有一个在刷新，则禁止掉例外一个刷新</p>
+</li>
+</ul>
+<p><strong>其他一些知识点</strong></p>
+<ul>
+<li><p>footer控件永远粘着cell的底部，如果一上来，TableView没有数据，那么会直接显示footer控件。所以创建完footer控件时，默认让其隐藏，同时在<code>numberOfRowInSession</code>中设置如果返回的count==0时隐藏</p>
+<figure class="highlight objc"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">self</span>.tableView.mj_footer.hidden = (<span class="keyword">self</span>.topics.count == <span class="number">0</span>);</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>设置TableView内边距的一些代码放在“精华”控制器中不合适，应该放到TableView自己的控制器中，子控制器的代码应该放到子控制器</p>
+</li>
+<li><p>在other文件中新建一个保存常量的类（继承NSObject）,用来保存一些全局都用到的常量信息</p>
+<p>  12.1 删除所有内容，导入.h和.m都导入<code>#import &lt;UIKit/UIkit.h&gt;</code><br>  12.2 .m中放一些const常量，.h中放一些放常量的引用同时加上<code>UIKIT_EXTERN</code></p>
+</li>
+<li><p>修改TableView内部的Cell的尺寸，让其左右有间距，需要重写他的setFrame方法，只需要设置一次的东西就写在<code>awakeFromNib(xib)</code>，或<code>initWithFrame(代码)</code>方法中</p>
+</li>
+<li><p>将createTtime字符串时间转变为NSDate格式的时间</p>
+<figure class="highlight objc"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">NSDate</span> *now = [<span class="built_in">NSDate</span> date]; <span class="comment">// 当前时间</span></span><br><span class="line"><span class="built_in">NSDateFormat</span> *fmt = [[<span class="built_in">NSDateFormat</span> alloc] init];</span><br><span class="line">fmt.dateformat = @“yyyy-MM-dd HH:mm:ss”;</span><br><span class="line"><span class="built_in">NSDate</span> *createtime = [fat dateWithString:topic.create_time];</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>两个时间的比较方法<br>(1):返回一个时间间隔（s）</p>
+<figure class="highlight objc"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">NSTimeInterval</span> delta = [now timeIntervalSinceDate:create];</span><br></pre></td></tr></table></figure>
+</li>
+</ul>
+<p>(2):NSCalendar类，有一个currentCalendar方法获取当前的日历<br><figure class="highlight objc"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">NSCalendar</span> *calendar = [<span class="built_in">NSCalendar</span> currentCalendar];</span><br><span class="line"><span class="built_in">NSInteger</span> year= [calendar component:<span class="built_in">NSCalendarUnitYear</span> fromDate:now];</span><br></pre></td></tr></table></figure></p>
+<p>其中<code>NSCalendarUnitYear</code>是一个枚举，里面有年、月、日、时、分、秒<code>components:fromDate:</code>同上一样，可以传多个枚举值，返回一个<code>NSDateCompoents</code>,里面放着年、月、日、时、分、秒<br>时间的比较:<br><figure class="highlight objc"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">NSDateCompoents</span> cmps =[calendar components:枚举 fromDate:create toDate:now options:<span class="number">0</span>]</span><br></pre></td></tr></table></figure></p>
+<p><code>cmps.year</code>,<code>cmps.month</code>等就是相差的间隔。</p>
+<ul>
+<li><p>UITableView的Cell有一个<code>TableView：heightForRowAtIndexPath:</code>方法，直接动态计算出每一个Cell的高度，但是这个方法调用非常频繁，所以将具体计算代码放在这里会影响性能。应该给模型提供一个<code>cellHeight</code>属性，重写该属性的getter方法，将计算的代码放这里。并且加一个if判断，如果_cellHeight没有值，才进行计算，这样就保证只计算一次，提升性能。但是提供这样一个属性暴漏在外面，别人很有可能会修改属性，所以加上readonly。</p>
+</li>
+<li><p>如果一个成员变量加了<code>readonly</code>，又重写了<code>getter</code>方法，那么getter方法中的成员变量就会报错，因为编译器认为有<code>readonly</code>的只生成getter方法，自己又实现了getter方法，意味着成员变量也需要自己实现，所以报错。这时，就需要我们自己再实现成员变量，在.m中加上<code>_cellheight</code>的成员变量。</p>
+</li>
+<li><p><code>- boundingRectWithSize:options:attributes:context:</code>方法是根据文字的大小、宽度，动态计算出这段文字的高度。</p>
+</li>
+<li><p>iPhone默认是不支持gif图片播放的，必须将一个gif图片解析成n个<code>UIImage</code>对象才能进行播放，用到ImageIO框架</p>
+</li>
+<li><p><code>imageView的contentMode</code>属性中有一个<code>UIViewContentModeScaleToFit</code>属性，表示，缩放图片比例，在现有的显示尺寸的大小内，保证看到图片的全部。另外<code>UIViewContentModeScaleToFill</code>模式是，等比例伸缩，然后在现有显示尺寸的大小内，显示伸缩后的图片的中间部分，但是剩余的头尾剩余部分也会显示出来，会遮盖其他控件，所以在显示图片的iamgeView右侧栏中间的模式中，勾选<code>Clip Subviews</code>即可将多余的部分裁剪掉。</p>
+</li>
+<li><p>带有图片的段子，为了提高用户体验，在图片没有下载完之前，</p>
+<p>  1.先显示占位图片；<br>  2.提供一个下载的进度条；</p>
+</li>
+<li><p>屏蔽第三方框架带来的风险，就是自己建立一下类，然后继承自框架的类，这样面向自己类做开发，以后如果不用这个框架了只需要改这个类即可，这样减少不用框架后多处修改代码的风险</p>
+</li>
+<li><p><code>-(void)UIImageWriteToSavedPhotosAlbum(UIImage *image, id completionTarget, SELcompletionSelector, void *contextInfo );</code><br>用来将图片保存进用户的相册，第一次调用会弹框询问。</p>
+</li>
+<li><p>图片段子中的图片，自定义一个类，继承<code>UIView</code>，提供一个类方法返回一个创建好的UIView</p>
+<figure class="highlight objc"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">[[[<span class="built_in">NSBundle</span> mainBundle] loadNibNamed:<span class="built_in">NSStringFromClass</span>(<span class="keyword">self</span>) owner:<span class="literal">nil</span> options:<span class="literal">nil</span>] lastObject];</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>根据模型的内容（图片、声音or视频？），将<code>UIView</code>添加到对应的cell中，所以在模型属性的setter方法中写；</p>
+</li>
+<li><p>为了保证只创建一次<code>UIView</code>，Cell来回滚动时可以循环利用，所以采用懒加载,但是控件都是弱指针，代码段执行完控件就死了，所以在懒加载中直接将控件下到<code>contentView</code>中</p>
+</li>
+<li><p>图片段子中的图片，需要给自定义的图片View增加一个topic模型,然后在if判断中若为图片段子则将topic模型传递给图片view的模型中，这样view才能拿到数据，设置数据到对应的view中去显示</p>
+</li>
+<li><p>如果Cell的尺寸做了修改，Cell内部的子控件<code>frame</code>尺寸不对，则将<code>autoresizingMask</code>属性设置为NO</p>
+<figure class="highlight objc"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">self</span>.autoresizingMask = <span class="built_in">UIViewAutoresizingNone</span>;</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>判断gif图片标志的显示或隐藏</p>
+<figure class="highlight objc"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 判断GIF是否显示</span></span><br><span class="line"><span class="built_in">NSString</span> *extensionName = topic.large_image.pathExtension;</span><br><span class="line"><span class="keyword">self</span>.gifView.hidden = ![extensionName.lowercaseString isEqualToString:<span class="string">@"gif"</span>];</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>在不知道图片扩展名的情况下，<code>SDWebImage</code>框架中有一个方法，可以取出图片数据的第一个字节，进行判断，获得图片的扩展名，这种方式是最准确的</p>
+</li>
+<li><p>发布按钮点击后，一进来，几个button在执行动画的过程中，应该让按钮不能被点击，所以在控制器的<code>viewDidLoad</code>方法中设置<br><code>self.view.userInteractionEnabled = NO</code>; (不响应用户交互事件)，动画执行完毕（最后标语落下来时），在setCompetionBlock这个block中恢复view的点击事件；</p>
+</li>
+<li><p><code>UIWindow</code>有三个级别，<code>Normal &lt; StatusBar &lt; Alert</code>依次升高。如果想做一个动画，在状态栏提示一些东西，就创建一个Window，设置为状态栏级别，挡住系统自带的状态栏，因为状态栏就是一个<code>StatusBar</code>级别的window。</p>
+</li>
+<li><p>命名规范</p>
+</li>
+</ul>
+<p>（1）成员变量访问以下滑线开头；<br>（2）全局变量可以在名称后面加一个下划线与成员变量区分；<br>（3）如果没有任何东西就是局部变量</p>
+<ul>
+<li><p>发布按钮，一进来动画在执行的过程中，让下降的按钮应该不能被点击，所以在<code>viewDidLoad</code>中让<code>view.userInteractionEnabled = NO</code>，在动画执行完毕后再恢复能点击,在 setCompletionBlock:^的block中恢复</p>
+</li>
+<li><p>reloadData刷新表格时就会调用数据源的三个方法</p>
+</li>
+</ul>
+<figure class="highlight objc"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">- (<span class="built_in">NSInteger</span>)tableView:(<span class="built_in">UITableView</span> *)tableView numberOfRowsInSection:(<span class="built_in">NSInteger</span>)section</span><br><span class="line">- (<span class="built_in">NSString</span> *)tableView:(<span class="built_in">UITableView</span> *)tableView titleForHeaderInSection:(<span class="built_in">NSInteger</span>)section</span><br><span class="line">- (<span class="built_in">UITableViewCell</span> *)tableView:(<span class="built_in">UITableView</span> *)tableView cellForRowAtIndexPath:(<span class="built_in">NSIndexPath</span> *)indexPath</span><br></pre></td></tr></table></figure>
+<ul>
+<li><p>header和cell一样也可以循环利用<code>dequeueReusableHeaderFooterViewWithIdentifier:</code>利用这个方法从缓存池中找这个标识的headerfooterView，返回一个<code>UITableViewHeaderFooterView</code></p>
+</li>
+<li><p>从iOS8开始提供了一个自动计算Cell高度尺寸的属性，先给出估算高度，然后让真实高度根据具体尺寸伸缩</p>
+<figure class="highlight objc"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">self</span>.tableView.estimatedRowHeight = <span class="number">44</span>;</span><br><span class="line"><span class="keyword">self</span>.tableView.rowHeight = <span class="built_in">UITableViewAutomaticDimension</span>;</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>连续点击两次tabBar自动刷新当前窗口中的TableView,是有通知完成，系统的delegate成为<code>tabBarController</code>的代理，当tabBar被点击时，发出一个通知。对应的TableViewController接到通知，调用自己的头部控件开始刷新</p>
+</li>
+<li><p>UIView没有图片属性，也没有背景图片属性，所以要给UIView添加背景需要调用<code>drawRect:</code>方法画上去</p>
+</li>
+<li><p>监听textFiled的文字改变可以用三种方法：</p>
+</li>
+</ul>
+<p>（1）<strong>代理</strong> - 成为代理——&gt;遵守协议——&gt;实现方法 （不推荐）<br>（2）<strong>通知</strong> 有一个<code>UITextFiledDidChangeNotification</code><br>（3）<strong>addTarget</strong> textFiled继承自<code>UIControl</code></p>
+<ul>
+<li><p>从iOS7以后</p>
+<figure class="highlight objc"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">[[<span class="built_in">UIBarButtonItem</span> alloc] initWithTitle:<span class="string">@"取消"</span> style:<span class="built_in">UIBarButtonItemStyleDone</span> target:<span class="keyword">self</span> action:<span class="keyword">@selector</span>(cancel)];</span><br><span class="line">style样式写什么都一样</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>设置导航控制器view上的标题文字大小的两种方式</p>
+</li>
+</ul>
+<p>（1）<code>UIViewController</code>被导航控制器包装后拿到titleView属性,自己包装一个UIView,里面放一个Label将文 字调整一下<code>self.navigationItem.titleView</code><br>（2）拿到<code>navigationBar</code>属性，在<code>navigationController</code>的<code>initialize</code>方法中设置<br><figure class="highlight objc"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">[<span class="keyword">self</span>.navigationController.navigationBar setTitleTextAttributes:@&#123;<span class="built_in">NSFontAttributeName</span> : [<span class="built_in">UIFont</span> systemFontOfSize:<span class="number">20</span>]&#125;];</span><br></pre></td></tr></table></figure></p>
+<ul>
+<li><p>如果在<code>navigatioController</code>利用<code>appearance</code>分状态修改了<code>UIBarButtonItem</code>的属性，那么在控制器中设置<code>rightBarButtonItem</code>状的enabled的属性之后，要调用<code>layoutifNeeded</code>函数强制刷新</p>
+<figure class="highlight objc"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">[<span class="keyword">self</span>.navigationController.navigationBar layoutIfNeeded];</span><br></pre></td></tr></table></figure>
+</li>
+<li><p><code>UITextView</code>没有占位文字，可以自定义一个继承自UITextView，增加一个<code>placeholder</code>属性的UITextView，方法有两种：</p>
+</li>
+</ul>
+<p>（1）实现<code>- (void)drawRect:(CGRect)rect</code>将文字画上去<br>（2）给TextView增加一个子控件Label,来显示占位文字，好处是，子控件可以在textView实现滚动效果</p>
+<ul>
+<li>监听<code>UITextView</code>的文字改变有很多中方法</li>
+</ul>
+<p>（1）<strong>通过代理</strong>，有一个TextViewDidChange:方法可以监听文字的改变，但是不推荐这种方法，因为控制器要成为代理来监听控件的改变，高耦合性，占位文字是控件内部的功能，应该由自己来控制或隐藏<br>（2）TextView文字发生改变会发出<strong>通知</strong>UITextViewDidChangeNotification</p>
+<ul>
+<li><p>如果监听了通知，一定要调用<code>dealloc</code>方法，将监听删除</p>
+</li>
+<li><p>文字一旦改变就会调用监听方法，在监听方法中调用<code>setNeedsDisplay</code>方法重新绘制，因为<code>setNeedsDisplay</code>会调用<code>DrawRect:</code>方法，该方法每次进来会将之前的内容擦掉，重新绘制一次</p>
+</li>
+<li><p><code>UITextView</code>给别人提供一个占位文字的属性，别人很有可能随时更改这个属性值，所以要重写属性的setter方法，时时监听属性的修改,需要重写以下几个方法,同时都要调用<code>setNeedsDisplay</code>方法</p>
+<p>  (1) 重写占位文字的属性方法<br>  (2) 重写字体属性的setter方法，因为字体别人也有可能修改，同样也要调用<br>  (3) 别人可能通过代码修改text值，所有也要重写setText:方法（调用父类的该方法）<br>  (4)别人修改的也有可能是富文本属性AttributedText，所有这个属性也要重写</p>
+</li>
+<li><p>TextView继承<code>UIscrollView</code>，所以他是能滚动的，其中有一个属性<code>alwaysBounceVertical</code>，在竖直方向上有弹簧效果</p>
+</li>
+<li><p>增加的label采用懒加载先确定位置，如果label的宽度确定，高度是要通过文字计算出来，所以在<code>layoutSubviews</code>方法中计算根据文字数量和字体大小确定后的label的尺寸，但是控制器中有可能随时修改这个尺寸和文字，所以要在setter方法中调用setNeedsLayout方法在恰当的时间重新计算更新后的label的尺寸</p>
+</li>
+</ul>
+<figure class="highlight objc"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/**</span><br><span class="line"> *  更新label的尺寸</span><br><span class="line"> */</span></span><br><span class="line">- (<span class="keyword">void</span>) layoutSubviews</span><br><span class="line">&#123;</span><br><span class="line">    <span class="built_in">CGSize</span> size = <span class="built_in">CGSizeMake</span>( <span class="keyword">self</span>.width - <span class="number">2</span> * <span class="keyword">self</span>.phLabel.x, MAXFLOAT);</span><br><span class="line">    <span class="keyword">self</span>.phLabel.size = [<span class="keyword">self</span>.placeholder boundingRectWithSize:size options:<span class="built_in">NSStringDrawingUsesLineFragmentOrigin</span> attributes:@&#123;<span class="built_in">NSFontAttributeName</span> : <span class="keyword">self</span>.font&#125; context:<span class="literal">nil</span>].size;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<ul>
+<li><p><code>setNeedsDisplay</code>会在恰当的时候调用<code>drawRect:</code>方法<br><code>setNeedsLayout</code>会在恰当时候调用<code>layoutSubviews</code>方法</p>
+</li>
+<li><p>通过代码设置创建按钮的尺寸和图片的尺寸一样的方法</p>
+<p>  （1）<code>button.size = [UIImage ImageNamed:@“tag_add_icon”].size;</code><br>  （2）取出普通状态下的图片<code>button.size = [button iamgeForState:UIControlStateNormal].size</code>;<br>  （3）获取正在展示的图片<code>button.size = button.currentImage.size</code>;</p>
+</li>
+<li><p>一旦根控制器modal出一个控制器，就会用<code>presentedViewController</code>属性引用着它。</p>
+</li>
+</ul>
+<p>a.<code>presentedViewController</code> -&gt; b a控制器的这个属性可以找到弹出的b控制器<br>b.<code>presentingViewController</code> -&gt; a b控制器的这个属性可以找到谁把他push出来了</p>
+<ul>
+<li><p>监听TextFiled的文字改变的三种方法：</p>
+<p>  （1）<strong>代理方法</strong>，但对中文的支持不好，不推荐<br>  （2）<strong>通知</strong><code>UITextFieldTextDidChangeNotification</code><br>  （3）<code>addTarget:</code>方法</p>
+</li>
+<li><p>按钮的<code>contenMode</code>属性用在内部的image身上，对文字的对齐方式不起作用,<code>contentHorizontalAlignment</code>属性，是设置按钮内部文字或图片水平方向的排布</p>
+</li>
+<li><p>右下角的换行不是字符，所以不能通过<code>addTarget:</code>方法中的点击方法监听，要通过代理监听</p>
+<figure class="highlight objc"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">- (<span class="built_in">BOOL</span>)textFieldShouldReturn:(<span class="built_in">UITextField</span> *)textField</span><br></pre></td></tr></table></figure>
+</li>
+<li><p><code>- (void)deleteBackard</code>是监听键盘的删除按键</p>
+</li>
+<li><p>自己定义的Block很容易发生循环引用，所以一定要用弱引用</p>
+</li>
+<li><p>布局控制器view中的子控件位置和尺寸的代码最好放到<code>viewDidLayoutSubviews</code>方法中，因为控制器的view有可能是通过xib、代码、storyboard创建，所以一开始初始化时的尺寸是不准确的。但是当view布局完成后的尺寸是最准确的</p>
+</li>
+<li><p>Xcode中蓝色文件夹表示在项目中真实存在</p>
+</li>
+<li><p><code>ABS()</code>是取绝对值函数</p>
+</li>
+<li><p><code>- (void)prepareLayout</code>用来做布局的初始化操作(不建议在 init 方法中进行布局的初始化操作)</p>
+</li>
+<li><p><code>- (NSDictionary *)attributesOfItemAtPath:(NSString *)path error:(NSError **)error</code>;这个方法获取文件大小是可靠的,文件计算不准确</p>
+</li>
+</ul>
+</div></article></div></main><footer><div class="paginator"><a href="/2016/04/09/故事不一定有标题/" class="prev">PREV</a><a href="/2016/04/09/UITextView实现占位文字的两种方法/" class="next">NEXT</a></div><div class="copyright"><p>© 2016 - 2018 <a href="https://recherj.github.io">RecherJ</a>, powered by <a href="https://hexo.io/" target="_blank">Hexo</a> and <a href="https://github.com/pinggod/hexo-theme-apollo" target="_blank">hexo-theme-apollo</a>.</p></div></footer></div><script async src="//cdn.bootcss.com/mathjax/2.7.0/MathJax.js?config=TeX-MML-AM_CHTML" integrity="sha384-crwIf/BuaWM9rM65iM+dWFldgQ1Un8jWZMuh3puxb8TOY9+linwLoI7ZHZT+aekW" crossorigin="anonymous"></script><script>(function(b,o,i,l,e,r){b.GoogleAnalyticsObject=l;b[l]||(b[l]=function(){(b[l].q=b[l].q||[]).push(arguments)});b[l].l=+new Date;e=o.createElement(i);r=o.getElementsByTagName(i)[0];e.src='//www.google-analytics.com/analytics.js';r.parentNode.insertBefore(e,r)}(window,document,'script','ga'));ga('create',"UA-65933410-1",'auto');ga('send','pageview');</script></body></html>
