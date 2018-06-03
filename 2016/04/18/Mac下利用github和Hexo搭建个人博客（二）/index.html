@@ -19,7 +19,7 @@
 <figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">git config --global user.name yourname</span><br><span class="line">git config --global user.email youremail</span><br></pre></td></tr></table></figure>
 </li>
 <li><p>查看当前所有的配置</p>
-<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">git config <span class="_">-l</span></span><br></pre></td></tr></table></figure>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">git config -l</span><br></pre></td></tr></table></figure>
 </li>
 </ul>
 <p>cd进blog目录下将github上的仓库<code>clone</code>下来</p>
@@ -28,12 +28,12 @@
 <p>注意：冒号后面都要空一格</p>
 <p>新建博客<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">hexo new <span class="string">"博客名称"</span></span><br></pre></td></tr></table></figure></p>
 <p>清除缓存<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">hexo clean</span><br></pre></td></tr></table></figure></p>
-<p>部署<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">hexo generate <span class="_">-d</span></span><br></pre></td></tr></table></figure></p>
+<p>部署<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">hexo generate -d</span><br></pre></td></tr></table></figure></p>
 <p>###写在最后</p>
 <p>建议利用<code>https</code>提交发布博客内容，之前使用的是SSH来发布，但是由于我朝网络的问题，经常会出现连接不上的问题</p>
 <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">connect to host github.com port 22: Operation timed out</span><br></pre></td></tr></table></figure>
 <p><code>StackOverflow</code>上有人说可以把SSH的端口号改为443走https，但我觉得最好的办法还是使用https部署</p>
-<p><a href="http://stackoverflow.com/questions/15589682/ssh-connect-to-host-github-com-port-22-connection-timed-out" target="_blank" rel="external">ssh: connect to host github.com port 22: Connection timed out</a><br><a href="https://help.github.com/articles/using-ssh-over-the-https-port/" target="_blank" rel="external">Using SSH over the HTTPS port</a></p>
+<p><a href="http://stackoverflow.com/questions/15589682/ssh-connect-to-host-github-com-port-22-connection-timed-out" target="_blank" rel="noopener">ssh: connect to host github.com port 22: Connection timed out</a><br><a href="https://help.github.com/articles/using-ssh-over-the-https-port/" target="_blank" rel="noopener">Using SSH over the HTTPS port</a></p>
 <p>修改的方式在<code>_config.yml</code>配置文件中有一个deploy设置。同时，也要修改github上仓库的提交方式。</p>
-<p>参考链接：<br><a href="http://www.jianshu.com/p/821fe67e712b" target="_blank" rel="external">简书-Hexo搭建静态个人博客</a></p>
+<p>参考链接：<br><a href="http://www.jianshu.com/p/821fe67e712b" target="_blank" rel="noopener">简书-Hexo搭建静态个人博客</a></p>
 </div></article></div></main><footer><div class="paginator"><a href="/2016/04/21/根据不同控制器自动切换横竖屏/" class="prev">PREV</a><a href="/2016/04/18/OC下runtime获取类私有成员属性/" class="next">NEXT</a></div><div class="copyright"><p>© 2016 - 2018 <a href="https://recherj.github.io">RecherJ</a>, powered by <a href="https://hexo.io/" target="_blank">Hexo</a> and <a href="https://github.com/pinggod/hexo-theme-apollo" target="_blank">hexo-theme-apollo</a>.</p></div></footer></div><script async src="//cdn.bootcss.com/mathjax/2.7.0/MathJax.js?config=TeX-MML-AM_CHTML" integrity="sha384-crwIf/BuaWM9rM65iM+dWFldgQ1Un8jWZMuh3puxb8TOY9+linwLoI7ZHZT+aekW" crossorigin="anonymous"></script><script>(function(b,o,i,l,e,r){b.GoogleAnalyticsObject=l;b[l]||(b[l]=function(){(b[l].q=b[l].q||[]).push(arguments)});b[l].l=+new Date;e=o.createElement(i);r=o.getElementsByTagName(i)[0];e.src='//www.google-analytics.com/analytics.js';r.parentNode.insertBefore(e,r)}(window,document,'script','ga'));ga('create',"UA-65933410-1",'auto');ga('send','pageview');</script></body></html>
