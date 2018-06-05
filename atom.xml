@@ -6,7 +6,7 @@
   <link href="/atom.xml" rel="self"/>
   
   <link href="https://recherj.github.io/"/>
-  <updated>2018-06-03T10:24:40.648Z</updated>
+  <updated>2018-06-05T15:12:11.751Z</updated>
   <id>https://recherj.github.io/</id>
   
   <author>
@@ -15,6 +15,27 @@
   </author>
   
   <generator uri="http://hexo.io/">Hexo</generator>
+  
+  <entry>
+    <title>Kingfisher加载gif问题</title>
+    <link href="https://recherj.github.io/2018/06/05/Kingfisher%E5%8A%A0%E8%BD%BDgif%E9%97%AE%E9%A2%98/"/>
+    <id>https://recherj.github.io/2018/06/05/Kingfisher加载gif问题/</id>
+    <published>2018-06-05T14:29:49.000Z</published>
+    <updated>2018-06-05T15:12:11.751Z</updated>
+    
+    <content type="html"><![CDATA[<p>之前将我们的一款 Swift 项目中的图片库，从OC的 <a href="https://github.com/rs/SDWebImage" target="_blank" rel="noopener">SDWebImage</a> 换成了喵神写的 <a href="https://github.com/onevcat/Kingfisher" target="_blank" rel="noopener">Kingfisher</a> , 主要为了尽可能纯swift开发，混编编译实在是太慢了..</p><p>因为是一款电商App，自然少不了大量的图片，首页是仿淘宝模式利用UICollectionView实现的大量瀑布流的商品，产品需求要求增加对gif动图的实现。这个不难啊，迅速将UIImageView的图片换成了下面的模式</p><figure class="highlight swift"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">imageView.kf.setImage(with: <span class="type">URL</span>(string: imageURL))</span><br></pre></td></tr></table></figure><p>滚动起来发现卡的飞起，直接被产品怼回来了。。这个怎么可以？？so，问题出在哪了呢，简单查看了下源码发现，<code>KingfisherManager</code> 在 retrieveImage 时先判断cache中有没有，再去检查disk，如果都没有就调用 <code>ImageDownloader</code> 去异步下载，然后再主线程中回调给调用者，并在内存和disk中歌缓存一份。问题是，图片回来后的 decode 默认是在主线程中完成的，这样一来当 scrolling 时，就会发生资源抢夺，占用主线程导致感知到明显的卡顿（简直是就是掉帧，惨目忍睹😭），于是乎去翻了下 <code>KingfisherOptionsInfo.swift</code> 发现了 <code>.backgroundDecode</code> 属性</p><figure class="highlight swift"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/// Decode the image in background thread before using.</span></span><br><span class="line"><span class="keyword">case</span> backgroundDecode</span><br></pre></td></tr></table></figure><p>再将原来设置图片的方法改成了</p><figure class="highlight swift"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">imageView.kf.setImage(with: <span class="type">URL</span>(string: datas.squareImage), </span><br><span class="line">               placeholder: <span class="literal">nil</span>, </span><br><span class="line">                   options: [.backgroundDecode], </span><br><span class="line">             progressBlock: <span class="literal">nil</span>, </span><br><span class="line">         completionHandler: <span class="literal">nil</span>)</span><br></pre></td></tr></table></figure><p>换成了子线程中去 decode 后滚动测试，发现 everything gonna’ smoothly!! hold on , 怎么 gif 图不动了？？这都要上线了，出这种幺蛾子？？于是乎赶紧去 github 上看了看 issues ， 发现不止我一个人有遇到这种问题啊。找到了 <a href="https://github.com/onevcat/Kingfisher/issues/880" target="_blank" rel="noopener">Can’t play GIF with .backgroundDecode option</a> 和 作者的一个回复 <a href="https://github.com/onevcat/Kingfisher/issues/625" target="_blank" rel="noopener">.backgroundDecode not working with GIF</a> 。喵神大概意思是说 backgroundDecode 需要平衡内存和CPU的使用在两种模式下。于是就把自己的所有首页模板中的 UIImageView 全部改成继承自 <code>AnimatedUIImageView</code> 类，使用后卡顿的问题得到了解决，gif 图也可以正常动，但似乎卡顿还是存在，另外动图图片除了第一帧外其他压缩都很严重。</p><p>最终经过反复查阅头文件，找到了 <code>needsPrescaling</code> 和  <code>runLoopMode</code> 这两个属性。</p><figure class="highlight swift"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/// Specifies whether the GIF frames should be pre-scaled to save memory. Default is true.</span></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">var</span> needsPrescaling = <span class="literal">true</span></span><br><span class="line"></span><br><span class="line"><span class="comment">/// The animation timer's run loop mode. Default is `NSRunLoopCommonModes`. Set this property to `NSDefaultRunLoopMode` will make the animation pause during UIScrollView scrolling.</span></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">var</span> runLoopMode = <span class="type">RunLoopMode</span>.commonModes &#123;</span><br><span class="line">  <span class="keyword">willSet</span> &#123;</span><br><span class="line">    <span class="keyword">if</span> runLoopMode == newValue &#123;</span><br><span class="line">      <span class="keyword">return</span></span><br><span class="line">    &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">      stopAnimating()</span><br><span class="line">      displayLink.remove(from: .main, forMode: runLoopMode)</span><br><span class="line">      displayLink.add(to: .main, forMode: newValue)</span><br><span class="line">      startAnimating()</span><br><span class="line">    &#125;</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure><p>将 <code>needsPrescaling</code> 设置为 false，并将 <code>runLoopMode</code> 改到 <code>.defaultRunLoopMode</code> 默认模式下，问题得到了解决。但卡顿掉帧还是存在，只是不那么明显了，后期再着重将这个问题再优化下。</p>]]></content>
+    
+    <summary type="html">
+    
+      
+      
+        &lt;p&gt;之前将我们的一款 Swift 项目中的图片库，从OC的 &lt;a href=&quot;https://github.com/rs/SDWebImage&quot; target=&quot;_blank&quot; rel=&quot;noopener&quot;&gt;SDWebImage&lt;/a&gt; 换成了喵神写的 &lt;a href=&quot;htt
+      
+    
+    </summary>
+    
+    
+  </entry>
   
   <entry>
     <title>仿淘宝购买页面</title>
@@ -389,24 +410,6 @@
     <summary type="html">
     
       &lt;p&gt;在Cocoa Touch框架中有两种系统自带的文本输入控件：&lt;code&gt;UITextFiled&lt;/code&gt;和&lt;code&gt;UITextView&lt;/code&gt;&lt;/p&gt;
-    
-    </summary>
-    
-    
-  </entry>
-  
-  <entry>
-    <title>浅谈UITableView内Cell的选中细节过程</title>
-    <link href="https://recherj.github.io/2016/04/09/%E6%B5%85%E8%B0%88UITableView%E5%86%85Cell%E7%9A%84%E9%80%89%E4%B8%AD%E7%BB%86%E8%8A%82%E8%BF%87%E7%A8%8B/"/>
-    <id>https://recherj.github.io/2016/04/09/浅谈UITableView内Cell的选中细节过程/</id>
-    <published>2016-04-09T12:34:31.000Z</published>
-    <updated>2018-05-06T10:15:32.558Z</updated>
-    
-    <content type="html"><![CDATA[<p>UITableView的代理协议中给代理者提供了4个代理方法，用来监听从选中一个cell到选中另一个cell的切换过程，当然代理必须实现这些方法，才能监听整个cell的点击切换过程。</p><a id="more"></a><figure class="highlight objc"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">//将要选中</span></span><br><span class="line">- (<span class="built_in">NSIndexPath</span> *)tableView:(<span class="built_in">UITableView</span> *)tableView willSelectRowAtIndexPath:(<span class="built_in">NSIndexPath</span> *)indexPath</span><br><span class="line"><span class="comment">// 选中 </span></span><br><span class="line">- (<span class="keyword">void</span>)tableView:(<span class="built_in">UITableView</span> *)tableView didSelectRowAtIndexPath:(<span class="built_in">NSIndexPath</span> *)indexPath</span><br><span class="line"><span class="comment">// 将要取消选中</span></span><br><span class="line">- (<span class="built_in">NSIndexPath</span> *)tableView:(<span class="built_in">UITableView</span> *)tableView willDeselectRowAtIndexPath:(<span class="built_in">NSIndexPath</span> *)indexPath</span><br><span class="line"><span class="comment">// 取消选中</span></span><br><span class="line">- (<span class="keyword">void</span>)tableView:(<span class="built_in">UITableView</span> *)tableView didDeselectRowAtIndexPath:(<span class="built_in">NSIndexPath</span> *)indexPath</span><br></pre></td></tr></table></figure><ol><li>当第一次点击某个cell时<br> 1.1 首先调用代理的<code>- willSelectRowAtIndexPath:(NSIndexPath *)indexPath</code>方法，并将选中的<code>indexPath</code>对象返回给代理，其中包含选中的这组section组号和row行号<br> 1.2 紧接着，马上会调<code>- didSelectRowAtIndexPath:(NSIndexPath *)indexPath</code>方法，告诉代理选中了该cell</li><li>再点击另一个Cell时<br> 2.1 首先调<code>- willSelectRowAtIndexPath:(NSIndexPath *)indexPath</code>方法，告诉代理有一个新Cell将要被选中，并将这个新cell的indexPath返回给代理<br> 2.2 然后调<code>willDeselectRowAtIndexPath:(NSIndexPath *)indexPath</code>方法，告诉代理即将取消选中上一个cell<br> 2.3 接着调<code>didDeselectRowAtIndexPath:(NSIndexPath *)indexPath</code>取消选中上一个cell<br> 2.4 最后调<code>didSelectRowAtIndexPath:(NSIndexPath *)indexPath</code>选中新cell<br>明白了这些cell选中的细节过程，我们就可以让控制器成为TableView的代理，监听其内部的点击事件，完成一些转场动画、弹框提示、modal新控制器或者修改cell内数据时，传递数据给下一个控制器等等一些详细操作了。<br>例如，可以不用push新控制器修改数据的方式，直接将修改后的数据在原来的view中刷新，将刷新表格的代码写在<code>willDeselectRowAtIndexPath:(NSIndexPath *)indexPath</code>中，这样修改后点击新cell，新数据自动刷新，不用上下拉滚动cell来刷新；<br>再例如，当点击某个cell，界面显示一些友好的文字提示，之后慢慢消失。整个view的显示、透明度变化、消失、view的最终删除等一系列动画过程的相关代码，就可以放在<code>didSelectRowAtIndexPath:(NSIndexPath *)indexPath</code>方法中完成<br>等等<br>……</li></ol><p>总之，在明白了这个cell点击函数调用的先后顺序后，我们就可以做很多事情了。</p>]]></content>
-    
-    <summary type="html">
-    
-      &lt;p&gt;UITableView的代理协议中给代理者提供了4个代理方法，用来监听从选中一个cell到选中另一个cell的切换过程，当然代理必须实现这些方法，才能监听整个cell的点击切换过程。&lt;/p&gt;
     
     </summary>
     
