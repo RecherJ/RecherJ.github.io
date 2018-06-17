@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html lang="en-US">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="author" content="map[]" />
+    
+    <link rel="shortcut icon" type="image/x-icon" href="https://recherj.github.io/img/favicon.ico">
+    <title>OC下runtime获取类私有成员属性</title>
+    <meta name="generator" content="Hugo 0.41" />
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
+    <link rel="stylesheet" type="text/css" href="https://recherj.github.io/css/main.css" />
+    <link rel="stylesheet" type="text/css" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.6.3/css/font-awesome.min.css" />
+    <link rel="stylesheet" type="text/css" href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:200,400,200bold,400old" />
+    
+    <link rel="stylesheet" href="https://recherj.github.io/css/code.css">
+    
+    <!--[if lt IE 9]>
+			<script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
+			<script src="https://oss.maxcdn.com/libs/respond.js/1.4.2/respond.min.js"></script>
+		<![endif]-->
+
+    
+  </head>
+
+  <body>
+    <div id="wrap">
+
+      
+      <nav class="navbar navbar-default">
+  <div class="navbar-container">
+    <div class="navbar-header">
+      <a class="navbar-brand" href="https://recherj.github.io/"><img src="https://recherj.github.io//img/favicon.png" /></a>
+      <span>厚德载物，上善若水</span>
+    </div>
+    <ul class="nav navbar-nav navbar-right">
+        
+          
+          <li><a href="/blog/">博客</a></li>
+          
+          <li><a href="/about/">关于</a></li>
+          
+        
+        </ul>
+  </div>
+</nav>
+
+      
+      <div class="container article-content">
+        <div class="article-top-block">
+            <div class="blog-post">
+              <h3>
+                <strong><a href="https://recherj.github.io/blog/oc%E4%B8%8Bruntime%E8%8E%B7%E5%8F%96%E7%B1%BB%E7%A7%81%E6%9C%89%E6%88%90%E5%91%98%E5%B1%9E%E6%80%A7/">OC下runtime获取类私有成员属性</a></strong>
+              </h3>
+            </div>
+            <div class="blog-title">
+              <h4>
+              April 18, 2016
+                &nbsp;&nbsp;
+                
+              </h4>
+            </div>
+        </div>
+        <div class="panel panel-default">
+          <div class="panel-body">
+            <div class="blogpost">
+              <p>苹果的runtime运行机制还是非常强大的，掌握runtime对开发帮助是如虎添翼。因为有些类的私有成员属性是不暴漏在外供开发者使用的，但是有时，如果我们知道了这些属性对开发来说事半功倍，省去很多麻烦。</p>
+
+<p></p>
+
+<p>下面介绍一个runtime中的C语言函数，可以找出这些藏在类中的私有成员属性。使用方法也很简单，首先导入头文件<code>#import &quot;objc/runtime.h&quot;</code>,这样就可以敲出下面这个方法</p>
+
+<pre><code class="language-objc">class_copyIvarList(Class cls, unsigned int *outCount)
+</code></pre>
+
+<p>两个参数：第一个传入你想获取的类，第二个传入一个整型的总数count的地址，它会返回这个总数给你。
+这个函数返回的是一个Ivar类型的指针对象，该指针指向每一个属性的地址，其实就是一个数组，遍历这个数组，就可以取出所有的私有成员变量了。
+<strong>注意点</strong>：该列表返回的属性中，只有本来的私有成员属性，不包含继承父类的。</p>
+
+<pre><code class="language-objc">Ivar *ivars = class_copyIvarList([UIGestureRecognizer class], &amp;count);
+
+for (int i = 0; i &lt; count; i++) {
+    Ivar ivar = ivars[i];
+    //获取属性名
+    NSString *ivarName = @(ivar_getName(ivar));
+    
+    NSLog(@&quot;%@&quot;, ivarName);
+}
+</code></pre>
+
+<p>获取到私有的成员属性后，就可以利用KVC来取出对应的值，非常方便。</p>
+
+<p>例如，可以利用这个方法在系统手势的基础上，增加一个自定义的返回手势</p>
+
+<p>系统的返回手势，只有在靠近左边滑动时才会有返回效果，如果我们希望在中间向右滑动也有返回效果的话，我们可以自己添加一个手势，将其添加到导航控制的View上，调用系统自带的target选择子，来实现该功能</p>
+
+<p>首先，禁用系统自带的滑动返回手势</p>
+
+<pre><code class="language-objc">self.interactivePopGestureRecognizer.enabled = NO;
+</code></pre>
+
+<p>新建一个手势，将其添加到导航控制器View上</p>
+
+<pre><code class="language-objc">UIPanGestureRecognizer *pan = [[UIPanGestureRecognizer alloc] initWithTarget:target action:@selector(handleNavigationTransition:)];
+[self.view addGestureRecognizer:pan];
+</code></pre>
+
+<p>这里target对象就是利用KVC模式取出的target</p>
+
+<pre><code class="language-objc">NSArray *targets= [self.interactivePopGestureRecognizer valueForKeyPath:@&quot;_targets&quot;];
+id objc = [targets firstObject];
+id target = [objc valueForKeyPath:@&quot;_target&quot;];
+</code></pre>
+
+<p>这样即使滑动中间也会有返回手势了，并且与系统自带的靠边返回不冲突。但是，如果当前的导航控制的栈顶控制器是自身的话，我们其实是需要将这个手势禁用的。因为，当前栈中已经没有需要出栈的控制器了。
+<code>UIGestureRecognizerDelegate</code>代理方法中有一个监听手势是否可用的方法，返回YES时手势可用。
+给刚才自己添加的pan手势设置代理</p>
+
+<pre><code class="language-objc">pan.delegate = self;
+</code></pre>
+
+<p>遵守<code>UIGestureRecognizerDelegate</code>协议
+当栈顶控制不等于自己时返回YES，如果是自己就返回NO,禁用自定义的手势</p>
+
+<pre><code class="language-objc">- (BOOL)gestureRecognizerShouldBegin:(UIGestureRecognizer *)gestureRecognizer
+{
+    return self.topViewController != [self.viewControllers firstObject];
+}
+</code></pre>
+
+<p>这样就给利用运行时机制和系统自带的手势识别给系统增加了一个我们自定义的手势。</p>
+
+<p><img src="https://ws3.sinaimg.cn/large/006tNc79ly1fseag5cytgg30bf0ky4qp.gif" alt="效果图" /></p>
+              <hr>
+              <div class="related-posts">
+                <h5>Related Posts</h5>
+                
+              </div>
+            </div>
+          </div>
+          <hr>
+        <div class="disqus">
+  <div id="disqus_thread"></div>
+  <script type="text/javascript">
+
+    (function() {
+      
+      
+      if (window.location.hostname == "localhost")
+        return;
+
+      var disqus_shortname = '';
+      var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+      dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+      (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+    })();
+  </script>
+  <noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+  <a href="http://disqus.com/" class="dsq-brlink">comments powered by <span class="logo-disqus">Disqus</span></a>
+</div>
+        </div>
+      </div>
+      
+    </div>
+
+    
+    <footer>
+  <div id="footer">
+    <div class="footer-container">
+      <p class="text-muted">&copy; All rights reserved. Powered by <a href="https://gohugo.io/">Hugo</a> and
+      <a href="http://github.com/RecherJ/canary/">canary</a> with ♥</p>
+    </div>
+  </div>
+</footer>
+
+
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
+
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" crossorigin="anonymous"></script>
+<script src="https://recherj.github.io/js/docs.min.js"></script>
+<script src="https://recherj.github.io/js/main.js"></script>
+
+<script src="https://recherj.github.io/js/ie10-viewport-bug-workaround.js"></script>
+
+
+    
+  </body>
+</html>

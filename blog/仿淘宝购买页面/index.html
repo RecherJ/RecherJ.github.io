@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html lang="en-US">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="author" content="map[]" />
+    
+    <link rel="shortcut icon" type="image/x-icon" href="https://recherj.github.io/img/favicon.ico">
+    <title>仿淘宝购买页面</title>
+    <meta name="generator" content="Hugo 0.41" />
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
+    <link rel="stylesheet" type="text/css" href="https://recherj.github.io/css/main.css" />
+    <link rel="stylesheet" type="text/css" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.6.3/css/font-awesome.min.css" />
+    <link rel="stylesheet" type="text/css" href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:200,400,200bold,400old" />
+    
+    <link rel="stylesheet" href="https://recherj.github.io/css/code.css">
+    
+    <!--[if lt IE 9]>
+			<script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
+			<script src="https://oss.maxcdn.com/libs/respond.js/1.4.2/respond.min.js"></script>
+		<![endif]-->
+
+    
+  </head>
+
+  <body>
+    <div id="wrap">
+
+      
+      <nav class="navbar navbar-default">
+  <div class="navbar-container">
+    <div class="navbar-header">
+      <a class="navbar-brand" href="https://recherj.github.io/"><img src="https://recherj.github.io//img/favicon.png" /></a>
+      <span>厚德载物，上善若水</span>
+    </div>
+    <ul class="nav navbar-nav navbar-right">
+        
+          
+          <li><a href="/blog/">博客</a></li>
+          
+          <li><a href="/about/">关于</a></li>
+          
+        
+        </ul>
+  </div>
+</nav>
+
+      
+      <div class="container article-content">
+        <div class="article-top-block">
+            <div class="blog-post">
+              <h3>
+                <strong><a href="https://recherj.github.io/blog/%E4%BB%BF%E6%B7%98%E5%AE%9D%E8%B4%AD%E4%B9%B0%E9%A1%B5%E9%9D%A2/">仿淘宝购买页面</a></strong>
+              </h3>
+            </div>
+            <div class="blog-title">
+              <h4>
+              June 3, 2018
+                &nbsp;&nbsp;
+                
+              </h4>
+            </div>
+        </div>
+        <div class="panel panel-default">
+          <div class="panel-body">
+            <div class="blogpost">
+              <p>前段时间，公司的设计小妹子觉得手淘iOS的那个加入购物车、购买时的动画效果很好，所以也要求我们做一个类似的，因为维语文字的排列方向时从右至左的，所以再仔细观察了淘宝的动画后，也仿写了一个类似样式的。
+</p>
+
+<p>直接上效果图</p>
+
+<p><img src="https://ws2.sinaimg.cn/large/006tKfTcgy1fry5xj5f5pg30ao0ixe81.gif" alt="效果图" /></p>
+
+<p>其实思路很简单：利用 <code>touchMoved</code> 和 <code>touchedEnded</code> 两个方法，计算手势移动的距离差计算出一个比例，结合view的transform变化完成。</p>
+
+<p>核心代码</p>
+
+<pre><code class="language-swift">
+override func touchesMoved(_ touches: Set&lt;UITouch&gt;, with event: UIEvent?) {
+        guard let touch = touches.first else { return }
+        // 1. 移动下面的view
+        let parentViewP = touch.location(in: parentView)
+  		// parentView 即下面两个种规格和下面购买数量的父视图
+        let prevParentViewP = touch.previousLocation(in: parentView)
+        let offsetY = parentViewP.y - prevParentViewP.y
+        
+        parentView.y += offsetY
+        // 限制移动范围
+        if parentView.y &lt; 125 { // parentView 起始坐标 10 + 100 + 15
+            parentView.y = 125
+            return
+        } else if parentView.y &gt; 300 {
+            parentView.y = 300
+            return
+        }
+        // 2. 缩放商品图片
+        let ratio = (parentView.y - 125) / (300 - 125)
+        goodImage.transform = CGAffineTransform(scaleX: 0.5 + ratio * 0.5, y: 0.5 + ratio * 0.5)
+        let delta = kScreenWidth * 0.5 - 200 * 0.5 - 10
+        goodImage.layer.position = CGPoint(x: kScreenWidth - 10 - delta * ratio, y: 10)
+        // 3. 移动价格
+        price.layer.anchorPoint = CGPoint(x: 1.0, y: 0)
+        let startX = kScreenWidth - 100 - 10 * 2
+        let endX = price.width * 0.5 + kScreenWidth * 0.5
+        let priceDelta = endX - startX
+        price.layer.position = CGPoint(x: startX + ratio * priceDelta, y: 10 + ratio * (215 - 10))
+        // 4. 移动选择的尺寸
+        let sizeStartX = kScreenWidth - 100 - 10 * 2
+        let sizeEndX = choosedsizeLabel.width * 0.5 + kScreenWidth * 0.5
+        let sizeDelta = sizeEndX - sizeStartX
+        choosedsizeLabel.layer.position = CGPoint(x: 1.0, y: 0)
+        choosedsizeLabel.layer.position = CGPoint(x: sizeStartX + ratio * sizeDelta, y: 35 + ratio * (215 - 10))
+    }
+
+// 这里是为了结束移动时，如果位置不是起始或终止位置，进行一个变换
+override func touchesEnded(_ touches: Set&lt;UITouch&gt;, with event: UIEvent?) {
+        if parentView.y &gt; 125 + 87.5 { // 移动到了放大区域内，放大
+            UIView.animate(withDuration: 0.25) {
+                self.parentView.y = 300
+                self.goodImage.layer.position = CGPoint(x: kScreenWidth - 10 - (kScreenWidth * 0.5 - 200 * 0.5 - 10), y: 10)
+                self.goodImage.transform = .identity
+                self.price.layer.position = CGPoint(x: self.price.width * 0.5 + kScreenWidth * 0.5 , y: 215)
+                self.choosedsizeLabel.layer.position = CGPoint(x: self.choosedsizeLabel.width * 0.5 + kScreenWidth * 0.5, y: 35 + 205)
+            }
+        } else { // 移动到了缩小区域内，缩小
+            UIView.animate(withDuration: 0.25) {
+                self.parentView.y = 125
+                self.goodImage.layer.position = CGPoint(x: kScreenWidth - 10, y: 10)
+                self.goodImage.transform = CGAffineTransform(scaleX: 0.5, y: 0.5)
+                self.price.layer.position = CGPoint(x: kScreenWidth - 100 - 10 * 2, y: 10)
+                self.choosedsizeLabel.layer.position = CGPoint(x: kScreenWidth - 100 - 10 * 2, y: 35)
+            }
+        }
+    }
+</code></pre>
+
+<p>这里里面的一些魔法数字都是人为规定的，可以根据大小位置进行相应调整。</p>
+              <hr>
+              <div class="related-posts">
+                <h5>Related Posts</h5>
+                
+              </div>
+            </div>
+          </div>
+          <hr>
+        <div class="disqus">
+  <div id="disqus_thread"></div>
+  <script type="text/javascript">
+
+    (function() {
+      
+      
+      if (window.location.hostname == "localhost")
+        return;
+
+      var disqus_shortname = '';
+      var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+      dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+      (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+    })();
+  </script>
+  <noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+  <a href="http://disqus.com/" class="dsq-brlink">comments powered by <span class="logo-disqus">Disqus</span></a>
+</div>
+        </div>
+      </div>
+      
+    </div>
+
+    
+    <footer>
+  <div id="footer">
+    <div class="footer-container">
+      <p class="text-muted">&copy; All rights reserved. Powered by <a href="https://gohugo.io/">Hugo</a> and
+      <a href="http://github.com/RecherJ/canary/">canary</a> with ♥</p>
+    </div>
+  </div>
+</footer>
+
+
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
+
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" crossorigin="anonymous"></script>
+<script src="https://recherj.github.io/js/docs.min.js"></script>
+<script src="https://recherj.github.io/js/main.js"></script>
+
+<script src="https://recherj.github.io/js/ie10-viewport-bug-workaround.js"></script>
+
+
+    
+  </body>
+</html>

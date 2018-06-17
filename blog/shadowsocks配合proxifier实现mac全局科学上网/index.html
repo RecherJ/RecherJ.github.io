@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="en-US">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="author" content="map[]" />
+    
+    <link rel="shortcut icon" type="image/x-icon" href="https://recherj.github.io/img/favicon.ico">
+    <title>Shadowsocks配合Proxifier实现Mac全局科学上网</title>
+    <meta name="generator" content="Hugo 0.41" />
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
+    <link rel="stylesheet" type="text/css" href="https://recherj.github.io/css/main.css" />
+    <link rel="stylesheet" type="text/css" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.6.3/css/font-awesome.min.css" />
+    <link rel="stylesheet" type="text/css" href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:200,400,200bold,400old" />
+    
+    <link rel="stylesheet" href="https://recherj.github.io/css/code.css">
+    
+    <!--[if lt IE 9]>
+			<script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
+			<script src="https://oss.maxcdn.com/libs/respond.js/1.4.2/respond.min.js"></script>
+		<![endif]-->
+
+    
+  </head>
+
+  <body>
+    <div id="wrap">
+
+      
+      <nav class="navbar navbar-default">
+  <div class="navbar-container">
+    <div class="navbar-header">
+      <a class="navbar-brand" href="https://recherj.github.io/"><img src="https://recherj.github.io//img/favicon.png" /></a>
+      <span>厚德载物，上善若水</span>
+    </div>
+    <ul class="nav navbar-nav navbar-right">
+        
+          
+          <li><a href="/blog/">博客</a></li>
+          
+          <li><a href="/about/">关于</a></li>
+          
+        
+        </ul>
+  </div>
+</nav>
+
+      
+      <div class="container article-content">
+        <div class="article-top-block">
+            <div class="blog-post">
+              <h3>
+                <strong><a href="https://recherj.github.io/blog/shadowsocks%E9%85%8D%E5%90%88proxifier%E5%AE%9E%E7%8E%B0mac%E5%85%A8%E5%B1%80%E7%A7%91%E5%AD%A6%E4%B8%8A%E7%BD%91/">Shadowsocks配合Proxifier实现Mac全局科学上网</a></strong>
+              </h3>
+            </div>
+            <div class="blog-title">
+              <h4>
+              January 25, 2017
+                &nbsp;&nbsp;
+                
+              </h4>
+            </div>
+        </div>
+        <div class="panel panel-default">
+          <div class="panel-body">
+            <div class="blogpost">
+              <p>前些天写了一篇给git设置全局代理的笔记，使用后发现不是很完美，利用<code>connect</code>接管了git的<code>SSH</code>使得像SourceTree这样的第三方GUI的git管理软件没有办法使用。并且<code>curl</code>、<code>wget</code>等在终端中跑的命令也是不能解决，局限性很大。</p>
+
+<p></p>
+
+<blockquote>
+<h5 id="所以-proxifier-https-www-proxifier-com-的出现像一个救世主-完美解决了像我这种不能翻墙就会死的人的痛点">所以，<a href="https://www.proxifier.com/"><strong>Proxifier</strong></a>的出现像一个救世主，完美解决了像我这种不能翻墙就会死的人的痛点。</h5>
+</blockquote>
+
+<p>关于Proxifier的使用，我就不在累赘，网上关于proxifier的配置文章实在太多。这里需要感谢一下 <em>@似水无痕</em> 对我的帮助，推荐一下他的简书地址<a href="http://www.jianshu.com/u/30d4b8a17509">似水无痕的小窝</a>。</p>
+
+<p>这里需特别说明一点，Proxifier有一个关于DNS的配置</p>
+
+<p><img src="https://ww4.sinaimg.cn/large/006tNc79jw1fc2t072js4j30fr0d3wge.jpg" alt="" /></p>
+
+<blockquote>
+<p>强烈建议勾选使用<code>Resolve hostnames through proxy</code>，即使用代理服务器DNS解析。</p>
+</blockquote>
+
+<p>系统default是上一个选项，即使用ISP分配给你的DNS。众所周知，国内网络有墙，如使用这种被污染的DNS是无法请求你需要的网址，所以建议使用你ss里的代理服务器DNS。</p>
+
+<p>关于Proxifier配置使用的详细讲解，推荐 <em>@似水无痕</em> 同学的一篇博文</p>
+
+<p><a href="https://www.zybuluo.com/yiranphp/note/611721">解决 mac （windows）终端上代理的难题</a></p>
+              <hr>
+              <div class="related-posts">
+                <h5>Related Posts</h5>
+                
+              </div>
+            </div>
+          </div>
+          <hr>
+        <div class="disqus">
+  <div id="disqus_thread"></div>
+  <script type="text/javascript">
+
+    (function() {
+      
+      
+      if (window.location.hostname == "localhost")
+        return;
+
+      var disqus_shortname = '';
+      var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+      dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+      (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+    })();
+  </script>
+  <noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+  <a href="http://disqus.com/" class="dsq-brlink">comments powered by <span class="logo-disqus">Disqus</span></a>
+</div>
+        </div>
+      </div>
+      
+    </div>
+
+    
+    <footer>
+  <div id="footer">
+    <div class="footer-container">
+      <p class="text-muted">&copy; All rights reserved. Powered by <a href="https://gohugo.io/">Hugo</a> and
+      <a href="http://github.com/RecherJ/canary/">canary</a> with ♥</p>
+    </div>
+  </div>
+</footer>
+
+
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
+
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" crossorigin="anonymous"></script>
+<script src="https://recherj.github.io/js/docs.min.js"></script>
+<script src="https://recherj.github.io/js/main.js"></script>
+
+<script src="https://recherj.github.io/js/ie10-viewport-bug-workaround.js"></script>
+
+
+    
+  </body>
+</html>

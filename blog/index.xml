@@ -1,0 +1,304 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>Blogs on RecherJ</title>
+    <link>https://recherj.github.io/blog/</link>
+    <description>Recent content in Blogs on RecherJ</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>en-US</language>
+    <lastBuildDate>Wed, 13 Jun 2018 23:10:26 +0000</lastBuildDate>
+    
+	<atom:link href="https://recherj.github.io/blog/index.xml" rel="self" type="application/rss+xml" />
+    
+    
+    <item>
+      <title>Fastlane自动化打包部署</title>
+      <link>https://recherj.github.io/blog/fastlane%E8%87%AA%E5%8A%A8%E5%8C%96%E6%89%93%E5%8C%85%E9%83%A8%E7%BD%B2/</link>
+      <pubDate>Wed, 13 Jun 2018 23:10:26 +0000</pubDate>
+      
+      <guid>https://recherj.github.io/blog/fastlane%E8%87%AA%E5%8A%A8%E5%8C%96%E6%89%93%E5%8C%85%E9%83%A8%E7%BD%B2/</guid>
+      <description>&lt;p&gt;我们的维语电商项目是 swift 和 OC 混编，所以每次手动打包发布测试版时巨慢，最近刚好把项目里的部分网络库从原来的OC版换到了swift版，正在慢慢的去 Objective-C 化。&lt;/p&gt;
+
+&lt;p&gt;久闻 fastlane 是自动化部署利器，今天就着实看了一下教程。简单把我踩过的坑记录下。&lt;/p&gt;
+
+&lt;p&gt;&lt;/p&gt;</description>
+    </item>
+    
+    <item>
+      <title>Kingfisher加载gif问题</title>
+      <link>https://recherj.github.io/blog/kingfisher%E5%8A%A0%E8%BD%BDgif%E9%97%AE%E9%A2%98/</link>
+      <pubDate>Tue, 05 Jun 2018 22:29:49 +0000</pubDate>
+      
+      <guid>https://recherj.github.io/blog/kingfisher%E5%8A%A0%E8%BD%BDgif%E9%97%AE%E9%A2%98/</guid>
+      <description>&lt;p&gt;之前将我们的一款 Swift 项目中的图片库，从OC的 &lt;a href=&#34;https://github.com/rs/SDWebImage&#34;&gt;SDWebImage&lt;/a&gt; 换成了喵神写的 &lt;a href=&#34;https://github.com/onevcat/Kingfisher&#34;&gt;Kingfisher&lt;/a&gt; , 主要为了尽可能纯swift开发，混编编译实在是太慢了..&lt;/p&gt;
+
+&lt;p&gt;&lt;/p&gt;</description>
+    </item>
+    
+    <item>
+      <title>仿淘宝购买页面</title>
+      <link>https://recherj.github.io/blog/%E4%BB%BF%E6%B7%98%E5%AE%9D%E8%B4%AD%E4%B9%B0%E9%A1%B5%E9%9D%A2/</link>
+      <pubDate>Sun, 03 Jun 2018 17:39:40 +0000</pubDate>
+      
+      <guid>https://recherj.github.io/blog/%E4%BB%BF%E6%B7%98%E5%AE%9D%E8%B4%AD%E4%B9%B0%E9%A1%B5%E9%9D%A2/</guid>
+      <description>&lt;p&gt;前段时间，公司的设计小妹子觉得手淘iOS的那个加入购物车、购买时的动画效果很好，所以也要求我们做一个类似的，因为维语文字的排列方向时从右至左的，所以再仔细观察了淘宝的动画后，也仿写了一个类似样式的。
+&lt;/p&gt;</description>
+    </item>
+    
+    <item>
+      <title>重拾博客</title>
+      <link>https://recherj.github.io/blog/%E9%87%8D%E6%8B%BE%E5%8D%9A%E5%AE%A2/</link>
+      <pubDate>Sun, 06 May 2018 14:38:37 +0000</pubDate>
+      
+      <guid>https://recherj.github.io/blog/%E9%87%8D%E6%8B%BE%E5%8D%9A%E5%AE%A2/</guid>
+      <description>&lt;p&gt;最近一直督促自己要把荒废的博客捡起来，之前搭建这个也是为了督促自己学习、写作、不断巩固学到的知识。&lt;/p&gt;
+
+&lt;p&gt;&lt;/p&gt;</description>
+    </item>
+    
+    <item>
+      <title>初识CATextLayer</title>
+      <link>https://recherj.github.io/blog/%E5%88%9D%E8%AF%86catextlayer/</link>
+      <pubDate>Fri, 03 Feb 2017 11:17:25 +0000</pubDate>
+      
+      <guid>https://recherj.github.io/blog/%E5%88%9D%E8%AF%86catextlayer/</guid>
+      <description>&lt;p&gt;用户界面是无法从一个单独的图片里面构建的。一个设计良好的图标能够很好地表现一个按钮或控件的意图，不过你迟早都要需要一个不错的老式风格的文本标签。&lt;/p&gt;
+
+&lt;p&gt;&lt;/p&gt;</description>
+    </item>
+    
+    <item>
+      <title>Shadowsocks配合Proxifier实现Mac全局科学上网</title>
+      <link>https://recherj.github.io/blog/shadowsocks%E9%85%8D%E5%90%88proxifier%E5%AE%9E%E7%8E%B0mac%E5%85%A8%E5%B1%80%E7%A7%91%E5%AD%A6%E4%B8%8A%E7%BD%91/</link>
+      <pubDate>Wed, 25 Jan 2017 13:05:43 +0000</pubDate>
+      
+      <guid>https://recherj.github.io/blog/shadowsocks%E9%85%8D%E5%90%88proxifier%E5%AE%9E%E7%8E%B0mac%E5%85%A8%E5%B1%80%E7%A7%91%E5%AD%A6%E4%B8%8A%E7%BD%91/</guid>
+      <description>&lt;p&gt;前些天写了一篇给git设置全局代理的笔记，使用后发现不是很完美，利用&lt;code&gt;connect&lt;/code&gt;接管了git的&lt;code&gt;SSH&lt;/code&gt;使得像SourceTree这样的第三方GUI的git管理软件没有办法使用。并且&lt;code&gt;curl&lt;/code&gt;、&lt;code&gt;wget&lt;/code&gt;等在终端中跑的命令也是不能解决，局限性很大。&lt;/p&gt;
+
+&lt;p&gt;&lt;/p&gt;</description>
+    </item>
+    
+    <item>
+      <title>配合Shadowsocks为git配置SSH全局代理突破GFW</title>
+      <link>https://recherj.github.io/blog/%E9%85%8D%E5%90%88shadowsocks%E4%B8%BAgit%E9%85%8D%E7%BD%AEssh%E5%85%A8%E5%B1%80%E4%BB%A3%E7%90%86%E7%AA%81%E7%A0%B4gfw/</link>
+      <pubDate>Tue, 17 Jan 2017 10:27:52 +0000</pubDate>
+      
+      <guid>https://recherj.github.io/blog/%E9%85%8D%E5%90%88shadowsocks%E4%B8%BAgit%E9%85%8D%E7%BD%AEssh%E5%85%A8%E5%B1%80%E4%BB%A3%E7%90%86%E7%AA%81%E7%A0%B4gfw/</guid>
+      <description>&lt;h4 id=&#34;更新说明&#34;&gt;更新说明&lt;/h4&gt;
+
+&lt;hr /&gt;
+
+&lt;ul&gt;
+&lt;li&gt;2017-01-17 初稿&lt;/li&gt;
+&lt;li&gt;2017-01-18 用 ssh:// 协议全局替换 https:// 协议&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;hr /&gt;
+
+&lt;p&gt;由于国内的特殊的网络环境，在某些特殊地方GFW更加凶残，github和国内的CSDN博客等网站居然都是封堵的，这让我们这些只想安静的写两行代码与世界的程序员交流(clone第三方框架)的美好愿望都无法实现。&lt;/p&gt;
+
+&lt;p&gt;&lt;/p&gt;</description>
+    </item>
+    
+    <item>
+      <title>App打包时遇大量警告解决办法</title>
+      <link>https://recherj.github.io/blog/app%E6%89%93%E5%8C%85%E6%97%B6%E9%81%87%E5%A4%A7%E9%87%8F%E8%AD%A6%E5%91%8A%E8%A7%A3%E5%86%B3%E5%8A%9E%E6%B3%95/</link>
+      <pubDate>Thu, 05 May 2016 09:44:33 +0000</pubDate>
+      
+      <guid>https://recherj.github.io/blog/app%E6%89%93%E5%8C%85%E6%97%B6%E9%81%87%E5%A4%A7%E9%87%8F%E8%AD%A6%E5%91%8A%E8%A7%A3%E5%86%B3%E5%8A%9E%E6%B3%95/</guid>
+      <description>&lt;p&gt;昨天在对App进行最后一次小修小布后，准备进行第一个版本的打包上架，在真机运行和调试时都没有问题，但是当&lt;code&gt;Archive&lt;/code&gt;时一下呼呼出现了89个警告，我想当时我的表情应该是这样的&lt;/p&gt;
+
+&lt;p&gt;&lt;/p&gt;</description>
+    </item>
+    
+    <item>
+      <title>dyld: Library not loaded: /System/Library/Frameworks/ModelIO.framework/XXXX问题解决</title>
+      <link>https://recherj.github.io/blog/dyld-library-not-loaded-system-library-frameworks-modelio-framework-xxxx%E9%97%AE%E9%A2%98%E8%A7%A3%E5%86%B3/</link>
+      <pubDate>Thu, 05 May 2016 09:28:46 +0000</pubDate>
+      
+      <guid>https://recherj.github.io/blog/dyld-library-not-loaded-system-library-frameworks-modelio-framework-xxxx%E9%97%AE%E9%A2%98%E8%A7%A3%E5%86%B3/</guid>
+      <description>&lt;p&gt;29号用朋友4s（iOS 8.4.1）真机调试时，编译时没问题，运行时程序直接奔溃，控制台打印出现了这样一个问题
+&lt;/p&gt;</description>
+    </item>
+    
+    <item>
+      <title>根据不同控制器自动切换横竖屏</title>
+      <link>https://recherj.github.io/blog/%E6%A0%B9%E6%8D%AE%E4%B8%8D%E5%90%8C%E6%8E%A7%E5%88%B6%E5%99%A8%E8%87%AA%E5%8A%A8%E5%88%87%E6%8D%A2%E6%A8%AA%E7%AB%96%E5%B1%8F/</link>
+      <pubDate>Thu, 21 Apr 2016 22:51:27 +0000</pubDate>
+      
+      <guid>https://recherj.github.io/blog/%E6%A0%B9%E6%8D%AE%E4%B8%8D%E5%90%8C%E6%8E%A7%E5%88%B6%E5%99%A8%E8%87%AA%E5%8A%A8%E5%88%87%E6%8D%A2%E6%A8%AA%E7%AB%96%E5%B1%8F/</guid>
+      <description>&lt;p&gt;准备制作自己的第一款App,但是遇到一个技术上问题：&lt;/p&gt;
+
+&lt;blockquote&gt;
+&lt;p&gt;&lt;strong&gt;如何在当前控制器modal出下一个控制器时自动将屏幕切换成横屏模式&lt;/strong&gt;。&lt;/p&gt;
+&lt;/blockquote&gt;
+
+&lt;p&gt;&lt;/p&gt;</description>
+    </item>
+    
+    <item>
+      <title>Mac下利用github和Hexo搭建个人博客（二）</title>
+      <link>https://recherj.github.io/blog/mac%E4%B8%8B%E5%88%A9%E7%94%A8github%E5%92%8Chexo%E6%90%AD%E5%BB%BA%E4%B8%AA%E4%BA%BA%E5%8D%9A%E5%AE%A2%E4%BA%8C/</link>
+      <pubDate>Mon, 18 Apr 2016 16:32:46 +0000</pubDate>
+      
+      <guid>https://recherj.github.io/blog/mac%E4%B8%8B%E5%88%A9%E7%94%A8github%E5%92%8Chexo%E6%90%AD%E5%BB%BA%E4%B8%AA%E4%BA%BA%E5%8D%9A%E5%AE%A2%E4%BA%8C/</guid>
+      <description>&lt;p&gt;&lt;em&gt;补上4月9号要写的后续搭建博客&lt;/em&gt;
+&lt;/p&gt;</description>
+    </item>
+    
+    <item>
+      <title>OC下runtime获取类私有成员属性</title>
+      <link>https://recherj.github.io/blog/oc%E4%B8%8Bruntime%E8%8E%B7%E5%8F%96%E7%B1%BB%E7%A7%81%E6%9C%89%E6%88%90%E5%91%98%E5%B1%9E%E6%80%A7/</link>
+      <pubDate>Mon, 18 Apr 2016 11:36:36 +0000</pubDate>
+      
+      <guid>https://recherj.github.io/blog/oc%E4%B8%8Bruntime%E8%8E%B7%E5%8F%96%E7%B1%BB%E7%A7%81%E6%9C%89%E6%88%90%E5%91%98%E5%B1%9E%E6%80%A7/</guid>
+      <description>&lt;p&gt;苹果的runtime运行机制还是非常强大的，掌握runtime对开发帮助是如虎添翼。因为有些类的私有成员属性是不暴漏在外供开发者使用的，但是有时，如果我们知道了这些属性对开发来说事半功倍，省去很多麻烦。&lt;/p&gt;
+
+&lt;p&gt;&lt;/p&gt;</description>
+    </item>
+    
+    <item>
+      <title>linker command failed with exit code 1 (use -vto see invocation)原因和解决</title>
+      <link>https://recherj.github.io/blog/linker-command-failed-with-exit-code-1-use-vto-see-invocation-%E5%8E%9F%E5%9B%A0%E5%92%8C%E8%A7%A3%E5%86%B3/</link>
+      <pubDate>Sun, 17 Apr 2016 18:22:27 +0000</pubDate>
+      
+      <guid>https://recherj.github.io/blog/linker-command-failed-with-exit-code-1-use-vto-see-invocation-%E5%8E%9F%E5%9B%A0%E5%92%8C%E8%A7%A3%E5%86%B3/</guid>
+      <description>&lt;p&gt;今天在写代码是遇到一个问题，编译时通不过，报“linker command failed with exit code 1 (use -vto see invocation)”错误，其实之前也遇到过，但是不理明白怎么去解决，就绕开了。。今天Google了一下说是可能是因为相同的.m文件造成的。
+
+&lt;a href=&#34;http://www.cnblogs.com/Wild-orangutans/p/4223652.html&#34;&gt;参考链接&lt;/a&gt;&lt;/p&gt;</description>
+    </item>
+    
+    <item>
+      <title>《不是每个故事都有解决》-读书笔记</title>
+      <link>https://recherj.github.io/blog/%E4%B8%8D%E6%98%AF%E6%AF%8F%E4%B8%AA%E6%95%85%E4%BA%8B%E9%83%BD%E6%9C%89%E7%BB%93%E5%B1%80-%E8%AF%BB%E4%B9%A6%E7%AC%94%E8%AE%B0/</link>
+      <pubDate>Sat, 16 Apr 2016 21:07:23 +0000</pubDate>
+      
+      <guid>https://recherj.github.io/blog/%E4%B8%8D%E6%98%AF%E6%AF%8F%E4%B8%AA%E6%95%85%E4%BA%8B%E9%83%BD%E6%9C%89%E7%BB%93%E5%B1%80-%E8%AF%BB%E4%B9%A6%E7%AC%94%E8%AE%B0/</guid>
+      <description>&lt;p&gt;这是一本情感故事类的书，一本闲书。
+&lt;/p&gt;</description>
+    </item>
+    
+    <item>
+      <title>《Effective Objective-2.0》读书笔记一</title>
+      <link>https://recherj.github.io/blog/effective-objective-2-0%E8%AF%BB%E4%B9%A6%E7%AC%94%E8%AE%B0%E4%B8%80/</link>
+      <pubDate>Tue, 12 Apr 2016 23:18:10 +0000</pubDate>
+      
+      <guid>https://recherj.github.io/blog/effective-objective-2-0%E8%AF%BB%E4%B9%A6%E7%AC%94%E8%AE%B0%E4%B8%80/</guid>
+      <description>&lt;p&gt;这本书也是我之前在一篇别人推荐的移动开发必读的书单中看到的，这本被重点推荐。然后上亚马逊看了一下大家的评价，还不错，就决定买了，不过就是挺贵的，69软妹。。 但我觉得挺值得，非常值得一看。
+&lt;/p&gt;</description>
+    </item>
+    
+    <item>
+      <title>手势识别器几个重要知识点</title>
+      <link>https://recherj.github.io/blog/%E6%89%8B%E5%8A%BF%E8%AF%86%E5%88%AB%E5%99%A8%E5%87%A0%E4%B8%AA%E9%87%8D%E8%A6%81%E7%9F%A5%E8%AF%86%E7%82%B9/</link>
+      <pubDate>Mon, 11 Apr 2016 22:21:53 +0000</pubDate>
+      
+      <guid>https://recherj.github.io/blog/%E6%89%8B%E5%8A%BF%E8%AF%86%E5%88%AB%E5%99%A8%E5%87%A0%E4%B8%AA%E9%87%8D%E8%A6%81%E7%9F%A5%E8%AF%86%E7%82%B9/</guid>
+      <description>&lt;p&gt;今天复习了一下手势识别器，&lt;code&gt;UIGestureRecognizer&lt;/code&gt;类
+该类中包含以下几个子类&lt;/p&gt;
+
+&lt;p&gt;&lt;/p&gt;</description>
+    </item>
+    
+    <item>
+      <title>访问通信录-适配iOS7</title>
+      <link>https://recherj.github.io/blog/%E8%AE%BF%E9%97%AE%E9%80%9A%E4%BF%A1%E5%BD%95-%E9%80%82%E9%85%8Dios7/</link>
+      <pubDate>Sat, 09 Apr 2016 21:48:42 +0000</pubDate>
+      
+      <guid>https://recherj.github.io/blog/%E8%AE%BF%E9%97%AE%E9%80%9A%E4%BF%A1%E5%BD%95-%E9%80%82%E9%85%8Dios7/</guid>
+      <description>&lt;p&gt;昨天学习iOS中访问用户通信录的一个框架&lt;code&gt;AddressBookUI.framework&lt;/code&gt;,这是个自带UI界面的系统框架,第一次访问要获得用户的授权.
+因为是已经封装好的所以,用起来也比较方便&lt;/p&gt;
+
+&lt;p&gt;&lt;/p&gt;</description>
+    </item>
+    
+    <item>
+      <title>There was an internal API error的解决方法</title>
+      <link>https://recherj.github.io/blog/there-was-an-internal-api-error%E7%9A%84%E8%A7%A3%E5%86%B3%E6%96%B9%E6%B3%95/</link>
+      <pubDate>Sat, 09 Apr 2016 21:45:48 +0000</pubDate>
+      
+      <guid>https://recherj.github.io/blog/there-was-an-internal-api-error%E7%9A%84%E8%A7%A3%E5%86%B3%E6%96%B9%E6%B3%95/</guid>
+      <description>&lt;p&gt;今天在真机调试二维码功能时遇到一个这样的问题&amp;rdquo;There was an internal API error&amp;rdquo;:&lt;/p&gt;
+
+&lt;p&gt;&lt;/p&gt;</description>
+    </item>
+    
+    <item>
+      <title>故事不一定有标题</title>
+      <link>https://recherj.github.io/blog/%E6%95%85%E4%BA%8B%E4%B8%8D%E4%B8%80%E5%AE%9A%E6%9C%89%E6%A0%87%E9%A2%98/</link>
+      <pubDate>Sat, 09 Apr 2016 21:42:06 +0000</pubDate>
+      
+      <guid>https://recherj.github.io/blog/%E6%95%85%E4%BA%8B%E4%B8%8D%E4%B8%80%E5%AE%9A%E6%9C%89%E6%A0%87%E9%A2%98/</guid>
+      <description>&lt;p&gt;我想，有些也堪称不了故事。&lt;/p&gt;
+
+&lt;p&gt;&lt;/p&gt;</description>
+    </item>
+    
+    <item>
+      <title>《百思不得姐》项目总结-63个知识点</title>
+      <link>https://recherj.github.io/blog/%E7%99%BE%E6%80%9D%E4%B8%8D%E5%BE%97%E5%A7%90%E9%A1%B9%E7%9B%AE%E6%80%BB%E7%BB%93-63%E4%B8%AA%E7%9F%A5%E8%AF%86%E7%82%B9/</link>
+      <pubDate>Sat, 09 Apr 2016 21:03:47 +0000</pubDate>
+      
+      <guid>https://recherj.github.io/blog/%E7%99%BE%E6%80%9D%E4%B8%8D%E5%BE%97%E5%A7%90%E9%A1%B9%E7%9B%AE%E6%80%BB%E7%BB%93-63%E4%B8%AA%E7%9F%A5%E8%AF%86%E7%82%B9/</guid>
+      <description>&lt;p&gt;从2月12日开始到3月9日，一个月学习这个项目收获了很多知识点，给自己总结出来，方便以后查看。
+
+- 控制器的view加载完毕，首先在&lt;code&gt;- (void)viewDidLoad&lt;/code&gt;方法中添加 下拉刷新 的控件；&lt;/p&gt;</description>
+    </item>
+    
+    <item>
+      <title>UITextView实现占位文字的两种方法</title>
+      <link>https://recherj.github.io/blog/uitextview%E5%AE%9E%E7%8E%B0%E5%8D%A0%E4%BD%8D%E6%96%87%E5%AD%97%E7%9A%84%E4%B8%A4%E7%A7%8D%E6%96%B9%E6%B3%95/</link>
+      <pubDate>Sat, 09 Apr 2016 20:41:37 +0000</pubDate>
+      
+      <guid>https://recherj.github.io/blog/uitextview%E5%AE%9E%E7%8E%B0%E5%8D%A0%E4%BD%8D%E6%96%87%E5%AD%97%E7%9A%84%E4%B8%A4%E7%A7%8D%E6%96%B9%E6%B3%95/</guid>
+      <description>&lt;p&gt;在Cocoa Touch框架中有两种系统自带的文本输入控件：&lt;code&gt;UITextFiled&lt;/code&gt;和&lt;code&gt;UITextView&lt;/code&gt;&lt;/p&gt;
+
+&lt;p&gt;&lt;/p&gt;</description>
+    </item>
+    
+    <item>
+      <title>浅谈UITableView内Cell的选中细节过程</title>
+      <link>https://recherj.github.io/blog/%E6%B5%85%E8%B0%88uitableview%E5%86%85cell%E7%9A%84%E9%80%89%E4%B8%AD%E7%BB%86%E8%8A%82%E8%BF%87%E7%A8%8B/</link>
+      <pubDate>Sat, 09 Apr 2016 20:34:31 +0000</pubDate>
+      
+      <guid>https://recherj.github.io/blog/%E6%B5%85%E8%B0%88uitableview%E5%86%85cell%E7%9A%84%E9%80%89%E4%B8%AD%E7%BB%86%E8%8A%82%E8%BF%87%E7%A8%8B/</guid>
+      <description>&lt;p&gt;UITableView的代理协议中给代理者提供了4个代理方法，用来监听从选中一个cell到选中另一个cell的切换过程，当然代理必须实现这些方法，才能监听整个cell的点击切换过程。&lt;/p&gt;
+
+&lt;p&gt;&lt;/p&gt;</description>
+    </item>
+    
+    <item>
+      <title>控制器中两个TableView的一些细节处理</title>
+      <link>https://recherj.github.io/blog/%E6%8E%A7%E5%88%B6%E5%99%A8%E4%B8%AD%E4%B8%A4%E4%B8%AAtableview%E7%9A%84%E4%B8%80%E4%BA%9B%E7%BB%86%E8%8A%82%E5%A4%84%E7%90%86/</link>
+      <pubDate>Sat, 09 Apr 2016 18:02:53 +0000</pubDate>
+      
+      <guid>https://recherj.github.io/blog/%E6%8E%A7%E5%88%B6%E5%99%A8%E4%B8%AD%E4%B8%A4%E4%B8%AAtableview%E7%9A%84%E4%B8%80%E4%BA%9B%E7%BB%86%E8%8A%82%E5%A4%84%E7%90%86/</guid>
+      <description>&lt;p&gt;先展示一张效果图&lt;/p&gt;
+
+&lt;p&gt;&lt;/p&gt;</description>
+    </item>
+    
+    <item>
+      <title>Transport security has blocked a cleartext HTTP ...”的解决办法</title>
+      <link>https://recherj.github.io/blog/transport-security-has-blocked-a-cleartext-http-http-resource-load-since-it-is-insecure-temporary-exceptions-can-be-configured-via-your-app-s-info-plist-file%E7%9A%84%E8%A7%A3%E5%86%B3%E5%8A%9E%E6%B3%95/</link>
+      <pubDate>Sat, 09 Apr 2016 17:45:46 +0000</pubDate>
+      
+      <guid>https://recherj.github.io/blog/transport-security-has-blocked-a-cleartext-http-http-resource-load-since-it-is-insecure-temporary-exceptions-can-be-configured-via-your-app-s-info-plist-file%E7%9A%84%E8%A7%A3%E5%86%B3%E5%8A%9E%E6%B3%95/</guid>
+      <description>&lt;p&gt;Xcode中利用&lt;code&gt;AFNetworking&lt;/code&gt;框架发送get请求时，如果是第一次，可能会报&lt;strong&gt;“Transport security has blocked a cleartext HTTP (http://) resource load since it is insecure. Temporary exceptions can be configured via your app&amp;rsquo;s Info.plist file”&lt;/strong&gt;这样的警告。&lt;/p&gt;
+
+&lt;p&gt;&lt;/p&gt;</description>
+    </item>
+    
+    <item>
+      <title>成功搭建Hexo后的第一篇博客</title>
+      <link>https://recherj.github.io/blog/%E6%88%90%E5%8A%9F%E6%90%AD%E5%BB%BAhexo%E5%90%8E%E7%9A%84%E7%AC%AC%E4%B8%80%E7%AF%87%E5%8D%9A%E5%AE%A2/</link>
+      <pubDate>Sat, 09 Apr 2016 12:00:00 +0000</pubDate>
+      
+      <guid>https://recherj.github.io/blog/%E6%88%90%E5%8A%9F%E6%90%AD%E5%BB%BAhexo%E5%90%8E%E7%9A%84%E7%AC%AC%E4%B8%80%E7%AF%87%E5%8D%9A%E5%AE%A2/</guid>
+      <description>&lt;p&gt;标题党，哈哈哈哈。按时间顺序来说，这个已经不是第一篇了。之前一直在简书写，但一直想搭建自己的专属博客网站，昨天在完成（基本）了swift版的新浪微博项目后，花了一天时间自己终于捣鼓出来了。这个主题界面是我挑选了众多前端童鞋写的主题后最终确定下来的。&lt;/p&gt;
+
+&lt;p&gt;&lt;/p&gt;</description>
+    </item>
+    
+  </channel>
+</rss>

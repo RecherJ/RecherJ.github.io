@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html lang="en-US">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="author" content="map[]" />
+    
+    <link rel="shortcut icon" type="image/x-icon" href="https://recherj.github.io/img/favicon.ico">
+    <title>初识CATextLayer</title>
+    <meta name="generator" content="Hugo 0.41" />
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
+    <link rel="stylesheet" type="text/css" href="https://recherj.github.io/css/main.css" />
+    <link rel="stylesheet" type="text/css" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.6.3/css/font-awesome.min.css" />
+    <link rel="stylesheet" type="text/css" href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:200,400,200bold,400old" />
+    
+    <link rel="stylesheet" href="https://recherj.github.io/css/code.css">
+    
+    <!--[if lt IE 9]>
+			<script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
+			<script src="https://oss.maxcdn.com/libs/respond.js/1.4.2/respond.min.js"></script>
+		<![endif]-->
+
+    
+  </head>
+
+  <body>
+    <div id="wrap">
+
+      
+      <nav class="navbar navbar-default">
+  <div class="navbar-container">
+    <div class="navbar-header">
+      <a class="navbar-brand" href="https://recherj.github.io/"><img src="https://recherj.github.io//img/favicon.png" /></a>
+      <span>厚德载物，上善若水</span>
+    </div>
+    <ul class="nav navbar-nav navbar-right">
+        
+          
+          <li><a href="/blog/">博客</a></li>
+          
+          <li><a href="/about/">关于</a></li>
+          
+        
+        </ul>
+  </div>
+</nav>
+
+      
+      <div class="container article-content">
+        <div class="article-top-block">
+            <div class="blog-post">
+              <h3>
+                <strong><a href="https://recherj.github.io/blog/%E5%88%9D%E8%AF%86catextlayer/">初识CATextLayer</a></strong>
+              </h3>
+            </div>
+            <div class="blog-title">
+              <h4>
+              February 3, 2017
+                &nbsp;&nbsp;
+                
+              </h4>
+            </div>
+        </div>
+        <div class="panel panel-default">
+          <div class="panel-body">
+            <div class="blogpost">
+              <p>用户界面是无法从一个单独的图片里面构建的。一个设计良好的图标能够很好地表现一个按钮或控件的意图，不过你迟早都要需要一个不错的老式风格的文本标签。</p>
+
+<p></p>
+
+<p>如果你想在一个图层里面显示文字，完全可以借助图层代理直接将字符串使用 <code>Core Graphics</code> 写入图层的内 容(<strong>这就是UILabel的精髓</strong>)。如果越过寄宿于图层的视图,直接在图层上操作,那其实相当繁琐。你要为每一个显示文字的图层创建一个能像图层代理一样工作的类,还要逻辑上判断哪个图层需要显示哪个字符串,更别提还要记录不同的字体,颜色等一系列乱七八糟的东西。</p>
+
+<p>万幸的是这些都是不必要的, <code>Core Animation</code> 提供了一个 <code>CALayer</code> 的子类 <code>CATextLayer</code> ,它以图层的形 式包含了 <code>UILabel</code> 几乎所有的绘制特性,并且额外提供了一些新的特性。</p>
+
+<p>同样, <code>CATextLayer</code> 也要比 <code>UILabel</code> 渲染得快得多。很少有人知道在iOS 6及之前的版本, <code>UILabel</code> 其实是通过 <code>WebKit</code> 来实现绘制的，这样就造成了当有很多文字的时候就会有极大的性能压力。而
+<code>CATextLayer</code> 使用了 <code>Core text</code> ，并且渲染得非常快。</p>
+
+<p>让我们来尝试用 <code>CATextLayer</code> 来显示一些文字。代码如下：</p>
+
+<pre><code class="language-objc">@interface ViewController ()
+@property (nonatomic, weak) IBOutlet UIView *labelView; 
+@end
+
+@implementation ViewController - (void)viewDidLoad
+{
+	[super viewDidLoad];
+	
+	//create a text layer
+	CATextLayer *textLayer = [CATextLayer layer]; 
+	textLayer.frame = self.labelView.bounds;
+	[self.labelView.layer addSublayer:textLayer];
+	
+	//set text attributes
+	textLayer.foregroundColor = [UIColor blackColor].CGColor; 
+	textLayer.alignmentMode = 	kCAAlignmentJustified;
+	textLayer.wrapped = YES;
+	
+	//choose a font
+	UIFont *font = [UIFont systemFontOfSize:15];
+	
+	//set layer font
+	CFStringRef fontName = (__bridge CFStringRef)font.fontName; 
+	CGFontRef fontRef = CGFontCreateWithFontName(fontName); 
+	textLayer.font = fontRef;
+	textLayer.fontSize = font.pointSize;
+	CGFontRelease(fontRef);
+	
+	//choose some text
+	NSString *text = @&quot;Lorem ipsum dolor sit amet, 	consectetur adipiscing \ 
+	elit. Quisque massa arcu, el eifend vel varius in, facilisis pulvinar \ 
+	leo. Nunc quis nunc at mauris pharetra condimentum ut ac neq ue. Nunc elementum, \
+	libero ut porttitor dictum, diam odio congue lacus, vel \ 
+	fringilla sapien diam at purus. Etiam suscipit pretium nunc sit amet \ 
+	lobortis&quot;;
+	
+	//set layer text
+	textLayer.string = text; 
+}
+@end
+</code></pre>
+
+<p><img src="https://ww4.sinaimg.cn/large/006tNc79ly1fcd4gdv906j30hn08hwgv.jpg" alt="" /></p>
+
+<p>如果你仔细看这个文本,你会发现一个奇怪的地方:这些文本有一些像素化了。这是因为并没有以 Retina 的方式渲染,第二章提到了这个 <code>contentScale</code> 属性,用来决定图层内容应该以怎样的分辨率来渲染。
+<code>contentsScale</code> 并不关心屏幕的拉伸因素而总是默认为1.0。如果我们想以Retina的质量来显示文字,我们 就得手动地设置 <code>CATextLayer</code> 的 <code>contentsScale</code> 属性,如下:</p>
+
+<pre><code class="language-objc">textLayer.contentsScale = [UIScreen mainScreen].scale;
+</code></pre>
+
+<p>这样就解决了这个问题</p>
+
+<p><img src="https://ww4.sinaimg.cn/large/006tNc79ly1fcd4hkwx3bj30ik09etbh.jpg" alt="" /></p>
+
+<p><code>CATextLayer</code> 的 font 属性不是一个 <code>UIFont</code> 类型,而是一个 <code>CFTypeRef</code> 类型。这样可以根据你的具体 需要来决定字体属性应该是用 CGFontRef 类型还是 CTFontRef 类型(Core Text字体)。同时字体大小 也是用 fontSize 属性单独设置的,因为 CTFontRef 和 CGFontRef 并不像UIFont一样包含点大小。这个 例子会告诉你如何将 UIFont 转换成 CGFontRef 。
+另外, <code>CATextLayer</code> 的 <code>string</code> 属性并不是你想象的 <code>NSString</code> 类型,而是 <code>id</code> 类型。这样你既可以用 <code>NSString</code> 也可以用 <code>NSAttributedString</code> 来指定文本了(注意, <code>NSAttributedString</code> 并不是 <code>NSString</code>
+的子类)。属性化字符串是iOS用来渲染字体风格的机制,它以特定的方式来决定指定范围内的字符串的原 始信息,比如字体,颜色,字重,斜体等。</p>
+
+<ul>
+<li>摘录自译本：<a href="https://www.gitbook.com/book/zsisme/ios-/details">《iOS核心动画高级技巧》</a></li>
+<li>原著：<a href="https://www.amazon.com/iOS-Core-Animation-Advanced-Techniques-ebook/dp/B00EHJCORC/ref=sr_1_1?ie=UTF8&amp;qid=1423192842&amp;sr=8-1&amp;keywords=Core+Animation+Advanced+Techniques">iOS Core Animation: Advanced Techniques</a></li>
+</ul>
+              <hr>
+              <div class="related-posts">
+                <h5>Related Posts</h5>
+                
+              </div>
+            </div>
+          </div>
+          <hr>
+        <div class="disqus">
+  <div id="disqus_thread"></div>
+  <script type="text/javascript">
+
+    (function() {
+      
+      
+      if (window.location.hostname == "localhost")
+        return;
+
+      var disqus_shortname = '';
+      var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+      dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+      (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+    })();
+  </script>
+  <noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+  <a href="http://disqus.com/" class="dsq-brlink">comments powered by <span class="logo-disqus">Disqus</span></a>
+</div>
+        </div>
+      </div>
+      
+    </div>
+
+    
+    <footer>
+  <div id="footer">
+    <div class="footer-container">
+      <p class="text-muted">&copy; All rights reserved. Powered by <a href="https://gohugo.io/">Hugo</a> and
+      <a href="http://github.com/RecherJ/canary/">canary</a> with ♥</p>
+    </div>
+  </div>
+</footer>
+
+
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
+
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" crossorigin="anonymous"></script>
+<script src="https://recherj.github.io/js/docs.min.js"></script>
+<script src="https://recherj.github.io/js/main.js"></script>
+
+<script src="https://recherj.github.io/js/ie10-viewport-bug-workaround.js"></script>
+
+
+    
+  </body>
+</html>

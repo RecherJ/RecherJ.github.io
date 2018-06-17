@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="en-US">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="author" content="map[]" />
+    
+    <link rel="shortcut icon" type="image/x-icon" href="https://recherj.github.io/img/favicon.ico">
+    <title>手势识别器几个重要知识点</title>
+    <meta name="generator" content="Hugo 0.41" />
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
+    <link rel="stylesheet" type="text/css" href="https://recherj.github.io/css/main.css" />
+    <link rel="stylesheet" type="text/css" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.6.3/css/font-awesome.min.css" />
+    <link rel="stylesheet" type="text/css" href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:200,400,200bold,400old" />
+    
+    <link rel="stylesheet" href="https://recherj.github.io/css/code.css">
+    
+    <!--[if lt IE 9]>
+			<script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
+			<script src="https://oss.maxcdn.com/libs/respond.js/1.4.2/respond.min.js"></script>
+		<![endif]-->
+
+    
+  </head>
+
+  <body>
+    <div id="wrap">
+
+      
+      <nav class="navbar navbar-default">
+  <div class="navbar-container">
+    <div class="navbar-header">
+      <a class="navbar-brand" href="https://recherj.github.io/"><img src="https://recherj.github.io//img/favicon.png" /></a>
+      <span>厚德载物，上善若水</span>
+    </div>
+    <ul class="nav navbar-nav navbar-right">
+        
+          
+          <li><a href="/blog/">博客</a></li>
+          
+          <li><a href="/about/">关于</a></li>
+          
+        
+        </ul>
+  </div>
+</nav>
+
+      
+      <div class="container article-content">
+        <div class="article-top-block">
+            <div class="blog-post">
+              <h3>
+                <strong><a href="https://recherj.github.io/blog/%E6%89%8B%E5%8A%BF%E8%AF%86%E5%88%AB%E5%99%A8%E5%87%A0%E4%B8%AA%E9%87%8D%E8%A6%81%E7%9F%A5%E8%AF%86%E7%82%B9/">手势识别器几个重要知识点</a></strong>
+              </h3>
+            </div>
+            <div class="blog-title">
+              <h4>
+              April 11, 2016
+                &nbsp;&nbsp;
+                
+              </h4>
+            </div>
+        </div>
+        <div class="panel panel-default">
+          <div class="panel-body">
+            <div class="blogpost">
+              <p>今天复习了一下手势识别器，<code>UIGestureRecognizer</code>类
+该类中包含以下几个子类</p>
+
+<p></p>
+
+<ul>
+<li>UITapGestureRecognizer(敲击)</li>
+<li>UIPinchGestureRecognizer(捏合，用于缩放)</li>
+<li>UIPanGestureRecognizer(拖拽)</li>
+<li>UISwipeGestureRecognizer(轻扫)</li>
+<li>UIRotationGestureRecognizer(旋转)</li>
+<li>UILongPressGestureRecognizer(长按)</li>
+</ul>
+
+<h3 id="uiswipegesturerecognizer">UISwipeGestureRecognizer</h3>
+
+<p>其中轻扫手势有一个扫动方向，<code>direction</code>属性，支持4个方向的扫动，是一个枚举。不设置默认是向右扫动。如果想支持多个方向的扫动，需要给该控件添加多个手势即可。</p>
+
+<h3 id="uipangesturerecognizer">UIPanGestureRecognizer</h3>
+
+<ul>
+<li><code>- translationInView:</code>方法返回一个在该控件上移动的点。所以可以改变该控件的<code>transform</code>值来实现拖拽的效果，实现代码如下：</li>
+</ul>
+
+<pre><code class="language-objc">// 获取移动点
+CGPoint transP = [pan translationInView:self.imageView];
+self.imageView.transform = CGAffineTransformTranslate(self.imageView.transform, transP.x, transP.y);
+// 复位
+[pan setTranslation:CGPointZero inView:self.imageView];
+</code></pre>
+
+<ul>
+<li>改变了控件的<code>transform</code>的属性后一定要将移动点置零，不然会有一个叠加效果，会在当前的<code>transform</code>基础上继续叠加，类似于一个加速度的概念。</li>
+</ul>
+
+<pre><code class="language-objc">[pan setTranslation:CGPointZero inView:self.imageView];
+</code></pre>
+
+<h3 id="uirotationgesturerecognizer">UIRotationGestureRecognizer</h3>
+
+<ul>
+<li>旋转手势有一个旋转角度的属性<code>rotation</code>属性，改变这个值可完成旋转的效果</li>
+<li>但同样，当改变控件的<code>transform</code>属性后也是要清空这个<code>rotation</code>，性质类似于拖拽手势的<code>translation</code>。</li>
+</ul>
+
+<p>此外，需要支持多个手势复合识别，需要实现<code>UIGestureRecognizerDelegate</code>代理协议中的一个<code>- (BOOL)gestureRecognizer: shouldRecognizeSimultaneouslyWithGestureRecognizer:</code>方法，返回Yes，代表支持多个手势识别。</p>
+              <hr>
+              <div class="related-posts">
+                <h5>Related Posts</h5>
+                
+              </div>
+            </div>
+          </div>
+          <hr>
+        <div class="disqus">
+  <div id="disqus_thread"></div>
+  <script type="text/javascript">
+
+    (function() {
+      
+      
+      if (window.location.hostname == "localhost")
+        return;
+
+      var disqus_shortname = '';
+      var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+      dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+      (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+    })();
+  </script>
+  <noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+  <a href="http://disqus.com/" class="dsq-brlink">comments powered by <span class="logo-disqus">Disqus</span></a>
+</div>
+        </div>
+      </div>
+      
+    </div>
+
+    
+    <footer>
+  <div id="footer">
+    <div class="footer-container">
+      <p class="text-muted">&copy; All rights reserved. Powered by <a href="https://gohugo.io/">Hugo</a> and
+      <a href="http://github.com/RecherJ/canary/">canary</a> with ♥</p>
+    </div>
+  </div>
+</footer>
+
+
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
+
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" crossorigin="anonymous"></script>
+<script src="https://recherj.github.io/js/docs.min.js"></script>
+<script src="https://recherj.github.io/js/main.js"></script>
+
+<script src="https://recherj.github.io/js/ie10-viewport-bug-workaround.js"></script>
+
+
+    
+  </body>
+</html>

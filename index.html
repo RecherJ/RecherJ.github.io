@@ -1,11 +1,75 @@
-<!DOCTYPE html><html><head><meta charset="utf-8"><meta name="X-UA-Compatible" content="IE=edge"><title> RecherJ's blog</title><meta name="description" content="Less is more"><meta name="viewport" content="width=device-width, initial-scale=1"><link rel="icon" href="/favicon.ico"><link rel="stylesheet" href="/css/apollo.css"><link rel="search" type="application/opensearchdescription+xml" href="https://recherj.github.io/atom.xml" title="RecherJ's blog"></head><body><div class="wrap"><header><a href="/" class="logo-link"><img src="/favicon.png" alt="logo"></a><ul class="nav nav-list"><li class="nav-list-item"><a href="/" target="_self" class="nav-list-link active">BLOG</a></li><li class="nav-list-item"><a href="/archives/" target="_self" class="nav-list-link">ARCHIVE</a></li><li class="nav-list-item"><a href="https://weibo.com/u/2698628733" target="_blank" class="nav-list-link">WEIBO</a></li><li class="nav-list-item"><a href="https://github.com/RecherJ" target="_blank" class="nav-list-link">GITHUB</a></li><li class="nav-list-item"><a href="/atom.xml" target="_self" class="nav-list-link">RSS</a></li></ul></header><main class="container"><ul class="home post-list"><li class="post-list-item"><article class="post-block"><h2 class="post-title"><a href="/2018/06/13/fastlane自动化打包部署/" class="post-title-link">fastlane自动化打包部署</a></h2><div class="post-info">Jun 13, 2018</div><div class="post-content"><p>我们的维语电商项目是 swift 和 OC 混编，所以每次手动打包发布测试版时巨慢，最近刚好把项目里的部分网络库从原来的OC版换到了swift版，正在慢慢的去 Objective-C 化。</p>
-<p>久闻 fastlane 是自动化部署利器，今天就着实看了一下教程。简单把我踩过的坑记录下。</p></div><a href="/2018/06/13/fastlane自动化打包部署/" class="read-more">...more</a></article></li><li class="post-list-item"><article class="post-block"><h2 class="post-title"><a href="/2018/06/05/Kingfisher加载gif问题/" class="post-title-link">Kingfisher加载gif问题</a></h2><div class="post-info">Jun 5, 2018</div><div class="post-content"><p>之前将我们的一款 Swift 项目中的图片库，从OC的 <a href="https://github.com/rs/SDWebImage" target="_blank" rel="noopener">SDWebImage</a> 换成了喵神写的 <a href="https://github.com/onevcat/Kingfisher" target="_blank" rel="noopener">Kingfisher</a> , 主要为了尽可能纯swift开发，混编编译实在是太慢了..</p></div><a href="/2018/06/05/Kingfisher加载gif问题/" class="read-more">...more</a></article></li><li class="post-list-item"><article class="post-block"><h2 class="post-title"><a href="/2018/06/03/仿淘宝购买页面/" class="post-title-link">仿淘宝购买页面</a></h2><div class="post-info">Jun 3, 2018</div><div class="post-content"><p>前段时间，公司的设计小妹子觉得手淘iOS的那个加入购物车、购买时的动画效果很好，所以也要求我们做一个类似的，因为维语文字的排列方向时从右至左的，所以再仔细观察了淘宝的动画后，也仿写了一个类似样式的。<br></div><a href="/2018/06/03/仿淘宝购买页面/" class="read-more">...more</a></article></li><li class="post-list-item"><article class="post-block"><h2 class="post-title"><a href="/2018/05/06/重拾博客/" class="post-title-link">重拾博客</a></h2><div class="post-info">May 6, 2018</div><div class="post-content"><p>最近一直督促自己要把荒废的博客捡起来，之前搭建这个也是为了督促自己学习、写作、不断巩固学到的知识。</p></div><a href="/2018/05/06/重拾博客/" class="read-more">...more</a></article></li><li class="post-list-item"><article class="post-block"><h2 class="post-title"><a href="/2017/02/03/初识CATextLayer/" class="post-title-link">初识CATextLayer</a></h2><div class="post-info">Feb 3, 2017</div><div class="post-content"><p>用户界面是无法从一个单独的图片里面构建的。一个设计良好的图标能够很好地表现一个按钮或控件的意图，不过你迟早都要需要一个不错的老式风格的文本标签。</p></div><a href="/2017/02/03/初识CATextLayer/" class="read-more">...more</a></article></li><li class="post-list-item"><article class="post-block"><h2 class="post-title"><a href="/2017/01/25/Shadowsocks配合Proxifier实现Mac全局科学上网/" class="post-title-link">Shadowsocks配合Proxifier实现Mac全局科学上网</a></h2><div class="post-info">Jan 25, 2017</div><div class="post-content"><p>前些天写了一篇给git设置全局代理的笔记，使用后发现不是很完美，利用<code>connect</code>接管了git的<code>SSH</code>使得像SourceTree这样的第三方GUI的git管理软件没有办法使用。并且<code>curl</code>、<code>wget</code>等在终端中跑的命令也是不能解决，局限性很大。</p></div><a href="/2017/01/25/Shadowsocks配合Proxifier实现Mac全局科学上网/" class="read-more">...more</a></article></li><li class="post-list-item"><article class="post-block"><h2 class="post-title"><a href="/2017/01/17/配合Shadowsocks为git配置SSH全局代理突破GFW/" class="post-title-link">配合Shadowsocks为git配置SSH全局代理突破GFW</a></h2><div class="post-info">Jan 17, 2017</div><div class="post-content"><h3 id="更新说明"><a href="#更新说明" class="headerlink" title="更新说明"></a>更新说明</h3><hr>
-<ul>
-<li>2017-01-17 初稿</li>
-<li>2017-01-18 用 ssh:// 协议全局替换 https:// 协议</li>
-</ul>
-<hr>
-<p>由于国内的特殊的网络环境，在某些特殊地方GFW更加凶残，github和国内的CSDN博客等网站居然都是封堵的，这让我们这些只想安静的写两行代码与世界的程序员交流(clone第三方框架)的美好愿望都无法实现。</p></div><a href="/2017/01/17/配合Shadowsocks为git配置SSH全局代理突破GFW/" class="read-more">...more</a></article></li><li class="post-list-item"><article class="post-block"><h2 class="post-title"><a href="/2016/05/05/App打包时遇大量警告解决办法/" class="post-title-link">App打包时遇大量警告解决办法</a></h2><div class="post-info">May 5, 2016</div><div class="post-content"><p>昨天在对App进行最后一次小修小布后，准备进行第一个版本的打包上架，在真机运行和调试时都没有问题，但是当<code>Archive</code>时一下呼呼出现了89个警告，我想当时我的表情应该是这样的<br></div><a href="/2016/05/05/App打包时遇大量警告解决办法/" class="read-more">...more</a></article></li><li class="post-list-item"><article class="post-block"><h2 class="post-title"><a href="/2016/05/05/dyld-Library-not-loaded-System-Library-Frameworks-ModelIO-framework-XXXX问题解决/" class="post-title-link">dyld: Library not loaded: /System/Library/Frameworks/ModelIO.framework/XXXX问题解决</a></h2><div class="post-info">May 5, 2016</div><div class="post-content"><p>29号用朋友4s（iOS 8.4.1）真机调试时，编译时没问题，运行时程序直接奔溃，控制台打印出现了这样一个问题<br></div><a href="/2016/05/05/dyld-Library-not-loaded-System-Library-Frameworks-ModelIO-framework-XXXX问题解决/" class="read-more">...more</a></article></li><li class="post-list-item"><article class="post-block"><h2 class="post-title"><a href="/2016/04/21/根据不同控制器自动切换横竖屏/" class="post-title-link">根据不同控制器自动切换横竖屏</a></h2><div class="post-info">Apr 21, 2016</div><div class="post-content"><p>准备制作自己的第一款App,但是遇到一个技术上问题：</p>
-<blockquote>
-<p><strong>如何在当前控制器modal出下一个控制器时自动将屏幕切换成横屏模式</strong>。</p>
-</blockquote></div><a href="/2016/04/21/根据不同控制器自动切换横竖屏/" class="read-more">...more</a></article></li></ul></main><footer><div class="paginator"><a href="/page/2/" class="next">NEXT</a></div><div class="copyright"><p>© 2016 - 2018 <a href="https://recherj.github.io">RecherJ</a>, powered by <a href="https://hexo.io/" target="_blank">Hexo</a> and <a href="https://github.com/pinggod/hexo-theme-apollo" target="_blank">hexo-theme-apollo</a>.</p></div></footer></div><script async src="//cdn.bootcss.com/mathjax/2.7.0/MathJax.js?config=TeX-MML-AM_CHTML" integrity="sha384-crwIf/BuaWM9rM65iM+dWFldgQ1Un8jWZMuh3puxb8TOY9+linwLoI7ZHZT+aekW" crossorigin="anonymous"></script><script>(function(b,o,i,l,e,r){b.GoogleAnalyticsObject=l;b[l]||(b[l]=function(){(b[l].q=b[l].q||[]).push(arguments)});b[l].l=+new Date;e=o.createElement(i);r=o.getElementsByTagName(i)[0];e.src='//www.google-analytics.com/analytics.js';r.parentNode.insertBefore(e,r)}(window,document,'script','ga'));ga('create',"UA-65933410-1",'auto');ga('send','pageview');</script></body></html>
+<!DOCTYPE html>
+<html lang="en-US">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="author" content="map[]" />
+    
+    <link rel="shortcut icon" type="image/x-icon" href="https://recherj.github.io/img/favicon.ico">
+    <title>RecherJ</title>
+    <meta name="generator" content="Hugo 0.41" />
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
+    <link rel="stylesheet" type="text/css" href="https://recherj.github.io/css/main.css" />
+    <link rel="stylesheet" type="text/css" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.6.3/css/font-awesome.min.css" />
+    <link rel="stylesheet" type="text/css" href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:200,400,200bold,400old" />
+    
+    <link rel="stylesheet" href="https://recherj.github.io/css/code.css">
+    
+    <!--[if lt IE 9]>
+			<script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
+			<script src="https://oss.maxcdn.com/libs/respond.js/1.4.2/respond.min.js"></script>
+		<![endif]-->
+
+    
+  </head>
+
+  <body style="overflow: hidden;">
+    <div id="container">
+      <div class="home-panel">
+          <img class="user-icon" src="https://recherj.github.io/img/favicon.png" alt="头像"/>
+          <div class="user-motto">厚德载物，上善若水</div>
+          <div class="user-info">
+            <p>嗨~ 我是刘勇刚(@RecherJ)，会一点iOS</p>
+            
+            <p>喜欢简约，纯粹</p>
+            
+          </div>
+          <div class="bottom-block">
+            
+            <div class="btn-item">
+              <a href="/blog/">博客</a>
+            </div>
+            
+            <div class="btn-item">
+              <a href="/about/">关于</a>
+            </div>
+            
+          </div>
+          
+
+<div class="contact-block">
+    
+      <a href="http://weibo.com/u/2698628733"><i class="social fa fa-weibo"></i></a>
+    
+
+    
+      <a href="http://github.com/RecherJ"><i class="social fa fa-github"></i></a>
+    
+
+    
+      <a href="mailto:ygliusz@gamail.com"><i class="social fa fa-envelope"></i></a>
+    
+
+    
+
+    
+
+    
+
+  </div>
+
+      </div>
+    </div>
+  </body>
+</html>

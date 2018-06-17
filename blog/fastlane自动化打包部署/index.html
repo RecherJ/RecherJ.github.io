@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html lang="en-US">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="author" content="map[]" />
+    
+    <link rel="shortcut icon" type="image/x-icon" href="https://recherj.github.io/img/favicon.ico">
+    <title>Fastlane自动化打包部署</title>
+    <meta name="generator" content="Hugo 0.41" />
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
+    <link rel="stylesheet" type="text/css" href="https://recherj.github.io/css/main.css" />
+    <link rel="stylesheet" type="text/css" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.6.3/css/font-awesome.min.css" />
+    <link rel="stylesheet" type="text/css" href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:200,400,200bold,400old" />
+    
+    <link rel="stylesheet" href="https://recherj.github.io/css/code.css">
+    
+    <!--[if lt IE 9]>
+			<script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
+			<script src="https://oss.maxcdn.com/libs/respond.js/1.4.2/respond.min.js"></script>
+		<![endif]-->
+
+    
+  </head>
+
+  <body>
+    <div id="wrap">
+
+      
+      <nav class="navbar navbar-default">
+  <div class="navbar-container">
+    <div class="navbar-header">
+      <a class="navbar-brand" href="https://recherj.github.io/"><img src="https://recherj.github.io//img/favicon.png" /></a>
+      <span>厚德载物，上善若水</span>
+    </div>
+    <ul class="nav navbar-nav navbar-right">
+        
+          
+          <li><a href="/blog/">博客</a></li>
+          
+          <li><a href="/about/">关于</a></li>
+          
+        
+        </ul>
+  </div>
+</nav>
+
+      
+      <div class="container article-content">
+        <div class="article-top-block">
+            <div class="blog-post">
+              <h3>
+                <strong><a href="https://recherj.github.io/blog/fastlane%E8%87%AA%E5%8A%A8%E5%8C%96%E6%89%93%E5%8C%85%E9%83%A8%E7%BD%B2/">Fastlane自动化打包部署</a></strong>
+              </h3>
+            </div>
+            <div class="blog-title">
+              <h4>
+              June 13, 2018
+                &nbsp;&nbsp;
+                
+              </h4>
+            </div>
+        </div>
+        <div class="panel panel-default">
+          <div class="panel-body">
+            <div class="blogpost">
+              <p>我们的维语电商项目是 swift 和 OC 混编，所以每次手动打包发布测试版时巨慢，最近刚好把项目里的部分网络库从原来的OC版换到了swift版，正在慢慢的去 Objective-C 化。</p>
+
+<p>久闻 fastlane 是自动化部署利器，今天就着实看了一下教程。简单把我踩过的坑记录下。</p>
+
+<p></p>
+
+<h3 id="安装">安装</h3>
+
+<pre><code class="language-bash">sudo gem install fastlane -n /usr/local/bin 
+</code></pre>
+
+<p>这里网上大部分的教程是说 <code>sudo gem install fastlane</code> 但至少我在 macOS High Sierra 上是不成功的，会报权限问题</p>
+
+<blockquote>
+<p>ERROR:  While executing gem &hellip; (Gem::FilePermissionError)
+You don&rsquo;t have write permissions for the /usr/bin</p>
+</blockquote>
+
+<p>参考链接<a href="https://stackoverflow.com/questions/14607193/installing-gem-or-updating-rubygems-fails-with-permissions-error">Installing gem or updating RubyGems fails with permissions error</a>，所以这里我选选择了指定目录安装。</p>
+
+<p>然后进入项目工程中执行 <code>fastlane init</code> 它会询问一下配置选项，先后依次输入 AppID, AppleID 、密码、iTunes Connect Team 等完成基础配置后，会默认执行 <code>$ bundle update</code>，这里我等了差不多半小时，没任何反应😂 。终止后重新手动执行了下 <code>$ bundle update</code> 说没有权限，果断sudo 后很快就安装好了。</p>
+
+<p>测试版需要上传到 fir.im 所以还需安装两个需要的插件 <code>fastlane add_plugin versioning</code>、<code>fastlane add_plugin firim</code> ，firim这个插件安装之前有依赖 firim</p>
+
+<p><img src="https://ws1.sinaimg.cn/large/006tNc79ly1fs9z63xaogj319m0astax.jpg" alt="" /></p>
+
+<p>所以同理也要指定目录安装</p>
+
+<pre><code class="language-bash">$ sudo gem install -n /usr/local/bin firim -v '0.2.1' --source 'https://rubygems.org'
+</code></pre>
+
+<p>再安装 firim 插件就正常了。</p>
+
+<h3 id="配置">配置</h3>
+
+<p>编辑 Fastfile</p>
+
+<pre><code class="language-ruby">lane :to_firim do
+  # 如果你用 pod install
+  cocoapods
+  # 如果你没有申请adhoc证书，sigh会自动帮你申请，并且添加到Xcode里
+  #sigh(adhoc: true)
+  # 以下两个action来自fastlane-plugin-versioning，
+  # 第一个递增 Build，第二个设定Version。
+  # 如果你有多个target，就必须指定target的值，否则它会直接找找到的第一个plist修改
+  # 在这里我建议每一个打的包的Build都要不一样，这样crash了拿到日志，可以对应到ipa上
+  increment_build_number_in_plist(target: &quot;XXXXX&quot;)
+  increment_version_number_in_plist(
+    target: &quot;XXXXX&quot;,
+    version_number: '4.2.0'
+    )
+  # gym用来编译ipa
+  gym(
+    output_directory: './firim',
+    export_options: {
+      method: &quot;ad-hoc&quot;, # 指定打包方式
+      teamID: &quot;XXXXX&quot;,
+      thinning: &quot;&lt;none&gt;&quot;
+    },
+    scheme: &quot;XXXXX&quot;
+    )
+  # 上传ipa到fir.im服务器，在fir.im获取firim_api_token
+  firim(firim_api_token: &quot;XXXXXXXXXXXXXXXXXXXX&quot;)
+end
+</code></pre>
+
+<p>将 target 、版本号、firim_token、TeamID等信息配置好后就可以 run <code>fastlane to_firim</code> 上传到 fir.im 了。</p>
+
+<h3 id="打包">打包</h3>
+
+<p>第一次执行到 cocoapods 时报错了，查了下需要在 Pluginfile 文件中加上</p>
+
+<pre><code class="language-bash">gem 'cocoapods'
+</code></pre>
+
+<p>然后在执行，发现上传firim 时报错，一查发现没有设置token，去fir.im上生成了api_token后填写上后再执行终于成功了。</p>
+
+<p><img src="https://ws4.sinaimg.cn/large/006tNc79ly1fs9zkgxyrxj319c0ho0vn.jpg" alt="" /></p>
+
+<p>上fir.im 检查下，有的。perfect！</p>
+
+<p>至此就初步完成最基本的测试版上传的配置，后续还需要再研究下去除一些不必要的log和警告，因为目前在打包时控制台会将所有的警告也输出。</p>
+
+<h3 id="参考链接">参考链接</h3>
+
+<ul>
+<li><a href="https://blog.csdn.net/kmyhy/article/details/52441681">fastlane 教程: 入门</a></li>
+<li><a href="https://www.jianshu.com/p/c38157e5d6c1">Fastlane安装指南</a></li>
+<li><a href="https://docs.fastlane.tools">fastlane docs</a></li>
+<li><a href="https://www.jianshu.com/p/2918cf082b9d">fastlane 自动打包到 fir.im 的踩坑之路</a></li>
+<li><a href="https://github.com/fastlane/fastlane/issues/6073">i&rsquo;m requred to install cocoa pods,but i have installed. ! </a></li>
+</ul>
+              <hr>
+              <div class="related-posts">
+                <h5>Related Posts</h5>
+                
+              </div>
+            </div>
+          </div>
+          <hr>
+        <div class="disqus">
+  <div id="disqus_thread"></div>
+  <script type="text/javascript">
+
+    (function() {
+      
+      
+      if (window.location.hostname == "localhost")
+        return;
+
+      var disqus_shortname = '';
+      var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+      dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+      (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+    })();
+  </script>
+  <noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+  <a href="http://disqus.com/" class="dsq-brlink">comments powered by <span class="logo-disqus">Disqus</span></a>
+</div>
+        </div>
+      </div>
+      
+    </div>
+
+    
+    <footer>
+  <div id="footer">
+    <div class="footer-container">
+      <p class="text-muted">&copy; All rights reserved. Powered by <a href="https://gohugo.io/">Hugo</a> and
+      <a href="http://github.com/RecherJ/canary/">canary</a> with ♥</p>
+    </div>
+  </div>
+</footer>
+
+
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
+
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" crossorigin="anonymous"></script>
+<script src="https://recherj.github.io/js/docs.min.js"></script>
+<script src="https://recherj.github.io/js/main.js"></script>
+
+<script src="https://recherj.github.io/js/ie10-viewport-bug-workaround.js"></script>
+
+
+    
+  </body>
+</html>
