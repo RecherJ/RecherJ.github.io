@@ -23,14 +23,12 @@
     </item>
     
     <item>
-      <title>Fastlane自动化打包部署</title>
+      <title>Fastlane结合fir.im实现自动化打包部署</title>
       <link>https://recherj.github.io/blog/fastlane%E8%87%AA%E5%8A%A8%E5%8C%96%E6%89%93%E5%8C%85%E9%83%A8%E7%BD%B2/</link>
       <pubDate>Wed, 13 Jun 2018 23:10:26 +0000</pubDate>
       
       <guid>https://recherj.github.io/blog/fastlane%E8%87%AA%E5%8A%A8%E5%8C%96%E6%89%93%E5%8C%85%E9%83%A8%E7%BD%B2/</guid>
-      <description>&lt;p&gt;我们的维语电商项目是 swift 和 OC 混编，所以每次手动打包发布测试版时巨慢，最近刚好把项目里的部分网络库从原来的OC版换到了swift版，正在慢慢的去 Objective-C 化。&lt;/p&gt;
-
-&lt;p&gt;久闻 fastlane 是自动化部署利器，今天就着实看了一下教程。简单把我踩过的坑记录下。&lt;/p&gt;
+      <description>&lt;p&gt;我们的维语电商项目是 swift 和 OC 混编，所以每次手动打包发布测试版时巨慢，最近刚好把项目里的部分网络库从原来的OC版换到了swift版，正在慢慢的去 Objective-C 化。每次在打包发布测试版给业务同事时就浪费很多时间，严重影响工作效率。&lt;/p&gt;
 
 &lt;p&gt;&lt;/p&gt;</description>
     </item>

@@ -7,7 +7,7 @@
     <meta name="author" content="map[]" />
     
     <link rel="shortcut icon" type="image/x-icon" href="https://recherj.github.io/img/favicon.ico">
-    <title>Fastlane自动化打包部署</title>
+    <title>Fastlane结合fir.im实现自动化打包部署</title>
     <meta name="generator" content="Hugo 0.41" />
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
     <link rel="stylesheet" type="text/css" href="https://recherj.github.io/css/main.css" />
@@ -51,7 +51,7 @@
         <div class="article-top-block">
             <div class="blog-post">
               <h3>
-                <strong><a href="https://recherj.github.io/blog/fastlane%E8%87%AA%E5%8A%A8%E5%8C%96%E6%89%93%E5%8C%85%E9%83%A8%E7%BD%B2/">Fastlane自动化打包部署</a></strong>
+                <strong><a href="https://recherj.github.io/blog/fastlane%E8%87%AA%E5%8A%A8%E5%8C%96%E6%89%93%E5%8C%85%E9%83%A8%E7%BD%B2/">Fastlane结合fir.im实现自动化打包部署</a></strong>
               </h3>
             </div>
             <div class="blog-title">
@@ -65,13 +65,23 @@
         <div class="panel panel-default">
           <div class="panel-body">
             <div class="blogpost">
-              <p>我们的维语电商项目是 swift 和 OC 混编，所以每次手动打包发布测试版时巨慢，最近刚好把项目里的部分网络库从原来的OC版换到了swift版，正在慢慢的去 Objective-C 化。</p>
-
-<p>久闻 fastlane 是自动化部署利器，今天就着实看了一下教程。简单把我踩过的坑记录下。</p>
+              <p>我们的维语电商项目是 swift 和 OC 混编，所以每次手动打包发布测试版时巨慢，最近刚好把项目里的部分网络库从原来的OC版换到了swift版，正在慢慢的去 Objective-C 化。每次在打包发布测试版给业务同事时就浪费很多时间，严重影响工作效率。</p>
 
 <p></p>
 
-<h3 id="安装">安装</h3>
+<p>我在想能不能将打包不同版本(测试版，adhoc版，正式发布版等)的需求自动化，每次这样手动打包真是太浪费时间了，而且每次还要根据不同版本修改接口和一些环境变量，万一哪次手抖改错了，那就跪了。毕竟人工再小心还是会出错的。如果将这些不同版本的 ipa 包再自动上传到 fir.im 直接通知业务去下载那就完美了。</p>
+
+<p>上一版刚好发布闲下来，研究了下 fastlane ，结合fir.im 再配合多Target基本实现了自动化部署。简单把我踩过的坑记录下。</p>
+
+<h3 id="多target配置">多Target配置</h3>
+
+<p>选中当前 Project -&gt; Targets， duplicate 当前的 target ，在弹框中选择 dulplicate only (这里是询问是否转换成iPad项目)，然后将这个新复制出来的 target 重命名，这里我为项目分了三个 Target，分别是 <code>Dev(开发版，对接测试接口)</code>、 <code>Stage(开发版，对接正式接口)</code>、<code>Release(App Store发布版)</code> 。</p>
+
+<p>分别先后修改对应的 <code>Display Name</code> 、 <code>Bundle Identifier</code> 、 <code>Scheme</code> 、和各版本之间对应的 info.plist 文件，info.plist 名字最好和对应的 target 名字一致，再在 General 中给各个 target 选择自己对应的 info.plist 文件。</p>
+
+<p>在Apple 开发网站中再为 Dev 和 Stage 生成对应的 <code>AppID</code> 以及个target对应的配置文件，这样三个版本的App 就可以共存了，方便了对比测试。这里有一篇关于如何配置多版本操作的文章，讲的非常详细。<a href="https://www.jianshu.com/p/18db54655246">iOS多个Target配置详情操作</a></p>
+
+<h3 id="fastlane安装">Fastlane安装</h3>
 
 <pre><code class="language-bash">sudo gem install fastlane -n /usr/local/bin 
 </code></pre>
@@ -102,36 +112,72 @@ You don&rsquo;t have write permissions for the /usr/bin</p>
 
 <p>编辑 Fastfile</p>
 
-<pre><code class="language-ruby">lane :to_firim do
-  # 如果你用 pod install
-  cocoapods
-  # 如果你没有申请adhoc证书，sigh会自动帮你申请，并且添加到Xcode里
-  #sigh(adhoc: true)
-  # 以下两个action来自fastlane-plugin-versioning，
-  # 第一个递增 Build，第二个设定Version。
-  # 如果你有多个target，就必须指定target的值，否则它会直接找找到的第一个plist修改
-  # 在这里我建议每一个打的包的Build都要不一样，这样crash了拿到日志，可以对应到ipa上
-  increment_build_number_in_plist(target: &quot;XXXXX&quot;)
-  increment_version_number_in_plist(
-    target: &quot;XXXXX&quot;,
+<pre><code class="language-ruby">#### 这是打包adhoc版本
+lane :adhoc do
+# 如果需要用 pod install
+cocoapods
+
+increment_build_number_in_plist(target: &quot;Stage&quot;)
+increment_version_number_in_plist(
+    target: &quot;Stage&quot;,
     version_number: '4.2.0'
-    )
-  # gym用来编译ipa
-  gym(
-    output_directory: './firim',
+)
+
+# gym用来编译ipa
+gym(
+    silent: true,
+    clean: true,
+  	# 输出路径
+    output_directory: './firim_adhoc',
     export_options: {
-      method: &quot;ad-hoc&quot;, # 指定打包方式
-      teamID: &quot;XXXXX&quot;,
+      method: &quot;ad-hoc&quot;,
+      provisioningProfiles: {
+        &quot;com.xxx.xxxx.d2l&quot;: &quot;ad_hoc_stage_2018_06_19&quot;
+      },
+      teamID: &quot;xxxxx&quot;,
       thinning: &quot;&lt;none&gt;&quot;
     },
-    scheme: &quot;XXXXX&quot;
-    )
-  # 上传ipa到fir.im服务器，在fir.im获取firim_api_token
-  firim(firim_api_token: &quot;XXXXXXXXXXXXXXXXXXXX&quot;)
+    scheme: &quot;Stage&quot;
+)
+
+# 上传ipa到fir.im服务器，在fir.im获取firim_api_token
+firim(firim_api_token: &quot;xxxxxxxxxxxxxxxxxxxxxxxxxx&quot;)
+end
+
+#### 这是打包开发版
+lane :dev do
+# 如果需要用 pod install
+cocoapods
+
+increment_build_number_in_plist(target: &quot;Dev&quot;)
+increment_version_number_in_plist(
+    target: &quot;Dev&quot;,
+    version_number: '4.2.0'
+)
+
+# gym用来编译ipa
+gym(
+    silent: true,
+    clean: true,
+    output_directory: './firim_dev',
+    export_options: {
+      method: &quot;development&quot;,
+      provisioningProfiles: {
+        # 为ad-hoc版指定对应的证书，这里一定要配置，不然多target时fastlane可能会选错，导致不能正常打包
+        &quot;com.xxx.xxxx.d2d&quot;: &quot;development_d2d_2018_06_19&quot;
+      },
+      teamID: &quot;xxxxxxx&quot;,
+      thinning: &quot;&lt;none&gt;&quot;
+    },
+    scheme: &quot;Dev&quot;
+)
+
+# 上传ipa到fir.im服务器，在fir.im获取firim_api_token
+firim(firim_api_token: &quot;xxxxxxxxxxxxxxxxxxxxxxxxxx&quot;)
 end
 </code></pre>
 
-<p>将 target 、版本号、firim_token、TeamID等信息配置好后就可以 run <code>fastlane to_firim</code> 上传到 fir.im 了。</p>
+<p>将 target 、版本号、firim_token、TeamID等信息配置好后就可以 run <code>fastlane adhoc</code> 和 <code>fastlane dev</code> 分别打包出测试版 和 对接生产接口的预发布版了，自动 上传到 fir.im 。</p>
 
 <h3 id="打包">打包</h3>
 
@@ -140,13 +186,25 @@ end
 <pre><code class="language-bash">gem 'cocoapods'
 </code></pre>
 
-<p>然后在执行，发现上传firim 时报错，一查发现没有设置token，去fir.im上生成了api_token后填写上后再执行终于成功了。</p>
+<p>然后在执行，发现上传firim 时报错，一查发现没有设置token，去fir.im上生成了api_token后填写上后再执行又报错，这次是因为找不到找不到对应的 scheme， Google一下原来需要在 Scheme &gt; Manage Schemes 中勾选 scheme 的 shared</p>
+
+<p>再run！又报错了。。找不到 pod_xxxxxx.xcodeproj。点击各个版本的 target &gt; general， 找到 <code>Linked Frameworks and Libraries</code> 删除里面的 pod_xxxxx.framework 这是之前只有一个target 时链接的三方库，现在需要分别生成 pod_dev 和 pod_stage 以及 pod_release 三个 framework。</p>
+
+<p>再run！又报错了。。</p>
+
+<p>上文中已经说过，要为每个任务配置对应的配合文件，不然再打包时找不到对应 target 和对应方式(development 或 adhoc) 的秒数文件。task中增加了一个参数后再跑就完美成功了！</p>
+
+<p><img src="https://ws1.sinaimg.cn/large/006tNc79ly1fsgvntumf9j31kk0own17.jpg" alt="" /></p>
+
+<p>最后打包出来会有一些详细参数信息</p>
+
+<p><img src="https://ws4.sinaimg.cn/large/006tNc79ly1fsgvnwulqoj30xm0dudi1.jpg" alt="" /></p>
 
 <p><img src="https://ws4.sinaimg.cn/large/006tNc79ly1fs9zkgxyrxj319c0ho0vn.jpg" alt="" /></p>
 
 <p>上fir.im 检查下，有的。perfect！</p>
 
-<p>至此就初步完成最基本的测试版上传的配置，后续还需要再研究下去除一些不必要的log和警告，因为目前在打包时控制台会将所有的警告也输出。</p>
+<p>至此就初步完成最基本的测试版上传的配置，<del>后续还需要再研究下去除一些不必要的log和警告，因为目前在打包时控制台会将所有的警告也输出</del>。在task中配置 <code>silent: true</code> 即可消除部分警告。</p>
 
 <h3 id="参考链接">参考链接</h3>
 
@@ -156,6 +214,8 @@ end
 <li><a href="https://docs.fastlane.tools">fastlane docs</a></li>
 <li><a href="https://www.jianshu.com/p/2918cf082b9d">fastlane 自动打包到 fir.im 的踩坑之路</a></li>
 <li><a href="https://github.com/fastlane/fastlane/issues/6073">i&rsquo;m requred to install cocoa pods,but i have installed. ! </a></li>
+<li><a href="https://stackoverflow.com/questions/13500793/xcodebuild-commands-give-different-results-when-run-from-the-command-line-than-w"><a href="https://stackoverflow.com/questions/13500793/xcodebuild-commands-give-different-results-when-run-from-the-command-line-than-w">xcodebuild commands give different results when run from the command line than when run from within Jenkins</a></a></li>
+<li>​</li>
 </ul>
               <hr>
               <div class="related-posts">
