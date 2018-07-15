@@ -3,6 +3,11 @@
   xmlns:xhtml="http://www.w3.org/1999/xhtml">
   
   <url>
+    <loc>https://recherj.github.io/blog/%E9%82%AA%E4%B8%8D%E5%8E%8B%E6%AD%A3%E5%BD%B1%E8%AF%84/</loc>
+    <lastmod>2018-07-15T09:55:00+08:00</lastmod>
+  </url>
+  
+  <url>
     <loc>https://recherj.github.io/blog/%E5%8D%9A%E5%AE%A2%E4%BB%8Ehexo%E8%BF%81%E7%A7%BB%E5%88%B0hugo/</loc>
     <lastmod>2018-06-18T15:23:03+08:00</lastmod>
   </url>
@@ -139,18 +144,12 @@
   
   <url>
     <loc>https://recherj.github.io/blog/</loc>
-    <lastmod>2018-06-18T15:23:03+08:00</lastmod>
+    <lastmod>2018-07-15T09:55:00+08:00</lastmod>
     <priority>0</priority>
   </url>
   
   <url>
     <loc>https://recherj.github.io/categories/</loc>
-    <priority>0</priority>
-  </url>
-  
-  <url>
-    <loc>https://recherj.github.io/categories/projects/</loc>
-    <lastmod>2016-10-02T22:55:05-04:00</lastmod>
     <priority>0</priority>
   </url>
   
@@ -161,8 +160,14 @@
   </url>
   
   <url>
+    <loc>https://recherj.github.io/categories/projects/</loc>
+    <lastmod>2016-10-02T22:55:05-04:00</lastmod>
+    <priority>0</priority>
+  </url>
+  
+  <url>
     <loc>https://recherj.github.io/</loc>
-    <lastmod>2018-06-18T15:23:03+08:00</lastmod>
+    <lastmod>2018-07-15T09:55:00+08:00</lastmod>
     <priority>0</priority>
   </url>
   

@@ -6,10 +6,21 @@
     <description>Recent content in Blogs on RecherJ</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en-US</language>
-    <lastBuildDate>Mon, 18 Jun 2018 15:23:03 +0800</lastBuildDate>
+    <lastBuildDate>Sun, 15 Jul 2018 09:55:00 +0800</lastBuildDate>
     
 	<atom:link href="https://recherj.github.io/blog/index.xml" rel="self" type="application/rss+xml" />
     
+    
+    <item>
+      <title>《邪不压正》影评</title>
+      <link>https://recherj.github.io/blog/%E9%82%AA%E4%B8%8D%E5%8E%8B%E6%AD%A3%E5%BD%B1%E8%AF%84/</link>
+      <pubDate>Sun, 15 Jul 2018 09:55:00 +0800</pubDate>
+      
+      <guid>https://recherj.github.io/blog/%E9%82%AA%E4%B8%8D%E5%8E%8B%E6%AD%A3%E5%BD%B1%E8%AF%84/</guid>
+      <description>&lt;p&gt;昨晚约同事去看了姜文的新作《邪不压正》，近一年没观影的我两个月前知道后就很期待。因为姜文老师一直是目前华语影坛的一股逆流，和一些主流价值观&lt;del&gt;背道而驰&lt;/del&gt;不太一样，也是少数敢于追随内心，不迎合大众消费者的导演之一了。&lt;/p&gt;
+
+&lt;p&gt;&lt;/p&gt;</description>
+    </item>
     
     <item>
       <title>博客从hexo迁移到hugo</title>
