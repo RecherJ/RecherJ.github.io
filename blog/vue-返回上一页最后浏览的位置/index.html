@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html lang="en-US">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="author" content="map[]" />
+    
+    <link rel="shortcut icon" type="image/x-icon" href="https://recherj.github.io/img/favicon.ico">
+    <title>Vue 返回上一页最后浏览的位置</title>
+    <meta name="generator" content="Hugo 0.41" />
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
+    <link rel="stylesheet" type="text/css" href="https://recherj.github.io/css/main.css" />
+    <link rel="stylesheet" type="text/css" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.6.3/css/font-awesome.min.css" />
+    <link rel="stylesheet" type="text/css" href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:200,400,200bold,400old" />
+    
+    <link rel="stylesheet" href="https://recherj.github.io/css/code.css">
+    
+    <!--[if lt IE 9]>
+			<script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
+			<script src="https://oss.maxcdn.com/libs/respond.js/1.4.2/respond.min.js"></script>
+		<![endif]-->
+
+    
+  </head>
+
+  <body>
+    <div id="wrap">
+
+      
+      <nav class="navbar navbar-default">
+  <div class="navbar-container">
+    <div class="navbar-header">
+      <a class="navbar-brand" href="https://recherj.github.io/"><img src="https://recherj.github.io//img/favicon.png" /></a>
+      <span>厚德载物，上善若水</span>
+    </div>
+    <ul class="nav navbar-nav navbar-right">
+        
+          
+          <li><a href="/blog/">博客</a></li>
+          
+          <li><a href="/about/">关于</a></li>
+          
+        
+        </ul>
+  </div>
+</nav>
+
+      
+      <div class="container article-content">
+        <div class="article-top-block">
+            <div class="blog-post">
+              <h3>
+                <strong><a href="https://recherj.github.io/blog/vue-%E8%BF%94%E5%9B%9E%E4%B8%8A%E4%B8%80%E9%A1%B5%E6%9C%80%E5%90%8E%E6%B5%8F%E8%A7%88%E7%9A%84%E4%BD%8D%E7%BD%AE/">Vue 返回上一页最后浏览的位置</a></strong>
+              </h3>
+            </div>
+            <div class="blog-title">
+              <h4>
+              August 9, 2018
+                &nbsp;&nbsp;
+                
+              </h4>
+            </div>
+        </div>
+        <div class="panel panel-default">
+          <div class="panel-body">
+            <div class="blogpost">
+              <p>业务同事希望网页也能像原生 App 那样实现进入下一页后，记住上一页页面的浏览位置，这样返回时可以继续之前的浏览位置继续浏览。需求一般出现列表的数据展示中。见效果图</p>
+
+<p></p>
+
+<p><img src="https://ws2.sinaimg.cn/large/006tNbRwly1fu3qv6carxg307j0dd4j2.gif" alt="" /></p>
+
+<p>简单研究了一下，<code>vue-router</code> 中的 <code>keepAlive</code> 属性能满足要求。</p>
+
+<pre><code class="language-js">export default new Router({
+    route: [
+        ...
+      {
+            path: '/home',
+            name: 'Home',
+            component: _import_('Home'),
+            meta: {
+                title: 'home',
+                keepAlive: true
+            }
+        },
+    ]
+})
+</code></pre>
+
+<p>标记该字段的页面组件在路由跳转时不会被<strong>销毁</strong>，而是被缓存起来，所以之前如果在 <code>created()</code> 中做的逻辑，就需要移 <code>activated()</code> 中来。</p>
+
+<p>记录滚动位置的实现思路也很简单</p>
+
+<blockquote>
+<p>用一个存储性属性记录当前滚动的位置，在下次组件被激活时，调用<code>window.scrollTo(x, y)</code> 来滚动到对应位置即可</p>
+</blockquote>
+
+<pre><code class="language-js">mounted() {
+  // 在这里注册监听window的滚动事件
+  window.addEventListener('scroll', this.handleScroll);
+},
+activated() {
+  // 激活后滚动到指定位置
+  if (this.scroll &gt; 0) {
+    window.scrollTo(0, this.scroll);
+    this.scroll = 0;
+    window.addEventListener('scroll', this.handleScroll);
+  }
+},
+deactivated() {
+  // 移除注册监听的scroll事件
+  window.removeEventListener('scroll', this.handleScroll);
+},
+</code></pre>
+
+<p>处理滚动的方法</p>
+
+<pre><code class="language-js">handleScroll() {
+  if (document.scrollingElement) {
+    this.scroll = document.scrollingElement &amp;&amp; document.scrollingElement.scrollTop;
+  } else {
+    this.scroll = document.body.scrollTop;
+  }
+}
+</code></pre>
+
+<p>然后在 <code>Root.vue</code> 跟组件中进行条件渲染</p>
+
+<pre><code class="language-pug">#box
+   keep-alive
+	 // 当标记了keepAlive 的组件渲染  
+     router-view(:key=&quot;$route.fullPath&quot;, v-if=&quot;$route.meta.keepAlive&quot;)
+   router-view(:key=&quot;$route.fullPath&quot;, v-if=&quot;!$route.meta.keepAlive&quot;)
+</code></pre>
+
+<p>这里需要说明一下的是，之前在网上看到有版本是</p>
+
+<pre><code class="language-js">// 时时记录当前滚动位置
+this.scroll  = document.documentElement &amp;&amp;  document.documentElement.scrollTop
+</code></pre>
+
+<p>这段代码在电脑的浏览器中运行正常，但在安卓手机的 <code>webview</code> 中不行，打印了下 <code>scroll</code> 值为 0，查了下是说再 html 和 body 标签中</p>
+
+<blockquote>
+<p>不能有 <code>height: 100%</code> 的样式，如果设置，那他们的高度就等于 <code>body</code> 的高度</p>
+</blockquote>
+
+<p>另外在 webkit 浏览器中正确获取滚动高度的元素应该是 <code>scrollingElement</code> ，见 <code>handleScroll</code> 方法。测试发现部分低配置的上古安卓机也不支持 <code>scrollingElement</code> ，所以再加一层判断。</p>
+
+<h3 id="参考链接">参考链接</h3>
+
+<p><a href="https://blog.csdn.net/qq_40204835/article/details/79853685">vue中 进入详情页记住滚动位置（keep-alive）</a></p>
+
+<p><a href="https://stackoverflow.com/questions/12788487/document-scrolltop-always-returns-0">document-scrolltop-always-returns-0</a></p>
+              <hr>
+              <div class="related-posts">
+                <h5>Related Posts</h5>
+                
+              </div>
+            </div>
+          </div>
+          <hr>
+        <div class="disqus">
+  <div id="disqus_thread"></div>
+  <script type="text/javascript">
+
+    (function() {
+      
+      
+      if (window.location.hostname == "localhost")
+        return;
+
+      var disqus_shortname = '';
+      var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+      dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+      (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+    })();
+  </script>
+  <noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+  <a href="http://disqus.com/" class="dsq-brlink">comments powered by <span class="logo-disqus">Disqus</span></a>
+</div>
+        </div>
+      </div>
+      
+    </div>
+
+    
+    <footer>
+  <div id="footer">
+    <div class="footer-container">
+      <p class="text-muted">&copy; All rights reserved. Powered by <a href="https://gohugo.io/">Hugo</a> and
+      <a href="http://github.com/RecherJ/canary/">canary</a> with ♥</p>
+    </div>
+  </div>
+</footer>
+
+
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
+
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" crossorigin="anonymous"></script>
+<script src="https://recherj.github.io/js/docs.min.js"></script>
+<script src="https://recherj.github.io/js/main.js"></script>
+
+<script src="https://recherj.github.io/js/ie10-viewport-bug-workaround.js"></script>
+
+
+    
+  </body>
+</html>

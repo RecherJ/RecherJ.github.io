@@ -6,10 +6,21 @@
     <description>Recent content on RecherJ</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en-US</language>
-    <lastBuildDate>Sun, 15 Jul 2018 09:55:00 +0800</lastBuildDate>
+    <lastBuildDate>Thu, 09 Aug 2018 20:20:00 +0800</lastBuildDate>
     
 	<atom:link href="https://recherj.github.io/index.xml" rel="self" type="application/rss+xml" />
     
+    
+    <item>
+      <title>Vue 返回上一页最后浏览的位置</title>
+      <link>https://recherj.github.io/blog/vue-%E8%BF%94%E5%9B%9E%E4%B8%8A%E4%B8%80%E9%A1%B5%E6%9C%80%E5%90%8E%E6%B5%8F%E8%A7%88%E7%9A%84%E4%BD%8D%E7%BD%AE/</link>
+      <pubDate>Thu, 09 Aug 2018 20:20:00 +0800</pubDate>
+      
+      <guid>https://recherj.github.io/blog/vue-%E8%BF%94%E5%9B%9E%E4%B8%8A%E4%B8%80%E9%A1%B5%E6%9C%80%E5%90%8E%E6%B5%8F%E8%A7%88%E7%9A%84%E4%BD%8D%E7%BD%AE/</guid>
+      <description>&lt;p&gt;业务同事希望网页也能像原生 App 那样实现进入下一页后，记住上一页页面的浏览位置，这样返回时可以继续之前的浏览位置继续浏览。需求一般出现列表的数据展示中。见效果图&lt;/p&gt;
+
+&lt;p&gt;&lt;/p&gt;</description>
+    </item>
     
     <item>
       <title>《邪不压正》影评</title>
