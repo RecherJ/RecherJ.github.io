@@ -1,0 +1,425 @@
+<!DOCTYPE html>
+<html lang="en-US">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="author" content="map[]" />
+    
+    <link rel="shortcut icon" type="image/x-icon" href="https://recherj.github.io/img/favicon.ico">
+    <title>WebViewJavascriptBridge 源码解析</title>
+    <meta name="generator" content="Hugo 0.41" />
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
+    <link rel="stylesheet" type="text/css" href="https://recherj.github.io/css/main.css" />
+    <link rel="stylesheet" type="text/css" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.6.3/css/font-awesome.min.css" />
+    <link rel="stylesheet" type="text/css" href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:200,400,200bold,400old" />
+    
+    <link rel="stylesheet" href="https://recherj.github.io/css/code.css">
+    
+    <!--[if lt IE 9]>
+			<script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
+			<script src="https://oss.maxcdn.com/libs/respond.js/1.4.2/respond.min.js"></script>
+		<![endif]-->
+
+    
+  </head>
+
+  <body>
+    <div id="wrap">
+
+      
+      <nav class="navbar navbar-default">
+  <div class="navbar-container">
+    <div class="navbar-header">
+      <a class="navbar-brand" href="https://recherj.github.io/">
+        <img src="https://recherj.github.io//img/favicon.png" />
+      </a>
+      <span>厚德载物，上善若水</span>
+    </div>
+    <ul class="nav navbar-nav navbar-right">
+        
+          
+          <li><a href="/blog/">博客</a></li>
+          
+          <li><a href="/about/">关于</a></li>
+          
+        
+        </ul>
+  </div>
+</nav>
+
+      
+      <div class="container article-content">
+        <div class="article-top-block">
+            <div class="blog-post">
+              <h3>
+                <strong><a href="https://recherj.github.io/blog/webviewjavascriptbridge-%E6%BA%90%E7%A0%81%E8%A7%A3%E6%9E%90/">WebViewJavascriptBridge 源码解析</a></strong>
+              </h3>
+            </div>
+            <div class="blog-title">
+              <h4>
+              August 19, 2018
+                &nbsp;&nbsp;
+                
+              </h4>
+            </div>
+        </div>
+        <div class="panel panel-default">
+          <div class="panel-body">
+            <div class="blogpost">
+              <p>项目用了 <a href="https://github.com/marcuswestin/WebViewJavascriptBridge">WebViewJavascriptBridge</a> 这个强大的库来实现 JS 和 Swift 交互，已达到原生页面可以和网页进行数据的通讯。前段时间仔细研究了一下它的实现原理，窥探一下这个在 github 上拥有 11K stars 的库的厉害之处，看明白后发现原理其实也很简单，但他的实现思路可谓非常精妙！</p>
+
+<p></p>
+
+<blockquote>
+<p>其实，JS 和 原生语言进行通信的核心就是通过创建一个隐藏的 iframe 对象，改变其 src 实现加载请求，在webview中监听该请求和 用 <code>UIWebView</code> 的 <code>- (void) stringByEvaluatingJavaScriptFromString:</code> 函数执行 JS 代码来配合实现数据的来回传递。</p>
+</blockquote>
+
+<p>目前项目中使用的是 4.x 版本，而最新的版本已经更新到 6.x。</p>
+
+<p><img src="https://ws1.sinaimg.cn/large/006tNbRwly1fuf4kc7amkj307i053dgu.jpg" alt="" /></p>
+
+<p>该库一共4个文件：由一个基类、供iOS使用的 <code>WebViewJavascriptBridge</code> 、一个供MacOS使用的 <code>WKWebViewJavascriptBridge</code> 和 JS 函数文件组成。</p>
+
+<h4 id="使用">使用</h4>
+
+<p>先来看看怎么使用</p>
+
+<ul>
+<li>首先初始化 bridge 对象</li>
+</ul>
+
+<pre><code class="language-swift">// swift &lt;-&gt; javascript
+fileprivate var bridge: WebViewJavascriptBridge!
+
+...
+
+override func viewDidLoad() {
+  	bridge = WebViewJavascriptBridge(for: webView, delegate: webViewProgress)
+}
+</code></pre>
+
+<ul>
+<li>注册交互 handler</li>
+</ul>
+
+<pre><code class="language-swift">bridge.registerHandler(&quot;appFunc_IsHideNavBar&quot;) { (data, responseCallback) in
+	// some logic here
+}
+</code></pre>
+
+<blockquote>
+<p>这里说明下:</p>
+
+<p>data： 从 JS 传递过来的参数，它是一个 id 类型，对应 js 中的 object</p>
+
+<p>responseCallback： 回调函数，js 匿名函数</p>
+</blockquote>
+
+<ul>
+<li>调用一个方法，此时 js 中与该方法有相同签名的函数会被调用</li>
+</ul>
+
+<pre><code class="language-swift">bridge.callHandler(&quot;jsFunc_ReceiveParam&quot;, data: someParams)
+</code></pre>
+
+<blockquote>
+<p>调用时同样可以传递两种参数</p>
+
+<p>data: 一个 id 类型的对象</p>
+
+<p>handler： 回调函数（上例中省略）</p>
+</blockquote>
+
+<p>在 web 项目中对应的交互 js 文件</p>
+
+<pre><code class="language-js">// 这是4.x 版本的使用方法，6.x版本的方式已经改变，详见 github readme.md
+function connectWebViewJavascriptBridge(callback) {
+    if (window.WebViewJavascriptBridge) {
+        callback(WebViewJavascriptBridge);
+    } else {
+        document.addEventListener('WebViewJavascriptBridgeReady', function() {
+            callback(WebViewJavascriptBridge);}, false
+        );
+    }
+}
+
+connectWebViewJavascriptBridge(function(bridge) {
+    bridge.init(function(message, responseCallback) {
+    })
+});
+</code></pre>
+
+<p>注册一个交互方法，从原生获取用户的 token 方法 （js主动调用原生函数）</p>
+
+<pre><code class="language-js">/**
+ * 主动获取token
+ * @param  {[Function]} processFunc [进程回调函数]
+ */
+function callAppFunc_CacheToken(processFunc){
+    connectWebViewJavascriptBridge(function(bridge) {
+        bridge.callHandler('appFunc_CacheToken', processFunc);
+    });
+}
+</code></pre>
+
+<p>这样 <code>callAppFunc_CacheToken()</code> 函数被执行时，对应 App 中的方法就会被掉起。</p>
+
+<p>两种语言方法能够交互的核心是</p>
+
+<blockquote>
+<p>它们都注册了相同的方法签名，即上面注册时传递的字符串</p>
+</blockquote>
+
+<h4 id="源码分析">源码分析</h4>
+
+<p><code>WebViewJavascriptBridgeBase</code> 基类是一个普通的 NSObject 对象，它有几个关键的属性：</p>
+
+<ul>
+<li>delegate // UIWebView，一旦有执行改变时就会通知代理</li>
+<li>startupMessageQueue  // 数组，保存了所有的注册方法</li>
+<li>responseCallbacks  // 字典，保存所有的回调执行函数， key 是注册方法时的函数签名</li>
+<li>messageHandlers  // 字典 保存 js 注册的方法， key 是注册方法时的函数签名</li>
+</ul>
+
+<p>我们在来看一下和App交互的核心文件 <code>WebViewJavascriptBridge</code> ， 首先它继承自 <code>WebViewJavascriptBridgeBase</code></p>
+
+<pre><code class="language-objc">#if defined __MAC_OS_X_VERSION_MAX_ALLOWED
+    #define WVJB_PLATFORM_OSX
+    #define WVJB_WEBVIEW_TYPE WebView
+    #define WVJB_WEBVIEW_DELEGATE_TYPE NSObject&lt;WebViewJavascriptBridgeBaseDelegate&gt;
+    #define WVJB_WEBVIEW_DELEGATE_INTERFACE NSObject&lt;WebViewJavascriptBridgeBaseDelegate, WebPolicyDelegate&gt;
+#elif defined __IPHONE_OS_VERSION_MAX_ALLOWED
+    #import &lt;UIKit/UIWebView.h&gt;
+    #define WVJB_PLATFORM_IOS
+    #define WVJB_WEBVIEW_TYPE UIWebView
+    #define WVJB_WEBVIEW_DELEGATE_TYPE NSObject&lt;UIWebViewDelegate&gt;
+    #define WVJB_WEBVIEW_DELEGATE_INTERFACE NSObject&lt;UIWebViewDelegate, WebViewJavascriptBridgeBaseDelegate&gt;
+#endif
+</code></pre>
+
+<p>首先是一堆宏定义，判断当前系统是 iOS 还是 MacOS 来导入对应的头文件，和声明是 UIWebView 还是 WebView。初始化一个bridge时：</p>
+
+<pre><code class="language-objc">- (void) _platformSpecificSetup:(WVJB_WEBVIEW_TYPE*)webView {
+    _webView = webView; // 保存用户传递过来的 webiview
+    _webView.delegate = self; // 自己成为 Webview 的代理，监听网页加载状态的改变
+    _base = [[WebViewJavascriptBridgeBase alloc] init];
+    _base.delegate = self; // 自己成为基类的代理
+}
+</code></pre>
+
+<p>初始化的过程 iOS 和 MacOS 几乎一样。</p>
+
+<p>当加载网页时，webview会通过代理方法通知到 <code>WebViewJavascriptBridge</code> 实例</p>
+
+<pre><code class="language-objc">- (BOOL)webView:(UIWebView *)webView shouldStartLoadWithRequest:(NSURLRequest *)request navigationType:(UIWebViewNavigationType)navigationType {
+    if (webView != _webView) { return YES; }
+    
+    NSURL *url = [request URL];
+    __strong WVJB_WEBVIEW_DELEGATE_TYPE* strongDelegate = _webViewDelegate;
+    if ([_base isWebViewJavascriptBridgeURL:url]) {
+        if ([_base isBridgeLoadedURL:url]) {
+            [_base injectJavascriptFile];
+        } else if ([_base isQueueMessageURL:url]) {
+            NSString *messageQueueString = [self _evaluateJavascript:[_base webViewJavascriptFetchQueyCommand]];
+            [_base flushMessageQueue:messageQueueString];
+        } else {
+            [_base logUnkownMessage:url];
+        }
+        return NO;
+    } else if (strongDelegate &amp;&amp; [strongDelegate respondsToSelector:@selector(webView:shouldStartLoadWithRequest:navigationType:)]) {
+        return [strongDelegate webView:webView shouldStartLoadWithRequest:request navigationType:navigationType];
+    } else {
+        return YES;
+    }
+}
+</code></pre>
+
+<p>因为在 WebViewJavascriptBridgeBase.h 头文件中通过宏定义了一种区别于 http/https 的协议 <code>#define kOldProtocolScheme @&quot;wvjbscheme&quot;</code> ，所以判断当前的请求是自定义类型还是，正常的 http/https 请求，如果是正常请求就通知 webview 的代理，如果是自己请求，则进一步判断是否执行过该请求和是否注册了该请求的方法，否则在控制台中输出找不到该方法的 console 信息。</p>
+
+<ul>
+<li>该请求被执行过，则重新注册交互</li>
+</ul>
+
+<pre><code class="language-objc">  - (void)injectJavascriptFile {
+      NSString *js = WebViewJavascriptBridge_js();
+      [self _evaluateJavascript:js]; // 执行js 生成 WebViewJavascriptBridge 对象，后文中会继续讲到
+      if (self.startupMessageQueue) {
+          NSArray* queue = self.startupMessageQueue;
+          self.startupMessageQueue = nil;
+          for (id queuedMessage in queue) {
+              [self _dispatchMessage:queuedMessage];
+          }
+      }
+  }
+</code></pre>
+
+<p>如果执行过则清空当前 startupMessageQueue 数组，根据注册的方法重新生成一遍。</p>
+
+<p><strong>这个过程会把 所有 注册的方法和回调保存在一个数组中，然后序列化成字符串传递给 JS，JS在接到这个字符串后再反序列化成数组</strong>，详见 <code>- (void)_dispatchMessage:</code> 方法的处理过程，正是所谓的分发消息。</p>
+
+<ul>
+<li>如果该请求在已有的消息队列中，则执行 js 方法，获取所有 js 注册好的回调方法信息。</li>
+</ul>
+
+<pre><code class="language-objc">  NSString *messageQueueString = [self _evaluateJavascript:[_base webViewJavascriptFetchQueyCommand]];
+              [_base flushMessageQueue:messageQueueString];
+</code></pre>
+
+<p>首先执行 JS 中 <code>_fetchQueue();</code> 方法获取所有 JS 保存的方法和回调函数，该数组已经被序列化成字符串，再交给 <code>flushMessageQueue</code> 函数完成处理</p>
+
+<p><strong>下面关键的核心过程来了</strong></p>
+
+<pre><code class="language-obj">- (void)flushMessageQueue:(NSString *)messageQueueString{
+    if (messageQueueString == nil || messageQueueString.length == 0) {
+    	// 如果该字符串为空，则说明 js 中 没有注册任何可以交互的方法，直接 return
+        NSLog(@&quot;WebViewJavascriptBridge: WARNING: ObjC got nil while fetching the message queue JSON from webview. This can happen if the WebViewJavascriptBridge JS is not currently present in the webview, e.g if the webview just loaded a new page.&quot;);
+        return;
+    }
+	// 将传递过来的 字符串序列化成 数组对象
+    id messages = [self _deserializeMessageJSON:messageQueueString];
+    for (WVJBMessage* message in messages) {
+        if (![message isKindOfClass:[WVJBMessage class]]) {
+            NSLog(@&quot;WebViewJavascriptBridge: WARNING: Invalid %@ received: %@&quot;, [message class], message);
+            continue;
+        }
+        [self _log:@&quot;RCVD&quot; json:message];
+        
+        // 根据 responseId 获取 方法的签名，即上面中注册时传递的字符串，OC 和 JS 都要一样，否则会找不到
+        NSString* responseId = message[@&quot;responseId&quot;];
+        if (responseId) {
+        	// 在 _responseCallbacks 中 根据这个签名来找到 OC 注册方法时传递的回调函数，然后执行该回调函数，并将 JS 传递过来的 id 类型的对象传递进这个回调函数中
+            WVJBResponseCallback responseCallback = _responseCallbacks[responseId];
+            // 直接执行 OC 回调函数 
+            responseCallback(message[@&quot;responseData&quot;]);
+            // 执行完成，从字典中删除该回调函数
+            [self.responseCallbacks removeObjectForKey:responseId];
+        } else {
+        	// 如果方法签名不存在，则检查回到函数的id是否存在，如果存在，则生成一个空的回到函数，并保存在 startupMessageQueue 数组中
+            WVJBResponseCallback responseCallback = NULL;
+            NSString* callbackId = message[@&quot;callbackId&quot;];
+            if (callbackId) {
+                responseCallback = ^(id responseData) {
+                    if (responseData == nil) {
+                        responseData = [NSNull null];
+                    }
+                    
+                    WVJBMessage* msg = @{ @&quot;responseId&quot;:callbackId, @&quot;responseData&quot;:responseData };
+                    [self _queueMessage:msg];
+                };
+            } else {
+            	// 如果回调函数id 都不存在则什么都不做
+                responseCallback = ^(id ignoreResponseData) {
+                    // Do nothing
+                };
+            }
+            
+            // 根据方法签名找到 从 JS 中传递过来的 函数
+            WVJBHandler handler = self.messageHandlers[message[@&quot;handlerName&quot;]];
+            
+            if (!handler) {
+                NSLog(@&quot;WVJBNoHandlerException, No handler for message from JS: %@&quot;, message);
+                continue;
+            }
+            // 执行 JS 函数，并把 数据 和 刚生成的 OC 回调函数传过去
+            handler(message[@&quot;data&quot;], responseCallback);
+        }
+    }
+}
+</code></pre>
+
+<p>responseId 存在时，是 JS 主动发起调用 OC 的方法；不存在是 OC 主动发起调用JS的方法。</p>
+
+<p>我们在来看看 JS 中的实现原理</p>
+
+<p>其实很简单，就是给 window 增加了一个 WebViewJavascriptBridge 对象</p>
+
+<pre><code class="language-js">window.WebViewJavascriptBridge = {
+  registerHandler: registerHandler,
+  callHandler: callHandler,
+  disableJavscriptAlertBoxSafetyTimeout: disableJavscriptAlertBoxSafetyTimeout,
+  _fetchQueue: _fetchQueue,
+  _handleMessageFromObjC: _handleMessageFromObjC
+};
+</code></pre>
+
+<p>该对象有几个关键方法：</p>
+
+<ul>
+<li>registerHandler：注册一个方法和 OC 交互；</li>
+<li>callHandler： 调用一个 OC 注册好的同签名函数；</li>
+<li>_fetchQueue： 获取需要传递个 OC 的 数组对象，里面保存的是一个个需要执行的函数和回调</li>
+<li>_handleMessageFromObjC： 顾名思义，处理 OC调用 JS 方法时的传递过来的数据和方法</li>
+</ul>
+
+<p>这个 WebViewJavascriptBridge 对象同样有几个关键 属性</p>
+
+<ul>
+<li>sendMessageQueue： 保存所有需要发送给 OC 的信息，该数组保存了一个个回调函数</li>
+<li>messageHandlers：object 根据方法签名保存 JS 注册的回调函数</li>
+<li>responseCallbacks： object 根据方法签名保存了 OC 传递过来的回调函数</li>
+</ul>
+
+<p>OC会在特定时候分别执行 WebViewJavascriptBridge 对象的 <code>_fetchQueue</code> 和 <code>_handleMessageFromObjC</code> 方法，分别获取 JS 需要传递给OC 的信息 和 执行从OC 传递过来函数还是执行 JS 注册的方法，将注册好的回调函数传递过去。</p>
+
+<p>这里 JS 和 OC 之所以能交互，是因为 docment 对象 生成了一个新的 <code>iframe</code> ，并将它的display设置为 none ， 每次改变 它的 src 属性来实现加载新请求的目的</p>
+
+<pre><code class="language-js">messagingIframe.src = CUSTOM_PROTOCOL_SCHEME + '://' + QUEUE_HAS_MESSAGE;
+</code></pre>
+
+<p>至此，JS 和 OC 的交互核心就讲完了。</p>
+              <hr>
+              <div class="related-posts">
+                <h5>Related Posts</h5>
+                
+              </div>
+            </div>
+          </div>
+          <hr>
+        <div class="disqus">
+  <div id="disqus_thread"></div>
+  <script type="text/javascript">
+
+    (function() {
+      
+      
+      if (window.location.hostname == "localhost")
+        return;
+
+      var disqus_shortname = '';
+      var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+      dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+      (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+    })();
+  </script>
+  <noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+  <a href="http://disqus.com/" class="dsq-brlink">comments powered by <span class="logo-disqus">Disqus</span></a>
+</div>
+        </div>
+      </div>
+      
+    </div>
+
+    
+    <footer>
+  <div id="footer">
+    <div class="footer-container">
+      <p class="text-muted">&copy; All rights reserved. Powered by <a href="https://gohugo.io/">Hugo</a> and
+      <a href="http://github.com/RecherJ/canary/">canary</a> with ♥</p>
+    </div>
+  </div>
+</footer>
+
+
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
+
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" crossorigin="anonymous"></script>
+<script src="https://recherj.github.io/js/docs.min.js"></script>
+<script src="https://recherj.github.io/js/main.js"></script>
+
+<script src="https://recherj.github.io/js/ie10-viewport-bug-workaround.js"></script>
+
+
+    
+  </body>
+</html>

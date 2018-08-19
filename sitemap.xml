@@ -3,6 +3,11 @@
   xmlns:xhtml="http://www.w3.org/1999/xhtml">
   
   <url>
+    <loc>https://recherj.github.io/blog/webviewjavascriptbridge-%E6%BA%90%E7%A0%81%E8%A7%A3%E6%9E%90/</loc>
+    <lastmod>2018-08-19T16:55:54+08:00</lastmod>
+  </url>
+  
+  <url>
     <loc>https://recherj.github.io/blog/vue-%E8%BF%94%E5%9B%9E%E4%B8%8A%E4%B8%80%E9%A1%B5%E6%9C%80%E5%90%8E%E6%B5%8F%E8%A7%88%E7%9A%84%E4%BD%8D%E7%BD%AE/</loc>
     <lastmod>2018-08-09T20:20:00+08:00</lastmod>
   </url>
@@ -149,7 +154,7 @@
   
   <url>
     <loc>https://recherj.github.io/blog/</loc>
-    <lastmod>2018-08-09T20:20:00+08:00</lastmod>
+    <lastmod>2018-08-19T16:55:54+08:00</lastmod>
     <priority>0</priority>
   </url>
   
@@ -172,7 +177,7 @@
   
   <url>
     <loc>https://recherj.github.io/</loc>
-    <lastmod>2018-08-09T20:20:00+08:00</lastmod>
+    <lastmod>2018-08-19T16:55:54+08:00</lastmod>
     <priority>0</priority>
   </url>
   

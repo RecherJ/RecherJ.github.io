@@ -6,10 +6,21 @@
     <description>Recent content in Blogs on RecherJ</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en-US</language>
-    <lastBuildDate>Thu, 09 Aug 2018 20:20:00 +0800</lastBuildDate>
+    <lastBuildDate>Sun, 19 Aug 2018 16:55:54 +0800</lastBuildDate>
     
 	<atom:link href="https://recherj.github.io/blog/index.xml" rel="self" type="application/rss+xml" />
     
+    
+    <item>
+      <title>WebViewJavascriptBridge 源码解析</title>
+      <link>https://recherj.github.io/blog/webviewjavascriptbridge-%E6%BA%90%E7%A0%81%E8%A7%A3%E6%9E%90/</link>
+      <pubDate>Sun, 19 Aug 2018 16:55:54 +0800</pubDate>
+      
+      <guid>https://recherj.github.io/blog/webviewjavascriptbridge-%E6%BA%90%E7%A0%81%E8%A7%A3%E6%9E%90/</guid>
+      <description>&lt;p&gt;项目用了 &lt;a href=&#34;https://github.com/marcuswestin/WebViewJavascriptBridge&#34;&gt;WebViewJavascriptBridge&lt;/a&gt; 这个强大的库来实现 JS 和 Swift 交互，已达到原生页面可以和网页进行数据的通讯。前段时间仔细研究了一下它的实现原理，窥探一下这个在 github 上拥有 11K stars 的库的厉害之处，看明白后发现原理其实也很简单，但他的实现思路可谓非常精妙！&lt;/p&gt;
+
+&lt;p&gt;&lt;/p&gt;</description>
+    </item>
     
     <item>
       <title>Vue 返回上一页最后浏览的位置</title>
