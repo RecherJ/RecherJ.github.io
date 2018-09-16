@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html lang="en-US">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="author" content="map[]" />
+    
+    <link rel="shortcut icon" type="image/x-icon" href="https://recherj.github.io/img/favicon.ico">
+    <title>记一次艰难的项目重构</title>
+    <meta name="generator" content="Hugo 0.41" />
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
+    <link rel="stylesheet" type="text/css" href="https://recherj.github.io/css/main.css" />
+    <link rel="stylesheet" type="text/css" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.6.3/css/font-awesome.min.css" />
+    <link rel="stylesheet" type="text/css" href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:200,400,200bold,400old" />
+    
+    <link rel="stylesheet" href="https://recherj.github.io/css/code.css">
+    
+    <!--[if lt IE 9]>
+			<script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
+			<script src="https://oss.maxcdn.com/libs/respond.js/1.4.2/respond.min.js"></script>
+		<![endif]-->
+
+    
+  </head>
+
+  <body>
+    <div id="wrap">
+
+      
+      <nav class="navbar navbar-default">
+  <div class="navbar-container">
+    <div class="navbar-header">
+      <a class="navbar-brand" href="https://recherj.github.io/">
+        <img src="https://recherj.github.io//img/favicon.png" />
+      </a>
+      <span>厚德载物，上善若水</span>
+    </div>
+    <ul class="nav navbar-nav navbar-right">
+        
+          
+          <li><a href="/blog/">博客</a></li>
+          
+          <li><a href="/about/">关于</a></li>
+          
+        
+        </ul>
+  </div>
+</nav>
+
+      
+      <div class="container article-content">
+        <div class="article-top-block">
+            <div class="blog-post">
+              <h3>
+                <strong><a href="https://recherj.github.io/blog/%E8%AE%B0%E4%B8%80%E6%AC%A1%E8%89%B0%E9%9A%BE%E7%9A%84%E9%A1%B9%E7%9B%AE%E9%87%8D%E6%9E%84/">记一次艰难的项目重构</a></strong>
+              </h3>
+            </div>
+            <div class="blog-title">
+              <h4>
+              September 16, 2018
+                &nbsp;&nbsp;
+                
+              </h4>
+            </div>
+        </div>
+        <div class="panel panel-default">
+          <div class="panel-body">
+            <div class="blogpost">
+              <p>忙了一个多月的新版本开发，终于坎坷的上线了&hellip;</p>
+
+<p></p>
+
+<p>总结一下到目前为止在项目重构上取的一些成果。真的很有必要说说，记得去年看到卓同学一篇 <a href="https://juejin.im/post/5a5625ddf265da3e3f4c9651">接手一个负分的 iOS 项目后我做了什么</a> 文章，现在想起来也是深有感触。因为没有分配专门的重构时间，所以以下提到的所有重构都是在正常开发的过程中进行的，现分享下我对目前这个 <a href="https://itunes.apple.com/cn/app/bazirim/id958111774?mt=8">Bazirim</a> 项目的一些重构经历吧。</p>
+
+<p>17年2月来到目前公司负责 iOS 开发，经过3个月我才拿到目前这个项目的源码，打开工程看了一下我惊呆了.. （此处省略很多字）作为一个工作了4年的开发工程师，居然连最基本的 MVC 架构都不会写？！ 不，项目没有架构一说，完全是看心情随意写，什么封装、低耦合，不存在的，全部写在控制器中，一个网络请求，两屏幕可能都滚不完.. 我的天，我当时深深地对自己产生了怀疑..</p>
+
+<p>吐槽归吐槽，但还是要协同开发的。所以开始了漫长的迭代过程..</p>
+
+<p>截止到今年9月14号，4.3.0 版本送审，历经 463 天，一共经历了6个版本的迭代，因为工作性质，并不能全时间负责一个项目开发，每次版本的开发，差不多一个半月左右，所以其实也是断断续续的进行着。但对项目重构自认为还算的上是立竿见影。</p>
+
+<p><img src="https://ws1.sinaimg.cn/large/006tNc79ly1fvbhuriy03j315o0nmqdw.jpg" alt="" /></p>
+
+<p>个版本的代码量</p>
+
+<p><img src="https://ws2.sinaimg.cn/large/006tNc79ly1fvbhwbv8p2j315o0s84d1.jpg" alt="" /></p>
+
+<p>经历6个版本迭代后，各版本先后添加了客服功能、视频播放、protobuf 数据上报、UI界面全面换新等一系列大功能后，代码量从最初的 20w+ 反而下降到目前的 15w+ 行，缩减了25%。上图也可以明显看出，代码量有一个先上升后下降的过程，其实真正大规模重构是从 4.1.0 版本开始。</p>
+
+<p>我们这个 App 用到了一些第三方服务如支付宝微信支付、友盟分享、订单加密等功能，所以不可避免的要引入一些 OC 的库，所以 OC 代码的占比还是很大的。重构了以下几个方面：</p>
+
+<ol>
+<li><p>去 OC 化</p>
+
+<p>虽然像支付分享推送等服务不可避免的要用到 OC 库，但除了这些其他的三方库能换成 swift 就尽可能换掉，开发 4.2.0 版本时，将原来的图片缓存库 SDWebImage 换成了喵神所开发的 Kingfisher ，在开发 4.3.0 时这次改动就非常大，将原来的网络请求库 AFNetworking 换成了 swift 版的  Alamofire，并又引入了 swift 版的 SnapKit 约束布局库，移除了项目中无用的 ZipArchive 解压库和几乎用不到的数据库 FMDB ，大大缩减了对 OC 三方库的一些依赖。所以上图也可以明显看出，OC 代码在个版本中是逐渐不断降低占比的，最后两个版本下降幅度非常明显。</p>
+
+<p>除此之外，由于我们这个项目其实是从 OC 语言版本演进过来的，刚接手时，还是 swift2.3 版本，目前已经 4.1 而且马上要升级到 4.2。除开依赖库外，项目中部分的业务代码最开始也是用 OC 开发的。在各个版本的迭代中，顺手就慢慢把它们都用 swift 重写了一遍。所以 OC 在该项目中的比重在不断下降，相反，swift 代码在不断增加。</p></li>
+
+<li><p>去 storyBoard 和 xib 化</p>
+
+<p>刚接手时，项目中居然有 51 个故事板，我当时都惊了，后来才了解到，同事原来是做后端的不会 iOS 开发。。页面几乎全部是用手画的，cell 等基本能用 xib 就用 xib，项目中大量的画板代码，Apple 推出这个技术其实也是为了缩短工程师的开发时间，提高开发效率，毕竟 iOS 没有像 web 那样有 hot reloading 技术还是很让人诟病的。但个人使用下来的感受就是这种东西很不适合项目的协同开发，点开 git 都会显示已造成改动，很容易产生冲突，并且编译还奇慢… 一旦一个项目中故事板和 xib 文件一多编译就会非常慢，最重要的是在版本的迭代时改动很麻烦，没有用代码手写来的方便。所以个人不喜欢这项技术。于是对项目中控制器一点点的改为纯代码开发，删除了大量的 storyboard 和 xib 文件。</p></li>
+
+<li><p>改警告</p>
+
+<p>虽然警告不影响程序的运行，但大量的黄色警告让人看着非常难受，并且会拖慢编译速度。刚接手时一编译，400+ 个警告，我.. 同事却说，“没事，又不影响编译”  what??? 但作为一个有追求的工程师，这是不能忍的。每次开发功能时，看到黄色的警告，能顺手解决的都顺手解决掉。</p></li>
+
+<li><p>重构页面逻辑</p>
+
+<p>项目业务逻辑很随意，从来不封装，更谈不上解耦一说，几乎所有业务逻辑都写在控制器中，动辄一个控制器代码量就在 2000+ 行，简直就是灾难..</p>
+
+<p>经历6个版本后，项目中 80% 左右的代码全部重写过。每次说是改动一个小功能，但对我来说简直就是重写。。。可以说相当心累了..</p></li>
+</ol>
+
+<p>严格意义上，从 4.1.0 开始，我才是独立开发，开始了真正意义上的重构，代码量从 22w+ 行，改到了目前的 15w+ 行，<strong>去掉了 7w 行左右</strong>，可想而知，项目中充斥着多少冗余无用代码..</p>
+
+<p>总结一下目前项目取得的成果</p>
+
+<ul>
+<li>StoryBoard 从最初的 51 个，下降到目前的 6 个，缩减了 88%， xib 代码量从最初的 9239 行，缩减到目前的 5104 行，缩减了 45%</li>
+<li>代码量从最初的 20w+ 行，下降到目前的 15w+，峰值是22w 行，缩减了 25%。</li>
+<li>编译警告从最初的 400+ 改到了目前的 31 个，缩减了 90% 左右</li>
+<li>swift 代码占比从最初的 38%， 上升到目前的 41%</li>
+<li>App 启动速度提示非常明显，但因为当初版本的代码已经无法编译运行了，这项数据无法精准的统计</li>
+<li>业务和业务之间的逻辑耦合大大降低</li>
+<li>拆分出了业务逻辑和基础组件，更加组件化</li>
+<li>安装包的体积缺增加了 10M 左右，猜想这可能是 Xcode 编译器和 swift 各个版本有关</li>
+</ul>
+
+<p>所以，可以说算是称得上是一次立竿见影的重构。</p>
+
+<p>且不说改的有多好，至少可以自豪的说现在不是一个负分项目了。一路下来感触也颇多，唯有一颗不断追求<strong>高质量代码</strong>的心和<strong>代码洁癖</strong>支撑我坚持下来。</p>
+
+<p>但，其实还有很多问题都需要解决，代码永远都不完美..</p>
+
+<p>任重道远，勉之。</p>
+              <hr>
+              <div class="related-posts">
+                <h5>Related Posts</h5>
+                
+              </div>
+            </div>
+          </div>
+          <hr>
+        <div class="disqus">
+  <div id="disqus_thread"></div>
+  <script type="text/javascript">
+
+    (function() {
+      
+      
+      if (window.location.hostname == "localhost")
+        return;
+
+      var disqus_shortname = '';
+      var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+      dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+      (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+    })();
+  </script>
+  <noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+  <a href="http://disqus.com/" class="dsq-brlink">comments powered by <span class="logo-disqus">Disqus</span></a>
+</div>
+        </div>
+      </div>
+      
+    </div>
+
+    
+    <footer>
+  <div id="footer">
+    <div class="footer-container">
+      <p class="text-muted">&copy; All rights reserved. Powered by <a href="https://gohugo.io/">Hugo</a> and
+      <a href="http://github.com/RecherJ/canary/">canary</a> with ♥</p>
+    </div>
+  </div>
+</footer>
+
+
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
+
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" crossorigin="anonymous"></script>
+<script src="https://recherj.github.io/js/docs.min.js"></script>
+<script src="https://recherj.github.io/js/main.js"></script>
+
+<script src="https://recherj.github.io/js/ie10-viewport-bug-workaround.js"></script>
+
+
+    
+  </body>
+</html>

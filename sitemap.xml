@@ -3,6 +3,11 @@
   xmlns:xhtml="http://www.w3.org/1999/xhtml">
   
   <url>
+    <loc>https://recherj.github.io/blog/%E8%AE%B0%E4%B8%80%E6%AC%A1%E8%89%B0%E9%9A%BE%E7%9A%84%E9%A1%B9%E7%9B%AE%E9%87%8D%E6%9E%84/</loc>
+    <lastmod>2018-09-16T16:49:47+08:00</lastmod>
+  </url>
+  
+  <url>
     <loc>https://recherj.github.io/blog/webviewjavascriptbridge-%E6%BA%90%E7%A0%81%E8%A7%A3%E6%9E%90/</loc>
     <lastmod>2018-08-19T16:55:54+08:00</lastmod>
   </url>
@@ -154,18 +159,12 @@
   
   <url>
     <loc>https://recherj.github.io/blog/</loc>
-    <lastmod>2018-08-19T16:55:54+08:00</lastmod>
+    <lastmod>2018-09-16T16:49:47+08:00</lastmod>
     <priority>0</priority>
   </url>
   
   <url>
     <loc>https://recherj.github.io/categories/</loc>
-    <priority>0</priority>
-  </url>
-  
-  <url>
-    <loc>https://recherj.github.io/tags/projects/</loc>
-    <lastmod>2016-10-02T22:55:05-04:00</lastmod>
     <priority>0</priority>
   </url>
   
@@ -176,8 +175,14 @@
   </url>
   
   <url>
+    <loc>https://recherj.github.io/tags/projects/</loc>
+    <lastmod>2016-10-02T22:55:05-04:00</lastmod>
+    <priority>0</priority>
+  </url>
+  
+  <url>
     <loc>https://recherj.github.io/</loc>
-    <lastmod>2018-08-19T16:55:54+08:00</lastmod>
+    <lastmod>2018-09-16T16:49:47+08:00</lastmod>
     <priority>0</priority>
   </url>
   
