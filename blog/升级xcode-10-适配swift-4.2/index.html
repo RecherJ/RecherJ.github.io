@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="en-US">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="author" content="map[]" />
+    
+    <link rel="shortcut icon" type="image/x-icon" href="https://recherj.github.io/img/favicon.ico">
+    <title>升级Xcode 10 适配swift 4</title>
+    <meta name="generator" content="Hugo 0.41" />
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
+    <link rel="stylesheet" type="text/css" href="https://recherj.github.io/css/main.css" />
+    <link rel="stylesheet" type="text/css" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.6.3/css/font-awesome.min.css" />
+    <link rel="stylesheet" type="text/css" href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:200,400,200bold,400old" />
+    
+    <link rel="stylesheet" href="https://recherj.github.io/css/code.css">
+    
+    <!--[if lt IE 9]>
+			<script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
+			<script src="https://oss.maxcdn.com/libs/respond.js/1.4.2/respond.min.js"></script>
+		<![endif]-->
+
+    
+  </head>
+
+  <body>
+    <div id="wrap">
+
+      
+      <nav class="navbar navbar-default">
+  <div class="navbar-container">
+    <div class="navbar-header">
+      <a class="navbar-brand" href="https://recherj.github.io/">
+        <img src="https://recherj.github.io//img/favicon.png" />
+      </a>
+      <span>厚德载物，上善若水</span>
+    </div>
+    <ul class="nav navbar-nav navbar-right">
+        
+          
+          <li><a href="/blog/">博客</a></li>
+          
+          <li><a href="/about/">关于</a></li>
+          
+        
+        </ul>
+  </div>
+</nav>
+
+      
+      <div class="container article-content">
+        <div class="article-top-block">
+            <div class="blog-post">
+              <h3>
+                <strong><a href="https://recherj.github.io/blog/%E5%8D%87%E7%BA%A7xcode-10-%E9%80%82%E9%85%8Dswift-4.2/">升级Xcode 10 适配swift 4</a></strong>
+              </h3>
+            </div>
+            <div class="blog-title">
+              <h4>
+              September 18, 2018
+                &nbsp;&nbsp;
+                
+              </h4>
+            </div>
+        </div>
+        <div class="panel panel-default">
+          <div class="panel-body">
+            <div class="blogpost">
+              <p>今天提示Xcode 10 GM版本出来，也是等了好久，第一时间做了升级，之前装了 beta 版和正式版共存，导致项目中的protobuf 编译出来的文件有问题，后来就卸载了。这次 swift 小版本的升级主要优化了编译时间，swift 的编译速度实在是难以忍受..</p>
+
+<p></p>
+
+<p>打开项目，第一步显示将编译器版本调至 swift 4.2，感受下 swift 大法 🌝</p>
+
+<p>项目名 —&gt; TARGETS —&gt; Build Settings —&gt; Swift Compiler - Language —&gt; Swift Language Version 选择 4.2</p>
+
+<p>那就先 build 一下吧</p>
+
+<p>Duang！ 400+ 个 errors，真酸爽，每年都可以重学一遍，这很 swift 嘛</p>
+
+<p>改动不大，这次最主要是重新明确了很多枚举的定义：</p>
+
+<ul>
+<li><code>UITableViewCellStyle</code> 被重命名为 <code>UITableViewCell.CellStyle</code>， <code>UITableViewCellEditingStyle</code> 被重命名为 <code>UITableViewCell.EditingStyle</code></li>
+<li><code>UIEdgeInsetsMake()</code> 被重命名为了 <code>UIEdgeInsets(_:_:_:_:)</code></li>
+<li><code>NSAttributeStringKey</code> 被重命名为 <code>NSAttributeString.key</code></li>
+<li><code>RunLoopMode.commonModes</code> 被重命名为了 <code>RunLoop.Mode.common</code></li>
+<li><code>NSLayoutFormatOptions</code> 被重命名为了 <code>NSLayoutConstraint.FormatOptions</code></li>
+<li><code>UIImageResizingMode</code> 被重命名为了 <code>UIImage.ResizingMode</code></li>
+<li><code>UIViewAutoresizing</code> 被重命名为了 <code>UIView.AutoresizingMask</code></li>
+<li><code>UIControlState</code> 被重命名为了 <code>UIControl.State</code></li>
+<li><code>UIViewContentMode</code> 被重命名为了 <code>UIView.ContentMode</code></li>
+<li><code>UIButtonType</code> 被重命名为了 <code>UIButton.ButtonType</code></li>
+<li><code>UICollectionElementKindSectionHeader</code> 被重命名为了 <code>UICollectionView.elementKindSectionHeader</code></li>
+<li>通知由原来的统一的 <code>Notification.Name.通知名</code> 的形式这次改到了对应具体类下面的通知，例如原来的 <code>.UIApplicationWillEnterForeground,</code> 通知改为了现在的 <code>UIApplication.willEnterForegroundNotification</code> 的形式</li>
+<li>原来的一些 OC 常量枚举，也做了修改。例如 <code>kCAMediaTimingFunctionEaseInEaseOut</code> 改为了 <code>CAMediaTimingFunctionName.easeInEaseOut</code> 等</li>
+</ul>
+
+<p>另外 Swift 对部分方法做了语义上的调整，例如原来的 <code>bringSubview(toFront:)</code> 方法被调整为了 <code>bringSubviewToFront()</code> 在一个方法明上如此反复推敲，可以说很严谨了。</p>
+
+<p>枚举默认增加了可选类型，控制器原来的 <code>ChildViewControllers</code> 被重命名为了 <code>children</code> ，慢慢 swift 和 OC 的差异越来越明显了。</p>
+
+<p>语法上的改动基本就这些。</p>
+
+<p>编译时会报一个 <code>libstdc++6.0.9</code> 的动态库找不到，这是因为苹果在最新的 Xcode 不在支持这个动态库，解决办法有两种，要么修改依赖的库让其不在使用废弃很久的这个动态库，或者将这个动态库从Xcode 9 下拷贝过来，但后者做法不推荐。</p>
+
+<p><strong>Multiple build commands for output file /Developer/xxx/xxx.xxx</strong></p>
+
+<p>这个问题需要把 Build Phases -&gt; Output Files 中 <code>${TARGET_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}</code> 这个删除，每次 pod install 后都会生成这个，手动把它删除即可。</p>
+
+<p>这样，再将依赖的 swift 语言开发的三方库做一波更新就可以了，后面有遇到问题再更新吧。</p>
+
+<h3 id="参考链接">参考链接</h3>
+
+<ul>
+<li><a href="https://www.jianshu.com/p/2d83e8757e1d">Xcode 10 beta 趟坑</a></li>
+<li><a href="https://stackoverflow.com/questions/50694822/xcode-10-ios-12-does-not-contain-libstdc6-0-9"><a href="https://stackoverflow.com/questions/50694822/xcode-10-ios-12-does-not-contain-libstdc6-0-9">Xcode 10 (iOS 12) does not contain libstdc++6.0.9</a></a></li>
+</ul>
+              <hr>
+              <div class="related-posts">
+                <h5>Related Posts</h5>
+                
+              </div>
+            </div>
+          </div>
+          <hr>
+        <div class="disqus">
+  <div id="disqus_thread"></div>
+  <script type="text/javascript">
+
+    (function() {
+      
+      
+      if (window.location.hostname == "localhost")
+        return;
+
+      var disqus_shortname = '';
+      var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+      dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+      (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+    })();
+  </script>
+  <noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+  <a href="http://disqus.com/" class="dsq-brlink">comments powered by <span class="logo-disqus">Disqus</span></a>
+</div>
+        </div>
+      </div>
+      
+    </div>
+
+    
+    <footer>
+  <div id="footer">
+    <div class="footer-container">
+      <p class="text-muted">&copy; All rights reserved. Powered by <a href="https://gohugo.io/">Hugo</a> and
+      <a href="http://github.com/RecherJ/canary/">canary</a> with ♥</p>
+    </div>
+  </div>
+</footer>
+
+
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
+
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" crossorigin="anonymous"></script>
+<script src="https://recherj.github.io/js/docs.min.js"></script>
+<script src="https://recherj.github.io/js/main.js"></script>
+
+<script src="https://recherj.github.io/js/ie10-viewport-bug-workaround.js"></script>
+
+
+    
+  </body>
+</html>

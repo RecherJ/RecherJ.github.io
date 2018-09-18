@@ -6,10 +6,21 @@
     <description>Recent content on RecherJ</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en-US</language>
-    <lastBuildDate>Sun, 16 Sep 2018 16:49:47 +0800</lastBuildDate>
+    <lastBuildDate>Tue, 18 Sep 2018 22:13:03 +0800</lastBuildDate>
     
 	<atom:link href="https://recherj.github.io/index.xml" rel="self" type="application/rss+xml" />
     
+    
+    <item>
+      <title>升级Xcode 10 适配swift 4</title>
+      <link>https://recherj.github.io/blog/%E5%8D%87%E7%BA%A7xcode-10-%E9%80%82%E9%85%8Dswift-4.2/</link>
+      <pubDate>Tue, 18 Sep 2018 22:13:03 +0800</pubDate>
+      
+      <guid>https://recherj.github.io/blog/%E5%8D%87%E7%BA%A7xcode-10-%E9%80%82%E9%85%8Dswift-4.2/</guid>
+      <description>&lt;p&gt;今天提示Xcode 10 GM版本出来，也是等了好久，第一时间做了升级，之前装了 beta 版和正式版共存，导致项目中的protobuf 编译出来的文件有问题，后来就卸载了。这次 swift 小版本的升级主要优化了编译时间，swift 的编译速度实在是难以忍受..&lt;/p&gt;
+
+&lt;p&gt;&lt;/p&gt;</description>
+    </item>
     
     <item>
       <title>记一次艰难的项目重构</title>
