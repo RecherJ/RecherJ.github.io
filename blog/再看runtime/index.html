@@ -1,0 +1,283 @@
+<!DOCTYPE html>
+<html lang="en-US">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="author" content="map[]" />
+    
+    <link rel="shortcut icon" type="image/x-icon" href="https://recherj.github.io/img/favicon.ico">
+    <title>再看 Runtime</title>
+    <meta name="generator" content="Hugo 0.41" />
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
+    <link rel="stylesheet" type="text/css" href="https://recherj.github.io/css/main.css" />
+    <link rel="stylesheet" type="text/css" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.6.3/css/font-awesome.min.css" />
+    <link rel="stylesheet" type="text/css" href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:200,400,200bold,400old" />
+    
+    <link rel="stylesheet" href="https://recherj.github.io/css/code.css">
+    
+    <!--[if lt IE 9]>
+			<script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
+			<script src="https://oss.maxcdn.com/libs/respond.js/1.4.2/respond.min.js"></script>
+		<![endif]-->
+
+    
+  </head>
+
+  <body>
+    <div id="wrap">
+
+      
+      <nav class="navbar navbar-default">
+  <div class="navbar-container">
+    <div class="navbar-header">
+      <a class="navbar-brand" href="https://recherj.github.io/">
+        <img src="https://recherj.github.io//img/favicon.png" />
+      </a>
+      <span>厚德载物，上善若水</span>
+    </div>
+    <ul class="nav navbar-nav navbar-right">
+        
+          
+          <li><a href="/blog/">博客</a></li>
+          
+          <li><a href="/aboutme/">关于</a></li>
+          
+        
+        </ul>
+  </div>
+</nav>
+
+      
+      <div class="container article-content">
+        <div class="article-top-block">
+            <div class="blog-post">
+              <h3>
+                <strong><a href="https://recherj.github.io/blog/%E5%86%8D%E7%9C%8Bruntime/">再看 Runtime</a></strong>
+              </h3>
+            </div>
+            <div class="blog-title">
+              <h4>
+              October 6, 2018
+                &nbsp;&nbsp;
+                
+              </h4>
+            </div>
+        </div>
+        <div class="panel panel-default">
+          <div class="panel-body">
+            <div class="blogpost">
+              <p><code>runtime</code> 这个老沈常谈的话题。Google一下会有不下10几篇的详细介绍 runtime 原理的文章。最近项目中因为埋点上报功能用到了，感觉相当强大。现站在巨人的肩膀上，整理些我认为比较重要的几点吧。</p>
+
+<p></p>
+
+<p>之前一直以为 runtime 是 OC 的特有功能，因为 swift 是一门静态语言，它从发明之出就是为了解决 OC 的运行时在决定对象的真实类型而造成的不安全。直到利用 Method Swizzling 交换了 <code>UIViewController</code> 的 <code>viewWillAppear</code> 和 <code>viewWillDisappear</code> 方法，实现页面进入和离开时的留存时长上报功能时，才知道原来 swift 也是可以使用 runtime 的。因为 Controller 继承自 <code>NSObject</code> , 底层是一个 OC 对象。</p>
+
+<p>那什么时候能用 OC 的 runtime 呢？</p>
+
+<p><strong>结论是</strong>：</p>
+
+<blockquote>
+<p>凡是继承自 NSObject 的类都可以使用 Runtime。</p>
+</blockquote>
+
+<p>用了这么多年的 NSObject 的，它到底是什么？</p>
+
+<pre><code class="language-c++">struct NSObject_IMPL {
+    Class isa;
+};
+</code></pre>
+
+<p>可以看出，NSObject 本质上就是一个结构体，里面有一个 <code>isa</code> 的类对象。在看看这个 <code>Class</code></p>
+
+<pre><code class="language-c++">/// An opaque type that represents an Objective-C class.
+typedef struct objc_class *Class;
+</code></pre>
+
+<p>原来 <code>isa</code> 就是一个指向 <code>objc_class</code> 结构体的指针，顺着在看看 <code>objc_class</code> 结构体</p>
+
+<pre><code class="language-c">struct objc_class {
+    Class _Nonnull isa  OBJC_ISA_AVAILABILITY;
+
+#if !__OBJC2__
+    Class _Nullable super_class                              OBJC2_UNAVAILABLE;
+    const char * _Nonnull name                               OBJC2_UNAVAILABLE;
+    long version                                             OBJC2_UNAVAILABLE;
+    long info                                                OBJC2_UNAVAILABLE;
+    long instance_size                                       OBJC2_UNAVAILABLE;
+    struct objc_ivar_list * _Nullable ivars                  OBJC2_UNAVAILABLE;
+    struct objc_method_list * _Nullable * _Nullable methodLists                    OBJC2_UNAVAILABLE;
+    struct objc_cache * _Nonnull cache                       OBJC2_UNAVAILABLE;
+    struct objc_protocol_list * _Nullable protocols          OBJC2_UNAVAILABLE;
+#endif
+
+} OBJC2_UNAVAILABLE;
+</code></pre>
+
+<p>上面有一个关键信息 isa，每一个 objc_class 结构体中都一个 isa。用来找到该对象的类或元类。引用一张非常经典的图</p>
+
+<p><img src="https://ws2.sinaimg.cn/large/006tNbRwly1fvyctpfxk6j30jg0jdwfc.jpg" alt="" /></p>
+
+<p>可以看出</p>
+
+<ul>
+<li>实例对象的 isa 指向 类对象</li>
+<li>类对象的 isa 指向 元类对象，元类的对象的 isa 指向根元类，根元类的 isa 指向它自己本身。</li>
+</ul>
+
+<p>所以当一个实例对象调用方法<strong>对象方法</strong>时过程为：</p>
+
+<ol>
+<li>先通过自身 isa 指针知道自己的类对象，看看类对象上有没有需要调用的方法；</li>
+<li>如果类对象没有，则通过类对象的 <code>super_class</code> 指针 找到类对象的父类对象，看看有没有需要调用的方法；</li>
+<li>如果还没找到，则重复第二步，一直找到 NSObject 类时还没找到，则抛出方法找不到的错误，如果找到就返回给调用实例，并在 每个经过的 <code>struct_cache</code> 结构体对象（本质上是一个散列表）里缓存一份，以便下次调用，提高效率。</li>
+</ol>
+
+<p>类对象的<strong>类方法</strong>方法调用过程：</p>
+
+<ol>
+<li>类对象通过 isa 指针找到自己的元类对象(meta class)，看自己的元类对象中有没有需要调用的方法；</li>
+<li>如果没有，则通过元类对象的 isa 指针找到元类对象的父类，找有没有该方法；</li>
+<li>直到找到 NSObject 的元类对象，NSObject 元类的父类为自己，所以最后都会找到 NSobject。找到则返回给调用者，没有就抛出方法找不到。</li>
+</ol>
+
+<p><strong>结论</strong>：</p>
+
+<ul>
+<li>对象方法保存在类对象中</li>
+<li>类方法保存在元类对象中</li>
+</ul>
+
+<p>OC 的方法调用本质上就是消息发送，这也是这门语言从 <a href="https://zh.wikipedia.org/wiki/Smalltalk">SmallTalk</a> 继承过来的特性。</p>
+
+<p>所有的方法调用最终都会转成</p>
+
+<pre><code class="language-c">objc_msgSend(id, SEL);
+</code></pre>
+
+<p>这就是 OC 经典的消息转发过程，大致可以分为三个阶段</p>
+
+<ol>
+<li><strong>消息发送阶段</strong></li>
+<li><strong>动态解析阶段</strong></li>
+<li><strong>消息转发阶段</strong></li>
+</ol>
+
+<p><strong>消息发送阶段时</strong>，过程大致如下</p>
+
+<p><img src="https://ws3.sinaimg.cn/large/006tNbRwly1fvye3c4bcyj30h60p775m.jpg" alt="" /></p>
+
+<ul>
+<li>如果方法列表已经排序了，则利用二分查找，否则顺序查找</li>
+<li>receiver 通过 isa 指针找到 receiverClass</li>
+<li>receiverClass 通过 super_class 指针找到父类</li>
+</ul>
+
+<p>如果方法还没找到，就回来进入第二个阶段，动态解析过程，大致流程为</p>
+
+<p><img src="https://ws2.sinaimg.cn/large/006tNbRwly1fvyeh23x9vj30e80bxgly.jpg" alt="" /></p>
+
+<ul>
+<li>动态解析时可以根据 <code>SEL</code> 名来为一个方法添加具体实现</li>
+</ul>
+
+<pre><code class="language-objc">  - (void)boo;
+
+  + (BooL)resolveInstanceMethod:(SEL)sel
+  {
+      if (sel == @selector(foo)) {
+          Method method = class_getInstanceMethod(self, @selector(boo));
+        	class_addMethod(self, sel, method_getImplentation(method), method_getTypeEncoding(method));
+        	return YES;
+      }
+    	return [super resolveInstanceMethod: sel];
+  }
+</code></pre>
+
+<p>或根据方法签名来添加</p>
+
+<pre><code class="language-objc">  + (BooL)resolveInstanceMethod:(SEL)sel
+  {
+      if (sel == @selector(foo)) {
+          class_addMethod(self, sel, (IMP)boo, &quot;v@:&quot;);
+        	return YES;
+      }
+    	return [super resolveInstanceMethod: sel];
+  }
+</code></pre>
+
+<blockquote>
+<p>其中 v 代表方法的返回为 void，@ 代表 id 类型参数， : 代表 SEL 类型参数</p>
+</blockquote>
+
+<p>如果动态解析阶段返回NO，则不会进入第三个消息转发阶段，默认返回 <code>[super resolveInstanceMethod: sel]</code>的执行结果，进入消息转发阶段</p>
+
+<p><img src="https://ws4.sinaimg.cn/large/006tNbRwly1fvyf0ybev3j30i80d6aav.jpg" alt="" /></p>
+
+<p>如果走到最后都没找到合适的方法接收者，则会抛出 <code>unrecognized selector sent to instance</code> 的错误。</p>
+
+<p>这里感谢很大家对runtime的详细说明</p>
+
+<h3 id="参考链接">参考链接</h3>
+
+<ul>
+<li><a href="https://www.jianshu.com/p/dfdfc29a38a5">runtime消息转发机制</a></li>
+<li><a href="https://juejin.im/post/5ac0a6116fb9a028de44d717">iOS Runtime详解</a></li>
+<li><a href="https://www.jianshu.com/p/adf0d566c887">iOS运行时(Runtime)详解+Demo</a></li>
+<li><a href="https://www.imooc.com/article/38310">新手也看得懂的 iOS Runtime 教程</a></li>
+</ul>
+              <hr>
+              <div class="related-posts">
+                <h5>Related Posts</h5>
+                
+              </div>
+            </div>
+          </div>
+          <hr>
+        <div class="disqus">
+  <div id="disqus_thread"></div>
+  <script type="text/javascript">
+
+    (function() {
+      
+      
+      if (window.location.hostname == "localhost")
+        return;
+
+      var disqus_shortname = '';
+      var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+      dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+      (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+    })();
+  </script>
+  <noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+  <a href="http://disqus.com/" class="dsq-brlink">comments powered by <span class="logo-disqus">Disqus</span></a>
+</div>
+        </div>
+      </div>
+      
+    </div>
+
+    
+    <footer>
+  <div id="footer">
+    <div class="footer-container">
+      <p class="text-muted">&copy; All rights reserved. Powered by <a href="https://gohugo.io/">Hugo</a> and
+      <a href="http://github.com/RecherJ/canary/">canary</a> with ♥</p>
+    </div>
+  </div>
+</footer>
+
+
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
+
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" crossorigin="anonymous"></script>
+<script src="https://recherj.github.io/js/docs.min.js"></script>
+<script src="https://recherj.github.io/js/main.js"></script>
+
+<script src="https://recherj.github.io/js/ie10-viewport-bug-workaround.js"></script>
+
+
+    
+  </body>
+</html>
