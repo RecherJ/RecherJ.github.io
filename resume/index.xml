@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>Resumes on RecherJ</title>
+    <link>https://recherj.github.io/resume/</link>
+    <description>Recent content in Resumes on RecherJ</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>en-US</language>
+    <lastBuildDate>Sun, 02 Oct 2016 22:55:05 -0400</lastBuildDate>
+    
+	<atom:link href="https://recherj.github.io/resume/index.xml" rel="self" type="application/rss+xml" />
+    
+    
+    <item>
+      <title>resume</title>
+      <link>https://recherj.github.io/resume/resume/</link>
+      <pubDate>Sun, 02 Oct 2016 22:55:05 -0400</pubDate>
+      
+      <guid>https://recherj.github.io/resume/resume/</guid>
+      <description>asdsad adasds
+ads d
+ sad
+ </description>
+    </item>
+    
+  </channel>
+</rss>

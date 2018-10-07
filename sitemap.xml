@@ -78,6 +78,11 @@
   </url>
   
   <url>
+    <loc>https://recherj.github.io/resume/resume/</loc>
+    <lastmod>2016-10-02T22:55:05-04:00</lastmod>
+  </url>
+  
+  <url>
     <loc>https://recherj.github.io/blog/app%E6%89%93%E5%8C%85%E6%97%B6%E9%81%87%E5%A4%A7%E9%87%8F%E8%AD%A6%E5%91%8A%E8%A7%A3%E5%86%B3%E5%8A%9E%E6%B3%95/</loc>
     <lastmod>2016-05-05T09:44:33+00:00</lastmod>
   </url>
@@ -193,6 +198,12 @@
   <url>
     <loc>https://recherj.github.io/</loc>
     <lastmod>2018-10-06T11:06:00+08:00</lastmod>
+    <priority>0</priority>
+  </url>
+  
+  <url>
+    <loc>https://recherj.github.io/resume/</loc>
+    <lastmod>2016-10-02T22:55:05-04:00</lastmod>
     <priority>0</priority>
   </url>
   
