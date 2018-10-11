@@ -6,10 +6,21 @@
     <description>Recent content in Blogs on RecherJ</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>cn-ZN</language>
-    <lastBuildDate>Sat, 06 Oct 2018 11:06:00 +0800</lastBuildDate>
+    <lastBuildDate>Thu, 11 Oct 2018 21:41:32 +0800</lastBuildDate>
     
 	<atom:link href="https://recherj.github.io/blog/index.xml" rel="self" type="application/rss+xml" />
     
+    
+    <item>
+      <title>Kingfisher 源码解析（一）</title>
+      <link>https://recherj.github.io/blog/kingfisher-%E6%BA%90%E7%A0%81%E8%A7%A3%E6%9E%90%E4%B8%80/</link>
+      <pubDate>Thu, 11 Oct 2018 21:41:32 +0800</pubDate>
+      
+      <guid>https://recherj.github.io/blog/kingfisher-%E6%BA%90%E7%A0%81%E8%A7%A3%E6%9E%90%E4%B8%80/</guid>
+      <description>&lt;p&gt;&lt;code&gt;Kingfisher&lt;/code&gt; 是一个纯 swift 语言编写的图片处理库，它的很多设计思路借鉴了 OC 版本的 SDWebImage ，但不影响它成为 swift 语言中最好用的图片库。它的源码前后断断续续地阅读了很长时间，每次阅读都感觉能学到很多东西。&lt;/p&gt;
+
+&lt;p&gt;&lt;/p&gt;</description>
+    </item>
     
     <item>
       <title>再看 Runtime</title>
@@ -17,7 +28,7 @@
       <pubDate>Sat, 06 Oct 2018 11:06:00 +0800</pubDate>
       
       <guid>https://recherj.github.io/blog/%E5%86%8D%E7%9C%8Bruntime/</guid>
-      <description>&lt;p&gt;&lt;code&gt;runtime&lt;/code&gt; 这个老沈常谈的话题。Google一下会有不下10几篇的详细介绍 runtime 原理的文章。最近项目中因为埋点上报功能用到了，感觉相当强大。现站在巨人的肩膀上，整理些我认为比较重要的几点吧。&lt;/p&gt;
+      <description>&lt;p&gt;&lt;code&gt;runtime&lt;/code&gt; 这个老生常谈的话题。Google一下会有不下10几篇的详细介绍 runtime 原理的文章。最近项目中因为埋点上报功能用到了，感觉相当强大。现站在巨人的肩膀上，整理些我认为比较重要的几点吧。&lt;/p&gt;
 
 &lt;p&gt;&lt;/p&gt;</description>
     </item>

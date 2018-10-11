@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="cn-ZN">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="author" content="map[]" />
+    
+    <link rel="shortcut icon" type="image/x-icon" href="https://recherj.github.io/img/favicon.ico">
+    <title>Kingfisher 源码解析（一）</title>
+    <meta name="generator" content="Hugo 0.41" />
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
+    <link rel="stylesheet" type="text/css" href="https://recherj.github.io/css/main.css" />
+    <link rel="stylesheet" type="text/css" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.6.3/css/font-awesome.min.css" />
+    <link rel="stylesheet" type="text/css" href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:200,400,200bold,400old" />
+    
+    <link rel="stylesheet" href="https://recherj.github.io/css/code.css">
+    
+    <!--[if lt IE 9]>
+			<script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
+			<script src="https://oss.maxcdn.com/libs/respond.js/1.4.2/respond.min.js"></script>
+		<![endif]-->
+
+    
+<script>
+var doNotTrack = false;
+if (!doNotTrack) {
+	(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+	(i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+	m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+	})(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
+	ga('create', 'UA-127123559-1', 'auto');
+	
+	ga('send', 'pageview');
+}
+</script>
+
+  </head>
+
+  <body>
+    <div id="wrap">
+      
+      <nav class="navbar navbar-default">
+  <div class="navbar-container">
+    <div class="navbar-header">
+      <a class="navbar-brand" href="https://recherj.github.io/">
+        <img src="https://recherj.github.io//img/favicon.png" />
+      </a>
+      <span>厚德载物，上善若水</span>
+    </div>
+    <ul class="nav navbar-nav navbar-right">
+        
+          
+          <li>
+            <a href="/blog/">博客</a>
+          </li>
+          
+          <li>
+            <a href="/aboutme/">关于</a>
+          </li>
+          
+        
+        </ul>
+  </div>
+</nav>
+
+      
+      <div class="container article-content">
+        <div class="article-top-block">
+            <div class="blog-post">
+              <h3>
+                <strong><a href="https://recherj.github.io/blog/kingfisher-%E6%BA%90%E7%A0%81%E8%A7%A3%E6%9E%90%E4%B8%80/">Kingfisher 源码解析（一）</a></strong>
+              </h3>
+            </div>
+            <div class="blog-title">
+              <h4>
+              October 11, 2018
+                &nbsp;&nbsp;
+                
+              </h4>
+            </div>
+        </div>
+        <div class="panel panel-default">
+          <div class="panel-body">
+            <div class="blogpost">
+              <p><code>Kingfisher</code> 是一个纯 swift 语言编写的图片处理库，它的很多设计思路借鉴了 OC 版本的 SDWebImage ，但不影响它成为 swift 语言中最好用的图片库。它的源码前后断断续续地阅读了很长时间，每次阅读都感觉能学到很多东西。</p>
+
+<p></p>
+
+<p>Kingfisher 核心功能就是给 ImageView 和 Button 这两种可以展示图片的控件设置网络图片。同时也提供了<strong>图片裁切合成</strong>、<strong>滤镜</strong>、<strong>缓存</strong>、<strong>批量下载</strong>、<strong>图片展示动画</strong> 等一系列功能，设计到了 swift 语言的 <strong>泛型</strong>、<strong>面向协议编程</strong>、<strong>运算符重载</strong>、<strong>结构体</strong> 等很多 swift 语言的特性，可以说是一款非常适合用来学习 swift 语言的三方库。</p>
+
+<blockquote>
+<p>当前版本 Kingfisher 4.10.0</p>
+
+<p>Swift sersion 4.2</p>
+</blockquote>
+
+<p>简单分析一下每个文件的作用</p>
+
+<ul>
+<li><strong>Image.swift</strong> 提供图片的加工功能，包括 <code>cgImage</code> 转 <code>UIImage</code> , <code>Data</code> 转 <code>UIImage</code> , 图片类型的判断和转换，图片的混合、拉伸、切圆角、毛玻璃效果等图片加工</li>
+<li>Indicator.swift 加载过程中的指示器 默认提供提供了一个系统的菊花 loading 效果，也可以自己传一张图来自定义加载 loading 的效果</li>
+<li><strong>ImageCache.swift</strong> 图片缓存管理 提供了对下载图片的内存缓存、磁盘缓存、缓存的清理、缓存时间的设置、缓存图片的存储和读取</li>
+<li><strong>ImageDownloader.swift</strong> 图片下载器 下载任务开始、取消，批量取消、提供了下载任务的回调监听</li>
+<li><strong>ImagePrefetcher.swift</strong> 批量抓取图片 提供了图片的批量下载，提供了完成、跳过、抓取的图片量的回调。</li>
+<li>ImageProcessor.swift 图片加工器 提供了通用、混合效果、圆角加工、拉伸、毛玻璃效果、颜色控制、黑白图片。合成等等多种加工功能</li>
+<li>ImageModifier.swift 图片的修改类 用来在使用前修改缓存的图片，提供了翻转效果（iOS9 以上）、图片的对齐方式、填充模式等一些 modifier</li>
+<li>CacheSerializer.swift  FormatIndicatedCacheSerializer 缓存序列化和反序列化 将图片转成 Data 或者将 data 转成 图片 支持 png、jpeg 和 gif 三种格式</li>
+<li>RequestModifier.swift 请求修改 提供了对图片资源请求的修改能力</li>
+<li>ImageTransition.swift 提供了 4 中图片翻转的效果</li>
+<li><strong>KingfisherManager.swift</strong> 最核心的文件之一，管理下载 task , 取回图片和下载并缓存图片的两个核心函数</li>
+<li><strong>KingfisherOptionsInfo.swift</strong> 下载行为的控制，提供了非常多的枚举类型，用来控制下载任务对图片的处理</li>
+<li>Filter.swift 滤镜 根据一个加工器和图片处理枚举类型对图片使用滤镜效果</li>
+<li>Placeholder.swift 为了 ImageView 提供一个占位图片</li>
+<li>Resource.swift 图片的URL请求</li>
+<li>Kingfisher.swift 为了需要使用的类型提供一层包装，个人理解是将方法与使用者自己定义的一些方法隔离开来</li>
+</ul>
+
+<p>Kingfisher 设置图片是通过为 ImageView 和 Button 两种类型控件提供分类扩展方法来实现的。详情见 Extensions 文件夹</p>
+
+<p>同时也提供了字符串的 MD5 和线程的扩展等方法，也为展示gif 图片提供了一个 AnimatedImageView 控件</p>
+              <hr>
+              <div class="related-posts">
+                <h5>Related Posts</h5>
+                
+              </div>
+            </div>
+          </div>
+          <hr>
+        <div class="disqus">
+  <div id="disqus_thread"></div>
+  <script type="text/javascript">
+
+    (function() {
+      
+      
+      if (window.location.hostname == "localhost")
+        return;
+
+      var disqus_shortname = 'recherj';
+      var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+      dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+      (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+    })();
+  </script>
+  <noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+  <a href="http://disqus.com/" class="dsq-brlink">comments powered by <span class="logo-disqus">Disqus</span></a>
+</div>
+        </div>
+      </div>
+      
+    </div>
+
+    
+    <footer>
+  <div id="footer">
+    <div class="footer-container">
+      <p class="text-muted">&copy; All rights reserved. Powered by <a href="https://gohugo.io/">Hugo</a> and
+      <a href="http://github.com/RecherJ/canary/">canary</a> with ♥</p>
+    </div>
+  </div>
+</footer>
+
+
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
+
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" crossorigin="anonymous"></script>
+<script src="https://recherj.github.io/js/docs.min.js"></script>
+<script src="https://recherj.github.io/js/main.js"></script>
+
+<script src="https://recherj.github.io/js/ie10-viewport-bug-workaround.js"></script>
+
+
+    
+  </body>
+</html>
