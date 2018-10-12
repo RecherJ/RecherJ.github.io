@@ -6,10 +6,21 @@
     <description>Recent content in Blogs on RecherJ</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>cn-ZN</language>
-    <lastBuildDate>Thu, 11 Oct 2018 21:41:32 +0800</lastBuildDate>
+    <lastBuildDate>Fri, 12 Oct 2018 19:28:48 +0800</lastBuildDate>
     
 	<atom:link href="https://recherj.github.io/blog/index.xml" rel="self" type="application/rss+xml" />
     
+    
+    <item>
+      <title>Kingfisher 源码解析（二）</title>
+      <link>https://recherj.github.io/blog/kingfisher-%E6%BA%90%E7%A0%81%E8%A7%A3%E6%9E%90%E4%BA%8C/</link>
+      <pubDate>Fri, 12 Oct 2018 19:28:48 +0800</pubDate>
+      
+      <guid>https://recherj.github.io/blog/kingfisher-%E6%BA%90%E7%A0%81%E8%A7%A3%E6%9E%90%E4%BA%8C/</guid>
+      <description>&lt;p&gt;&lt;code&gt;Kingfisher&lt;/code&gt; 通过给 ImageView 和 Button 分别扩展了两个分类方法来设置图片&lt;/p&gt;
+
+&lt;p&gt;&lt;/p&gt;</description>
+    </item>
     
     <item>
       <title>Kingfisher 源码解析（一）</title>

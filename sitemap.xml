@@ -3,6 +3,11 @@
   xmlns:xhtml="http://www.w3.org/1999/xhtml">
   
   <url>
+    <loc>https://recherj.github.io/blog/kingfisher-%E6%BA%90%E7%A0%81%E8%A7%A3%E6%9E%90%E4%BA%8C/</loc>
+    <lastmod>2018-10-12T19:28:48+08:00</lastmod>
+  </url>
+  
+  <url>
     <loc>https://recherj.github.io/blog/kingfisher-%E6%BA%90%E7%A0%81%E8%A7%A3%E6%9E%90%E4%B8%80/</loc>
     <lastmod>2018-10-11T21:41:32+08:00</lastmod>
   </url>
@@ -179,18 +184,12 @@
   
   <url>
     <loc>https://recherj.github.io/blog/</loc>
-    <lastmod>2018-10-11T21:41:32+08:00</lastmod>
+    <lastmod>2018-10-12T19:28:48+08:00</lastmod>
     <priority>0</priority>
   </url>
   
   <url>
     <loc>https://recherj.github.io/categories/</loc>
-    <priority>0</priority>
-  </url>
-  
-  <url>
-    <loc>https://recherj.github.io/categories/projects/</loc>
-    <lastmod>2016-10-02T22:55:05-04:00</lastmod>
     <priority>0</priority>
   </url>
   
@@ -201,8 +200,14 @@
   </url>
   
   <url>
+    <loc>https://recherj.github.io/categories/projects/</loc>
+    <lastmod>2016-10-02T22:55:05-04:00</lastmod>
+    <priority>0</priority>
+  </url>
+  
+  <url>
     <loc>https://recherj.github.io/</loc>
-    <lastmod>2018-10-11T21:41:32+08:00</lastmod>
+    <lastmod>2018-10-12T19:28:48+08:00</lastmod>
     <priority>0</priority>
   </url>
   

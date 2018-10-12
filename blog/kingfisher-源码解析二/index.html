@@ -1,0 +1,344 @@
+<!DOCTYPE html>
+<html lang="cn-ZN">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="author" content="map[]" />
+    
+    <link rel="shortcut icon" type="image/x-icon" href="https://recherj.github.io/img/favicon.ico">
+    <title>Kingfisher 源码解析（二）</title>
+    <meta name="generator" content="Hugo 0.41" />
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
+    <link rel="stylesheet" type="text/css" href="https://recherj.github.io/css/main.css" />
+    <link rel="stylesheet" type="text/css" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.6.3/css/font-awesome.min.css" />
+    <link rel="stylesheet" type="text/css" href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:200,400,200bold,400old" />
+    
+    <link rel="stylesheet" href="https://recherj.github.io/css/code.css">
+    
+    <!--[if lt IE 9]>
+			<script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
+			<script src="https://oss.maxcdn.com/libs/respond.js/1.4.2/respond.min.js"></script>
+		<![endif]-->
+
+    
+<script>
+var doNotTrack = false;
+if (!doNotTrack) {
+	(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+	(i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+	m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+	})(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
+	ga('create', 'UA-127123559-1', 'auto');
+	
+	ga('send', 'pageview');
+}
+</script>
+
+  </head>
+
+  <body>
+    <div id="wrap">
+      
+      <nav class="navbar navbar-default">
+  <div class="navbar-container">
+    <div class="navbar-header">
+      <a class="navbar-brand" href="https://recherj.github.io/">
+        <img src="https://recherj.github.io//img/favicon.png" />
+      </a>
+      <span>厚德载物，上善若水</span>
+    </div>
+    <ul class="nav navbar-nav navbar-right">
+        
+          
+          <li>
+            <a href="/blog/">博客</a>
+          </li>
+          
+          <li>
+            <a href="/aboutme/">关于</a>
+          </li>
+          
+        
+        </ul>
+  </div>
+</nav>
+
+      
+      <div class="container article-content">
+        <div class="article-top-block">
+            <div class="blog-post">
+              <h3>
+                <strong><a href="https://recherj.github.io/blog/kingfisher-%E6%BA%90%E7%A0%81%E8%A7%A3%E6%9E%90%E4%BA%8C/">Kingfisher 源码解析（二）</a></strong>
+              </h3>
+            </div>
+            <div class="blog-title">
+              <h4>
+              October 12, 2018
+                &nbsp;&nbsp;
+                
+              </h4>
+            </div>
+        </div>
+        <div class="panel panel-default">
+          <div class="panel-body">
+            <div class="blogpost">
+              <p><code>Kingfisher</code> 通过给 ImageView 和 Button 分别扩展了两个分类方法来设置图片</p>
+
+<p></p>
+
+<p><img src="https://ws1.sinaimg.cn/large/006tNbRwly1fw5s9q91kmj30f205ujvw.jpg" alt="" /></p>
+
+<p>这里没有使用 UIImageView 和 UIButton 是因为该库也支持 MacOS ，所以在 MacOS 上是 NSImageView 和 NSButton 控件。详情见 Kingfisher.swift 中</p>
+
+<pre><code class="language-swift">// 判断系统软件版本是 MacOS 还是 其他平台来分别导入对应 framework
+#if os(macOS)
+    import AppKit
+    public typealias Image = NSImage
+    public typealias View = NSView
+    public typealias Color = NSColor
+    public typealias ImageView = NSImageView
+    public typealias Button = NSButton
+#else
+    import UIKit
+    public typealias Image = UIImage
+    public typealias Color = UIColor
+    #if !os(watchOS)
+    public typealias ImageView = UIImageView
+    public typealias View = UIView
+    public typealias Button = UIButton
+    #else
+    import WatchKit
+    #endif
+#endif
+</code></pre>
+
+<p>设置图片的核心方法</p>
+
+<pre><code class="language-swift">@discardableResult
+public func setImage(with resource: Resource?,
+                     placeholder: Placeholder? = nil,
+                     options: KingfisherOptionsInfo? = nil,
+                     progressBlock: DownloadProgressBlock? = nil,
+                     completionHandler: CompletionHandler? = nil) -&gt; RetrieveImageTask
+</code></pre>
+
+<ul>
+<li>Resource 图片的 URL</li>
+<li>placeholder 占位图</li>
+<li>KingfisherOptionsInfo 一个数组，保存图片下载后的一系列处理操作</li>
+<li>progressBlock 进度回调</li>
+<li>completionHandler 完成回调</li>
+<li>返回一个下载处理 task</li>
+</ul>
+
+<p>方法的核心逻辑</p>
+
+<ol>
+<li>首先判断 URL 是否存在，否则直接返回；</li>
+<li>将用户传的 KingfisherOptionsInfo 和 默认的 KingfisherEmptyOptionsInfo 合并，有过有展位图保存展位图；</li>
+<li>如果有加载 loading 则开始展示加载 loading 动画；</li>
+<li>保存下载链接；</li>
+<li>使用 Kingfisher 的 <code>retrieveImage(with:options:progressBlock:completionHandler)</code> 方法去获取图片；</li>
+<li>retrieveImage 方法返回一个 图片处理 task 保存并返回这个task</li>
+</ol>
+
+<p>Kingfisher 利用 runtime 给 ImageView 分别扩展了 webURL 和 imageTask 属性，用来分别保存当前控件上的图片链接和下载任务，方便以后取回复用取回图片和操作这个下载任务。</p>
+
+<p>UIButton 和 NSButton 因为存在背景图片所以增加了一个方法</p>
+
+<pre><code class="language-swift">@discardableResult
+public func setBackgroundImage(with resource: Resource?,
+                               for state: UIControl.State,
+                               placeholder: UIImage? = nil,
+                               options: KingfisherOptionsInfo? = nil,
+                               progressBlock: DownloadProgressBlock? = nil,
+                               completionHandler: CompletionHandler? = nil) -&gt; RetrieveImageTask
+</code></pre>
+
+<p>方法的实现过程思路和 UIImageView 一样。同样也给 Button 扩展了 背景图 url 和 下载任务 task</p>
+
+<p>扩展里给 watchOS 增加了 <code>WKInterfaceImage</code> 方法，该控件与 iOS 的 UIImageView 一样，所以里面的实现基本和 ImageView 的扩展实现差不多。</p>
+
+<p>那我们就顺着代码的实现看看这个 <code>retrieveImage</code> 方法到底做了什么</p>
+
+<p>图片的取回操作，在最核心的 <code>KingfisherManager.swift</code> 文件中，一共有 3 个 核心方法</p>
+
+<ul>
+<li><code>retrieveImage(with resource:options:progressBlock:completionHandler:) -&gt; RetrieveImageTask</code></li>
+<li><code>downloadAndCacheImage(with url:forKey key:retrieveImageTask:progressBlock: completionHandler:options:) -&gt; RetrieveImageDownloadTask?</code></li>
+<li><code>tryToRetrieveImageFromCache(forKey key: with url:retrieveImageTask:progressBlock:completionHandler:options:)</code></li>
+</ul>
+
+<p>其中第一个方法会分别调用下面两个方法，判断 options 中 是否有 <code>forceRefresh</code> 值，如果有则去调用第二方法去下载图片，否则调用第三个方法尝试从缓存中取回图片</p>
+
+<p>下载图片时，其实是调用 <code>ImageDownloader.swift</code> 中的 <code>downloadImage(with:retrieveImageTask:options:progressBlock:completionHandler)</code> 方法</p>
+
+<pre><code class="language-swift">let targetCache = options.targetCache ?? self.cache
+if let error = error, error.code == KingfisherError.notModified.rawValue {
+  // 没有修改。尝试从缓存中找
+  targetCache.retrieveImage(forKey: key, options: options, completionHandler: { 
+    (cacheImage, cacheType) -&gt; Void in
+  	completionHandler?(cacheImage, nil, cacheType, url)                                                                          
+  })
+  return
+}
+
+if let image = image, let originalData = originalData {
+  // 目标缓存路径缓存图片。
+  // 如果没有特别要求，则会在磁盘也缓存一份
+  targetCache.store(image,
+                    original: originalData,
+                    forKey: key,
+                    processorIdentifier:options.processor.identifier,
+                    cacheSerializer: options.cacheSerializer,
+                    toDisk: !options.cacheMemoryOnly,
+                    completionHandler: {
+                      guard options.waitForCache else { return }
+
+                      let cacheType = targetCache.imageCachedType(forKey: key, processorIdentifier: options.processor.identifier)
+                      completionHandler?(image, nil, cacheType, url)
+                    })
+
+  if options.cacheOriginalImage &amp;&amp; options.processor != DefaultImageProcessor.default {
+    let originalCache = options.originalCache ?? targetCache
+    let defaultProcessor = DefaultImageProcessor.default
+    processQueue.async {
+      if let originalImage = defaultProcessor.process(item: .data(originalData), options: options) {
+        // 原始缓存路径也会缓存一份
+        originalCache.store(originalImage,
+                            original: originalData,
+                            forKey: key,
+                            processorIdentifier: defaultProcessor.identifier,
+                            cacheSerializer: options.cacheSerializer,
+                            toDisk: !options.cacheMemoryOnly,
+                            completionHandler: nil)
+      }
+    }
+  }
+}
+
+if options.waitForCache == false {
+  completionHandler?(image, error, .none, url)
+}
+</code></pre>
+
+<p>取回图片的逻辑也很简单</p>
+
+<pre><code class="language-swift">// If found, we could finish now.
+if image != nil {
+  diskTaskCompletionHandler(image, nil, cacheType, url)
+  return
+}
+
+// If not found, and we are using a default processor, download it!
+let processor = options.processor
+guard processor != DefaultImageProcessor.default else {
+  handleNoCache()
+  return
+}
+            
+// If processor is not the default one, we have a chance to check whether
+// the original image is already in cache.
+let originalCache = options.originalCache ?? targetCache
+let optionsWithoutProcessor = options.removeAllMatchesIgnoringAssociatedValue(.processor(processor))
+originalCache.retrieveImage(forKey: key, options: optionsWithoutProcessor) { image, cacheType in
+	// If we found the original image, there is no need to download it again.
+ 	// We could just apply processor to it now.
+	guard let image = image else {
+		handleNoCache()
+		return
+	}
+
+	processQueue.async {
+		guard let processedImage = processor.process(item: .image(image), options: options) else {
+        options.callbackDispatchQueue.safeAsync {
+            diskTaskCompletionHandler(nil, nil, .none, url)
+        }
+          	return
+        }
+      	targetCache.store(processedImage,
+                          original: nil,
+                          forKey: key,
+                          processorIdentifier:options.processor.identifier,
+                          cacheSerializer: options.cacheSerializer,
+                          toDisk: !options.cacheMemoryOnly,
+                          completionHandler: {
+			guard options.waitForCache else { return }
+
+			let cacheType = targetCache.imageCachedType(forKey: key, processorIdentifier: options.processor.identifier)
+                            options.callbackDispatchQueue.safeAsync {
+             	diskTaskCompletionHandler(processedImage, nil, cacheType, url)
+                                        }
+                    })
+
+        if options.waitForCache == false {
+          options.callbackDispatchQueue.safeAsync {
+            diskTaskCompletionHandler(processedImage, nil, .none, url)
+          }
+        }
+    }
+}
+</code></pre>
+
+<ul>
+<li>首先尝试存目标缓存中取，如果取到了则直接返回；</li>
+<li>如果 options 的 processor 不是默认的，则直接重新下载；</li>
+<li>尝试从原始缓存中找，如果没找到则重新下载；</li>
+<li>加工图片，并在目标缓存中在存储一份，回调成功闭包</li>
+</ul>
+              <hr>
+              <div class="related-posts">
+                <h5>Related Posts</h5>
+                
+              </div>
+            </div>
+          </div>
+          <hr>
+        <div class="disqus">
+  <div id="disqus_thread"></div>
+  <script type="text/javascript">
+
+    (function() {
+      
+      
+      if (window.location.hostname == "localhost")
+        return;
+
+      var disqus_shortname = 'recherj';
+      var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+      dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+      (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+    })();
+  </script>
+  <noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+  <a href="http://disqus.com/" class="dsq-brlink">comments powered by <span class="logo-disqus">Disqus</span></a>
+</div>
+        </div>
+      </div>
+      
+    </div>
+
+    
+    <footer>
+  <div id="footer">
+    <div class="footer-container">
+      <p class="text-muted">&copy; All rights reserved. Powered by <a href="https://gohugo.io/">Hugo</a> and
+      <a href="http://github.com/RecherJ/canary/">canary</a> with ♥</p>
+    </div>
+  </div>
+</footer>
+
+
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
+
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" crossorigin="anonymous"></script>
+<script src="https://recherj.github.io/js/docs.min.js"></script>
+<script src="https://recherj.github.io/js/main.js"></script>
+
+<script src="https://recherj.github.io/js/ie10-viewport-bug-workaround.js"></script>
+
+
+    
+  </body>
+</html>
