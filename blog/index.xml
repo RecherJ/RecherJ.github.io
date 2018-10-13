@@ -6,10 +6,21 @@
     <description>Recent content in Blogs on RecherJ</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>cn-ZN</language>
-    <lastBuildDate>Fri, 12 Oct 2018 19:28:48 +0800</lastBuildDate>
+    <lastBuildDate>Sat, 13 Oct 2018 17:51:40 +0800</lastBuildDate>
     
 	<atom:link href="https://recherj.github.io/blog/index.xml" rel="self" type="application/rss+xml" />
     
+    
+    <item>
+      <title>Kingfisher 源码解析（三）</title>
+      <link>https://recherj.github.io/blog/kingfisher-%E6%BA%90%E7%A0%81%E8%A7%A3%E6%9E%90%E4%B8%89/</link>
+      <pubDate>Sat, 13 Oct 2018 17:51:40 +0800</pubDate>
+      
+      <guid>https://recherj.github.io/blog/kingfisher-%E6%BA%90%E7%A0%81%E8%A7%A3%E6%9E%90%E4%B8%89/</guid>
+      <description>&lt;p&gt;上篇说道 &lt;code&gt;KingfisherManager.swift&lt;/code&gt; 下载图片，本篇打开 &lt;code&gt;ImageDownloader.swift&lt;/code&gt; 文件看看到底 downloader 是怎么下载图片的&lt;/p&gt;
+
+&lt;p&gt;&lt;/p&gt;</description>
+    </item>
     
     <item>
       <title>Kingfisher 源码解析（二）</title>
