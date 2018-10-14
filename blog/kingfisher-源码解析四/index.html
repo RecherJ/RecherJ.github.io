@@ -1,0 +1,421 @@
+<!DOCTYPE html>
+<html lang="cn-ZN">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="author" content="map[]" />
+    
+    <link rel="shortcut icon" type="image/x-icon" href="https://recherj.github.io/img/favicon.ico">
+    <title>Kingfisher 源码解析（四）</title>
+    <meta name="generator" content="Hugo 0.41" />
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
+    <link rel="stylesheet" type="text/css" href="https://recherj.github.io/css/main.css" />
+    <link rel="stylesheet" type="text/css" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.6.3/css/font-awesome.min.css" />
+    <link rel="stylesheet" type="text/css" href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:200,400,200bold,400old" />
+    
+    <link rel="stylesheet" href="https://recherj.github.io/css/code.css">
+    
+    <!--[if lt IE 9]>
+			<script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
+			<script src="https://oss.maxcdn.com/libs/respond.js/1.4.2/respond.min.js"></script>
+		<![endif]-->
+
+    
+<script>
+var doNotTrack = false;
+if (!doNotTrack) {
+	(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+	(i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+	m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+	})(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
+	ga('create', 'UA-127123559-1', 'auto');
+	
+	ga('send', 'pageview');
+}
+</script>
+
+  </head>
+
+  <body>
+    <div id="wrap">
+      
+      <nav class="navbar navbar-default">
+  <div class="navbar-container">
+    <div class="navbar-header">
+      <a class="navbar-brand" href="https://recherj.github.io/">
+        <img src="https://recherj.github.io//img/favicon.png" />
+      </a>
+      <span>厚德载物，上善若水</span>
+    </div>
+    <ul class="nav navbar-nav navbar-right">
+        
+          
+          <li>
+            <a href="/blog/">博客</a>
+          </li>
+          
+          <li>
+            <a href="/aboutme/">关于</a>
+          </li>
+          
+        
+        </ul>
+  </div>
+</nav>
+
+      
+      <div class="container article-content">
+        <div class="article-top-block">
+            <div class="blog-post">
+              <h3>
+                <strong><a href="https://recherj.github.io/blog/kingfisher-%E6%BA%90%E7%A0%81%E8%A7%A3%E6%9E%90%E5%9B%9B/">Kingfisher 源码解析（四）</a></strong>
+              </h3>
+            </div>
+            <div class="blog-title">
+              <h4>
+              October 14, 2018
+                &nbsp;&nbsp;
+                
+              </h4>
+            </div>
+        </div>
+        <div class="panel panel-default">
+          <div class="panel-body">
+            <div class="blogpost">
+              <p>image 缓存分为两种：<strong>内存缓存</strong>和<strong>磁盘缓存</strong>。在 <code>ImageCache.swift</code> 类中分别有两种实例来处理</p>
+
+<pre><code class="language-swift">// Memory
+fileprivate let memoryCache = NSCache&lt;NSString, AnyObject&gt;()
+
+// Disk
+fileprivate let ioQueue: DispatchQueue
+fileprivate var fileManager: FileManager!
+</code></pre>
+
+<p></p>
+
+<p>默认的最大缓存时间是一周</p>
+
+<pre><code class="language-swift">open var maxCachePeriodInSecond: TimeInterval = 60 * 60 * 24 * 7
+</code></pre>
+
+<p>下面来看看缓存图片的核心代码</p>
+
+<pre><code class="language-swift">open func store(_ image: Image,
+                original: Data? = nil,
+                forKey key: String,
+                processorIdentifier identifier: String = &quot;&quot;,
+                cacheSerializer serializer: CacheSerializer = DefaultCacheSerializer.default,
+                toDisk: Bool = true,
+                completionHandler: (() -&gt; Void)? = nil)
+{
+
+  // 先在内存中缓存
+  let computedKey = key.computedKey(with: identifier)
+  memoryCache.setObject(image, forKey: computedKey as NSString, cost: image.kf.imageCost)
+
+  // 主线程中执行回调
+  func callHandlerInMainQueue() {
+    if let handler = completionHandler {
+      DispatchQueue.main.async {
+        handler()
+      }
+    }
+  }
+
+  // 默认保存磁盘
+  if toDisk {
+    // 队列中异步保存
+    ioQueue.async {
+      // 根据 Image 序列化成 data 数据
+      if let data = serializer.data(with: image, original: original) {
+        // 如果缓存路径不存在则创建一个默认缓存路径
+        if !self.fileManager.fileExists(atPath: self.diskCachePath) {
+          do {
+            try self.fileManager.createDirectory(atPath: self.diskCachePath, withIntermediateDirectories: true, attributes: nil)
+          } catch _ {}
+        }
+		
+        // 写入磁盘缓存
+        self.fileManager.createFile(atPath: self.cachePath(forComputedKey: computedKey), contents: data, attributes: nil)
+      }
+      // 执行完成回调
+      callHandlerInMainQueue()
+    }
+  } else {
+    // 如果不需要写入磁盘则直接执行完成回调
+    callHandlerInMainQueue()
+  }
+}
+</code></pre>
+
+<p>总结一下该方法主要做的事情：</p>
+
+<ul>
+<li>首先在内存中缓存一份</li>
+<li>嵌套定义了一个函数，负责在主线程中执行完成时的回调</li>
+<li>除非显式的指明不进行磁盘缓存，否则默认是在磁盘中也缓存一份
+
+<ul>
+<li>先判断目标路径是否存在，不存在则创建一个默认缓存路径</li>
+<li>利用 <code>FileManager</code> 写入磁盘缓存中</li>
+<li>执行完成的回调闭包</li>
+<li>如果不需要缓存磁盘则直接执行回调闭包</li>
+</ul></li>
+</ul>
+
+<p><code>ImageCache</code> 还提供了另外一个从缓存中取图片的方法 <code>retrieveImage(forKey key:options:completionHandler:) -&gt; RetrieveImageDiskTask?</code>，简单看看它的实现过程</p>
+
+<pre><code class="language-swift">// 守卫一下，没有完成回调，直接返回空任务 task
+guard let completionHandler = completionHandler else {
+  return nil
+}
+
+var block: RetrieveImageDiskTask?
+let options = options ?? KingfisherEmptyOptionsInfo
+let imageModifier = options.imageModifier
+
+// 根据 图片的唯一 computedKey 去内存中找，如果找到了直接执行完成回调 
+if let image = self.retrieveImageInMemoryCache(forKey: key, options: options) {
+  // 回调队列中异步执行
+  options.callbackDispatchQueue.safeAsync {
+    completionHandler(imageModifier.modify(image), .memory)
+  }
+} else if options.fromMemoryCacheOrRefresh { // 如果显式标记只从磁盘中找，那就回调没有找到
+  options.callbackDispatchQueue.safeAsync {
+    completionHandler(nil, .none)
+  }
+} else {
+  // 没有找到，创建一个 DispatchWorkItem 去磁盘中找
+  var sSelf: ImageCache! = self
+  block = DispatchWorkItem(block: {
+    // 根据 computedKey 开始在磁盘中取
+    if let image = sSelf.retrieveImageInDiskCache(forKey: key, options: options) {
+      // 如果显式的标记了后台解码图片
+      if options.backgroundDecode {
+        // processQueue 队列中异步解码图片，再只在内存中缓存一份
+        sSelf.processQueue.async {
+          let result = image.kf.decoded
+          sSelf.store(result,
+                      forKey: key,
+                      processorIdentifier: options.processor.identifier,
+                      cacheSerializer: options.cacheSerializer,
+                      toDisk: false,
+                      completionHandler: nil)
+          // callbackDispatchQueue 队列异步执行完成回调
+          options.callbackDispatchQueue.safeAsync {
+            completionHandler(imageModifier.modify(result), .disk)
+            sSelf = nil
+          }
+        }
+      } else {
+        // 不用后台解码图片则直接在内存缓存图片
+        sSelf.store(image,
+                    forKey: key,
+                    processorIdentifier: options.processor.identifier,
+                    cacheSerializer: options.cacheSerializer,
+                    toDisk: false,
+                    completionHandler: nil
+                   )
+        // 完成回调
+        options.callbackDispatchQueue.safeAsync {
+          completionHandler(imageModifier.modify(image), .disk)
+          sSelf = nil
+        }
+      }
+    } else {
+      // 磁盘和内存中都没找到图片，回调通知没有找到图片
+      options.callbackDispatchQueue.safeAsync {
+        completionHandler(nil, .none)
+        sSelf = nil
+      }
+    }
+  })
+  // ioQueue 异步执行这个任务
+  sSelf.ioQueue.async(execute: block!)
+}
+
+return block
+</code></pre>
+
+<p>总结一下就是</p>
+
+<ul>
+<li>先判断有没有完成回调，没有则提前返回；</li>
+<li>根据图片 url 生成的 computedKey 唯一标识符去内存中找，如果找到了就执行回调结果并返回；</li>
+<li>没有找到则创建一个 <code>dispatchworkItem</code> 去磁盘中找，找到了在内存中缓存一份在回调结果并返回；</li>
+<li>还没有找到就回调没有找到的结果。</li>
+</ul>
+
+<p>此外，<code>ImageCache</code> 还提供了清除缓存的方法，这里清除同样也分为内存清除和磁盘的清理。</p>
+
+<p>内存清理的过程很简单</p>
+
+<pre><code class="language-swift">@objc public func clearMemoryCache() {
+  memoryCache.removeAllObjects()
+}
+</code></pre>
+
+<p>磁盘清理也不复杂</p>
+
+<pre><code class="language-swift">open func clearDiskCache(completion handler: (()-&gt;())? = nil) {
+  ioQueue.async {
+    do {
+      // 根据 diskCachePath 删除文件
+      try self.fileManager.removeItem(atPath: self.diskCachePath)
+      // 再根据 diskCachePath 重新创建一个空文件夹
+      try self.fileManager.createDirectory(atPath: self.diskCachePath, withIntermediateDirectories: true, attributes: nil)
+    } catch _ { }
+	// 主线程中回调完成结果
+    if let handler = handler {
+      DispatchQueue.main.async {
+        handler()
+      }
+    }
+  }
+}
+</code></pre>
+
+<p><code>ImageCache</code> 默认会为我们提供了 <strong>App 进入后台时清理过期图片缓存文件的功能</strong></p>
+
+<pre><code class="language-swift">@objc public func backgroundCleanExpiredDiskCache() {
+  // 守卫一下，如果 application 单例不存在则直接返回
+  guard let sharedApplication = Kingfisher&lt;UIApplication&gt;.shared else { return }
+  // 结束后台任务
+  func endBackgroundTask(_ task: inout UIBackgroundTaskIdentifier) {
+    sharedApplication.endBackgroundTask(task)
+    task = UIBackgroundTaskIdentifier.invalid
+  }
+
+  var backgroundTask: UIBackgroundTaskIdentifier!
+  backgroundTask = sharedApplication.beginBackgroundTask {
+    endBackgroundTask(&amp;backgroundTask!)
+  }
+  // 清理过期缓存
+  cleanExpiredDiskCache {
+    endBackgroundTask(&amp;backgroundTask!)
+  }
+}
+</code></pre>
+
+<p><code>cleanExpiredDiskCache(completion:)</code> 方法实现如下</p>
+
+<pre><code class="language-swift">// 在 ioQueue 队列中异步执行
+ioQueue.async {
+  // 在磁盘中遍历分别找到
+  // URLsToDelete: 数组 需要删除的 url 图片
+  // diskCacheSize: 计算出的磁盘缓存大小
+  // cacheFiles: 数组 保存了已经缓存的文件
+  var (URLsToDelete, diskCacheSize, cachedFiles) = self.travelCachedFiles(onlyForCacheSize: false)
+
+  // 根据这个数组遍历删除图片文件
+  for fileURL in URLsToDelete {
+    do {
+      try self.fileManager.removeItem(at: fileURL)
+    } catch _ { }
+  }
+
+  if self.maxDiskCacheSize &gt; 0 &amp;&amp; diskCacheSize &gt; self.maxDiskCacheSize {
+    let targetSize = self.maxDiskCacheSize / 2
+
+    // 按时间排序，删除最旧的文件
+    let sortedFiles = cachedFiles.keysSortedByValue {
+      resourceValue1, resourceValue2 -&gt; Bool in
+
+      if let date1 = resourceValue1.contentAccessDate,
+      let date2 = resourceValue2.contentAccessDate
+      {
+        return date1.compare(date2) == .orderedAscending
+      }
+      return true
+    }
+
+    for fileURL in sortedFiles {
+	  // 尝试删除
+      do {
+        try self.fileManager.removeItem(at: fileURL)
+      } catch { }
+      // 装进待删除的数组中
+      URLsToDelete.append(fileURL)
+	  // 获取每个图片的大小，并从磁盘总大小中减去
+      if let fileSize = cachedFiles[fileURL]?.totalFileAllocatedSize {
+        diskCacheSize -= UInt(fileSize)
+      }
+	  // 一旦磁盘缓存大小已经小于目标大小就停止
+      if diskCacheSize &lt; targetSize {
+        break
+      }
+    }
+  }
+  // 主队列的主线程中发送完成清除过期图片的通知
+  DispatchQueue.main.async {
+
+    if URLsToDelete.count != 0 {
+      let cleanedHashes = URLsToDelete.map { $0.lastPathComponent }
+      NotificationCenter.default.post(name: .KingfisherDidCleanDiskCache, object: self, userInfo: [KingfisherDiskCacheCleanedHashKey: cleanedHashes])
+    }
+	// 执行回调
+    handler?()
+  }
+}
+</code></pre>
+
+<p><code>ImageCache</code> 类是 Kingfisher 的核心之一，它支撑起了整个图片的缓存逻辑，提供了取图，存图和清除缓存的核心功能。这里面涉及了异步编程的很多地方，非常值得一读。</p>
+
+<p>最后一篇，将会分析一下剩余 Kingfisher 提供到的一些功能，同时也会对里面值得学习的 swift 编程技巧，做一个浅显的分析。</p>
+              <hr>
+              <div class="related-posts">
+                <h5>Related Posts</h5>
+                
+              </div>
+            </div>
+          </div>
+          <hr>
+        <div class="disqus">
+  <div id="disqus_thread"></div>
+  <script type="text/javascript">
+
+    (function() {
+      
+      
+      if (window.location.hostname == "localhost")
+        return;
+
+      var disqus_shortname = 'recherj';
+      var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+      dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+      (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+    })();
+  </script>
+  <noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+  <a href="http://disqus.com/" class="dsq-brlink">comments powered by <span class="logo-disqus">Disqus</span></a>
+</div>
+        </div>
+      </div>
+      
+    </div>
+
+    
+    <footer>
+  <div id="footer">
+    <div class="footer-container">
+      <p class="text-muted">&copy; All rights reserved. Powered by <a href="https://gohugo.io/">Hugo</a> and
+      <a href="http://github.com/RecherJ/canary/">canary</a> with ♥</p>
+    </div>
+  </div>
+</footer>
+
+
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
+
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" crossorigin="anonymous"></script>
+<script src="https://recherj.github.io/js/docs.min.js"></script>
+<script src="https://recherj.github.io/js/main.js"></script>
+
+<script src="https://recherj.github.io/js/ie10-viewport-bug-workaround.js"></script>
+
+
+    
+  </body>
+</html>

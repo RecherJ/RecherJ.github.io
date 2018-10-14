@@ -6,10 +6,29 @@
     <description>Recent content on RecherJ</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>cn-ZN</language>
-    <lastBuildDate>Sat, 13 Oct 2018 17:51:40 +0800</lastBuildDate>
+    <lastBuildDate>Sun, 14 Oct 2018 11:57:39 +0800</lastBuildDate>
     
 	<atom:link href="https://recherj.github.io/index.xml" rel="self" type="application/rss+xml" />
     
+    
+    <item>
+      <title>Kingfisher 源码解析（四）</title>
+      <link>https://recherj.github.io/blog/kingfisher-%E6%BA%90%E7%A0%81%E8%A7%A3%E6%9E%90%E5%9B%9B/</link>
+      <pubDate>Sun, 14 Oct 2018 11:57:39 +0800</pubDate>
+      
+      <guid>https://recherj.github.io/blog/kingfisher-%E6%BA%90%E7%A0%81%E8%A7%A3%E6%9E%90%E5%9B%9B/</guid>
+      <description>&lt;p&gt;image 缓存分为两种：&lt;strong&gt;内存缓存&lt;/strong&gt;和&lt;strong&gt;磁盘缓存&lt;/strong&gt;。在 &lt;code&gt;ImageCache.swift&lt;/code&gt; 类中分别有两种实例来处理&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-swift&#34;&gt;// Memory
+fileprivate let memoryCache = NSCache&amp;lt;NSString, AnyObject&amp;gt;()
+
+// Disk
+fileprivate let ioQueue: DispatchQueue
+fileprivate var fileManager: FileManager!
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;&lt;/p&gt;</description>
+    </item>
     
     <item>
       <title>Kingfisher 源码解析（三）</title>
