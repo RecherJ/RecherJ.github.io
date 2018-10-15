@@ -1,0 +1,297 @@
+<!DOCTYPE html>
+<html lang="cn-ZN">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="author" content="map[]" />
+    
+    <link rel="shortcut icon" type="image/x-icon" href="https://recherj.github.io/img/favicon.ico">
+    <title>Kingfisher 源码解析（五）</title>
+    <meta name="generator" content="Hugo 0.41" />
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
+    <link rel="stylesheet" type="text/css" href="https://recherj.github.io/css/main.css" />
+    <link rel="stylesheet" type="text/css" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.6.3/css/font-awesome.min.css" />
+    <link rel="stylesheet" type="text/css" href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:200,400,200bold,400old" />
+    
+    <link rel="stylesheet" href="https://recherj.github.io/css/code.css">
+    
+    <!--[if lt IE 9]>
+			<script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
+			<script src="https://oss.maxcdn.com/libs/respond.js/1.4.2/respond.min.js"></script>
+		<![endif]-->
+
+    
+<script>
+var doNotTrack = false;
+if (!doNotTrack) {
+	(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+	(i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+	m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+	})(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
+	ga('create', 'UA-127123559-1', 'auto');
+	
+	ga('send', 'pageview');
+}
+</script>
+
+  </head>
+
+  <body>
+    <div id="wrap">
+      
+      <nav class="navbar navbar-default">
+  <div class="navbar-container">
+    <div class="navbar-header">
+      <a class="navbar-brand" href="https://recherj.github.io/">
+        <img src="https://recherj.github.io//img/favicon.png" />
+      </a>
+      <span>厚德载物，上善若水</span>
+    </div>
+    <ul class="nav navbar-nav navbar-right">
+        
+          
+          <li>
+            <a href="/blog/">博客</a>
+          </li>
+          
+          <li>
+            <a href="/aboutme/">关于</a>
+          </li>
+          
+        
+        </ul>
+  </div>
+</nav>
+
+      
+      <div class="container article-content">
+        <div class="article-top-block">
+            <div class="blog-post">
+              <h3>
+                <strong><a href="https://recherj.github.io/blog/kingfisher-%E6%BA%90%E7%A0%81%E8%A7%A3%E6%9E%90%E4%BA%94/">Kingfisher 源码解析（五）</a></strong>
+              </h3>
+            </div>
+            <div class="blog-title">
+              <h4>
+              October 15, 2018
+                &nbsp;&nbsp;
+                
+              </h4>
+            </div>
+        </div>
+        <div class="panel panel-default">
+          <div class="panel-body">
+            <div class="blogpost">
+              <p>本篇是 Kingfisher 源码分析的最后一篇，这节主要分析一些笔者认为该库比较主要，且值得学习的点。</p>
+
+<p></p>
+
+<h3 id="kf-扩展">kf  扩展</h3>
+
+<p>首先，Kingfisher 的设计非常巧妙，它并非直接采用给 UIKit 中的组件扩展分类方法的方式，而是通过协议的方式来给需要的类扩展了一个 <code>kf</code> 属性，将需要的方法扩展在这个属性下，私认为是为了在命名上避免与使用者自定义的方法冲突而覆盖的目的</p>
+
+<pre><code class="language-swift">public final class Kingfisher&lt;Base&gt; {
+    public let base: Base
+    public init(_ base: Base) {
+        self.base = base
+    }
+}
+
+public protocol KingfisherCompatible {
+    associatedtype CompatibleType
+    var kf: CompatibleType { get }
+}
+
+public extension KingfisherCompatible {
+    public var kf: Kingfisher&lt;Self&gt; {
+        return Kingfisher(self)
+    }
+}
+</code></pre>
+
+<p>这样就给需要的类增加了一层包装，在需要满足的类中遵守 <code>KingfisherCompatible</code> 协议，即可给该类扩展出 <code>kf</code> 属性，该属性返回一个该真实类型的实例。</p>
+
+<pre><code class="language-swift">// 给 UIImage 和 NSImage 类扩展 kf 
+extension Image: KingfisherCompatible { }
+#if !os(watchOS)
+// 给 UIImageView 和 NSImageView 扩展 kf
+extension ImageView: KingfisherCompatible { }
+// 给 UIBUtton 和 NSButton 扩展 kf
+extension Button: KingfisherCompatible { }
+#else
+// WatchOS 中的 图片控件扩展 kf
+extension WKInterfaceImage: KingfisherCompatible { }
+</code></pre>
+
+<h3 id="面向协议编程">面向协议编程</h3>
+
+<p>swift 利用值类型的 struct 和 协议的设计模式，更鼓励大家面向协议编程。基于 <code>组合优于继承</code> 的理念，swift 底层的基本数据类型全部用协议的方式重新做了设计，同样 Kingfsher 中也大量采用协议的方式来设计接口。包括但不限于</p>
+
+<ul>
+<li><p>URL 的  <code>Resource</code> 协议；</p></li>
+
+<li><p>给 ImageView 增加占位图片的 <code>PlaceHolder</code> 协议；</p></li>
+
+<li><p>处理图片的 <code>ImageProcessor</code> 协议；</p></li>
+
+<li><p>修改网络请求的 <code>ImageDownloadRequestModifier</code> 协议；</p></li>
+
+<li><p>图片 Image 和 Data 之间相互转换的协议 <code>CacheSerializer</code> ;</p></li>
+
+<li><p>重写调整图片的协议 <code>ImageModifier</code> ;</p></li>
+
+<li><p>下载状态的回调代理 <code>ImageDownloaderDelegate</code> ;</p></li>
+
+<li><p>给加载状态的控件增加 loading 状态的 <code>Indicator</code> ;</p></li>
+</ul>
+
+<p>…</p>
+
+<p>所以面向协议的特性，在这个框架提现地淋漓尽致，如果你想着手开始学习 swift 这门语言的面向协议编程，那么笔者认为这个框架是非常适合入门学习的。</p>
+
+<h3 id="关联值枚举">关联值枚举</h3>
+
+<p>swift 将枚举的特性可谓发挥到了极致，不仅可以定义枚举，还可以定义属性，设计方法，甚至枚举可以设置<strong>关联值</strong> ，这使得枚举更加强大。</p>
+
+<p>框架中的 <code>KingfisherOptionsInfoItem</code> 是一个枚举类型，它包装着一系列下载图片的处理操作，例如：过渡动画、后台解码图片、回调队列、只从缓存中取图等 22 个 可选方式。其中部分就是<strong>枚举关联值</strong>。它允许你在设置该枚举值时相应的传入一个实例值。</p>
+
+<h3 id="运算符重载">运算符重载</h3>
+
+<p>同样在 <code>KingfisherOptionsInfo.swift</code> 文件中，作者为我们展示了如何定义一个全新的运算的过程</p>
+
+<pre><code class="language-swift">// 申明该运算符的优先级
+recedencegroup ItemComparisonPrecedence {
+    associativity: none
+    higherThan: LogicalConjunctionPrecedence
+}
+// 申明该运算符
+infix operator &lt;== : ItemComparisonPrecedence
+</code></pre>
+
+<p>实现运算符</p>
+
+<pre><code class="language-swift">// 该运算符用来比较两个 `KingfisherOptionsInfoItem` 是否相等
+func &lt;== (lhs: KingfisherOptionsInfoItem, rhs: KingfisherOptionsInfoItem) -&gt; Bool {
+    switch (lhs, rhs) {
+    case (.targetCache(_), .targetCache(_)): return true
+    case (.originalCache(_), .originalCache(_)): return true
+    case (.downloader(_), .downloader(_)): return true
+    case (.transition(_), .transition(_)): return true
+    case (.downloadPriority(_), .downloadPriority(_)): return true
+    case (.forceRefresh, .forceRefresh): return true
+    case (.fromMemoryCacheOrRefresh, .fromMemoryCacheOrRefresh): return true
+    case (.forceTransition, .forceTransition): return true
+    case (.cacheMemoryOnly, .cacheMemoryOnly): return true
+    case (.waitForCache, .waitForCache): return true
+    case (.onlyFromCache, .onlyFromCache): return true
+    case (.backgroundDecode, .backgroundDecode): return true
+    case (.callbackDispatchQueue(_), .callbackDispatchQueue(_)): return true
+    case (.scaleFactor(_), .scaleFactor(_)): return true
+    case (.preloadAllAnimationData, .preloadAllAnimationData): return true
+    case (.requestModifier(_), .requestModifier(_)): return true
+    case (.processor(_), .processor(_)): return true
+    case (.cacheSerializer(_), .cacheSerializer(_)): return true
+    case (.imageModifier(_), .imageModifier(_)): return true
+    case (.keepCurrentImageWhileLoading, .keepCurrentImageWhileLoading): return true
+    case (.onlyLoadFirstFrame, .onlyLoadFirstFrame): return true
+    case (.cacheOriginalImage, .cacheOriginalImage): return true
+    default: return false
+    }
+}
+</code></pre>
+
+<h3 id="多线程网络">多线程网络</h3>
+
+<p>在 <code>ImageCache</code> 类中，有两个队列： 磁盘读写 <code>ioQueue</code> 串行队列和缓存进度处理  <code>processQueue</code> 并发队列。</p>
+
+<p>当缓存图片和删除时，<code>ioQueue</code> 队列异步执行写入和删除文件的该过程。</p>
+
+<p>当从缓存中获取图片时，从磁盘读取找到后在缓存在内存一份的过程中，就是利用 <code>processQueue</code> 队列并发执行这个缓存过程</p>
+
+<pre><code class="language-swift">// 如果需要在后台解码这张图片时
+if options.backgroundDecode {
+  sSelf.processQueue.async {
+
+    let result = image.kf.decoded
+
+    sSelf.store(result,
+                forKey: key,
+                processorIdentifier: options.processor.identifier,
+                cacheSerializer: options.cacheSerializer,
+                toDisk: false,
+                completionHandler: nil)
+    options.callbackDispatchQueue.safeAsync {
+      completionHandler(imageModifier.modify(result), .disk)
+      sSelf = nil
+    }
+  }
+}
+</code></pre>
+
+<h3 id="大量的条件编译">大量的条件编译</h3>
+
+<p>因为该库同时支持 iOS ，watchOS 和 MacOS 三大平台，所以项目中大量用到了条件编译判断，例如</p>
+
+<p>判断平台版本的 <code>if os(macOS)</code></p>
+
+<p>系统版本判断 <code>available(iOS 11, tvOS 11.0, macOS 10.13, *)</code></p>
+
+<p>&hellip;</p>
+
+<p>这么短的篇幅其实很难将整个框架的特点全部罗列完，所以抓一些非常典型的特性进行分析，以上就是笔者对这个框架的一些理解，如果有错误还请斧正。非常感谢~</p>
+              <hr>
+              <div class="related-posts">
+                <h5>Related Posts</h5>
+                
+              </div>
+            </div>
+          </div>
+          <hr>
+        <div class="disqus">
+  <div id="disqus_thread"></div>
+  <script type="text/javascript">
+
+    (function() {
+      
+      
+      if (window.location.hostname == "localhost")
+        return;
+
+      var disqus_shortname = 'recherj';
+      var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+      dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+      (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+    })();
+  </script>
+  <noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+  <a href="http://disqus.com/" class="dsq-brlink">comments powered by <span class="logo-disqus">Disqus</span></a>
+</div>
+        </div>
+      </div>
+      
+    </div>
+
+    
+    <footer>
+  <div id="footer">
+    <div class="footer-container">
+      <p class="text-muted">&copy; All rights reserved. Powered by <a href="https://gohugo.io/">Hugo</a> and
+      <a href="http://github.com/RecherJ/canary/">canary</a> with ♥</p>
+    </div>
+  </div>
+</footer>
+
+
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
+
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" crossorigin="anonymous"></script>
+<script src="https://recherj.github.io/js/docs.min.js"></script>
+<script src="https://recherj.github.io/js/main.js"></script>
+
+<script src="https://recherj.github.io/js/ie10-viewport-bug-workaround.js"></script>
+
+
+    
+  </body>
+</html>
